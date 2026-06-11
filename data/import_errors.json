@@ -1,0 +1,3254 @@
+[
+  {
+    "type": "supabase",
+    "id": "fly_fb5a988b2dc057",
+    "titre": "Law School Scholarship Contest in United States",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_48f9013af7a284",
+    "titre": "Fully funded African STARS Fellowships in South Af",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e617e2cc03af6b",
+    "titre": "Ulm University PhD Scholarships 2026 in Explainabl",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_cdb2bccca7123f",
+    "titre": "University of Kyrenia Postgraduate Scholarships, C",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_04870c3edefee8",
+    "titre": "Harvard University Rowland Fellowship 2027, USA (F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0f17e924592da4",
+    "titre": "Stanford University Knight-Hennessy Scholarships 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a8074cc959a1d5",
+    "titre": "In Country/In Region scholarships at University of",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_143f127dff406d",
+    "titre": "Bourse de Master DAAD Helmut Schmidt en Allemagne,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a4e1fd218e9385",
+    "titre": "British Council UK 90th Anniversary Fellowship 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d56bd19bfc7bc4",
+    "titre": "Purdue University Scholarship 2026 in USA for Unde",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c43ef285690af8",
+    "titre": "FAO Schwarz Fellowships 2026 in USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ce4600b91e29f7",
+    "titre": "University of Milan European Futures Scholarships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_be32225afa3b8a",
+    "titre": "Wang Gungwu Fellowship 2027, Singapore (Fully Fund",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_80e7fe10e27a9a",
+    "titre": "Gerda Henkel Research Scholarships 2027, Germany",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b23a2a872564e9",
+    "titre": "PhD Scholarships for Research Project on Governing",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9ba345cac1d7af",
+    "titre": "TU Dresden DAAD-BIDS Scholarship 2026 (€5,400 Fund",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7cf43b6471638f",
+    "titre": "Disability Justice Fund for Women",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_661502cfa24a35",
+    "titre": "MTCP Scholarships 2026, Malaysia (Fully Funded)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e0538afc26c33f",
+    "titre": "Technical University of Munich AI Scholarships 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6bab64b2222ca0",
+    "titre": "University of Auckland Mark Barrow Education and S",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c1192d1d7f2f1a",
+    "titre": "Henan University of Chinese Medicine Scholarships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3d3cf22446be72",
+    "titre": "Bourses d’Étude Schwarzman à Tsinghua University, ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2b46db95701337",
+    "titre": "The DYB Scholarship Program in USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_634f01b52aa320",
+    "titre": "University of Ferrara PhD Scholarships 2026, Italy",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1fcc77f30416ee",
+    "titre": "University of Pisa PhD Scholarships 2026, Italy",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a74f2a9d10058b",
+    "titre": "France Embassy Master’s Scholarships (Uganda) 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9b0da53eb7c9f0",
+    "titre": "Bourses de l’Université de Melbourne 2026-2027",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9b154d79286eb0",
+    "titre": "Al Alfi PhD Fellowships in Applied Sciences and En",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b40fd461266c05",
+    "titre": "Holding Redlich Indigenous Scholarship in Australi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f199eda961ac3b",
+    "titre": "Bourses d’Excellence de l’Institut Galilée 2026-20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d1b63872980470",
+    "titre": "Stefan Banach Scholarship 2026, Poland",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_da4290d5e961c9",
+    "titre": "Hunan Government China Link Scholarships 2027",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ae6eca9493a497",
+    "titre": "Nuevo Futuro Scholarships in United States",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_846c4498406798",
+    "titre": "OYW ICMM Young Scholarship 2026 in South Africa (F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9fdf31337d8bbb",
+    "titre": "Romania ARICE Scholarships 2026 (Fully Funded)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_103f8446aab9f0",
+    "titre": "RIFS Fellows Program 2027 in Germany (Fully Funded",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_74dfe5a5c9234c",
+    "titre": "Konrad Adenauer Stiftung International Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7152e165e1e247",
+    "titre": "KIT University PhD Scholarships 2026 in Photocatal",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c6785b60165411",
+    "titre": "29 FIAS Fellowships 2027–2028, France",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a789a44a5fc3dd",
+    "titre": "Bourses de l’École d’études Avancées de l’IMT",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6e6b7faf656b99",
+    "titre": "Bourse d’Étude Skoltech en Russie pour étudiants é",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ca8136063ed3c9",
+    "titre": "Bourses d’Entrée de l’Université St Thomas au Cana",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_443070facf18d7",
+    "titre": "Bourses de la Fondation Heinrich Böll en Allemagne",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fbd768b9c9bdd2",
+    "titre": "Programme Spécial Bourses d’études au KUT (Japon)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ac87fd78ab5e7c",
+    "titre": "Istituto Marangoni Early Talent Scholarship 2026 i",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_adcb869b547b0a",
+    "titre": "University of Bologna PhD Scholarships 2026 Italy",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_536f0899baa9a4",
+    "titre": "Southwest University (SWU) Silk Road Scholarships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4923c5fd11ef17",
+    "titre": "Oxford University Rhodes Scholarships 2027, UK (Fu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_436fabe6b86ffb",
+    "titre": "NYCU Scholarships (Spring Intake) 2026, Taiwan",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f5920d51ec867a",
+    "titre": "Chengdu Sister City Scholarship in China (2027 Int",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9eda6ff31e6a5d",
+    "titre": "ADA University Azerbaijan Scholarships 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b8b974769b2fe5",
+    "titre": "King Abdulaziz University International Student Sc",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c8e71e23e2fe4b",
+    "titre": "Thailand Chulabhorn Graduate Institute Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3ef91768c06bbf",
+    "titre": "University of Stirling Dr Dee Amy Chinn Gender Stu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6a8df8e9975e8b",
+    "titre": "Bourse ARICE du Gouvernement Roumain, 2026-2027",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_49bedea720c0d1",
+    "titre": "CABMET Scholarship ($500 STEM Scholarship in the U",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ccfb16fb14a231",
+    "titre": "WTS Colorado Chapter Scholarships, USA($5,000 for ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c3bd1afe1e51a7",
+    "titre": "Greenhouse Scholars Whole Person College Program (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2a428eaef1064a",
+    "titre": "Brent P. Poor Memorial Scholarship (Up to $8,000 T",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4388bec34c02c5",
+    "titre": "MSCA Engineering PhD Scholarships 2026 in Europe",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_065604abcdc832",
+    "titre": "Bourse du Programme de Coopération Technique Malai",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_468d22f797f03c",
+    "titre": "DAAD AI Scholarships, Germany",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9e37def36ab7bb",
+    "titre": "Bourse MPOWER du Citoyen du Monde, Études au Canad",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2086a1815c6fc3",
+    "titre": "SCAR Fellowships 2026, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a985e0fb6e2da3",
+    "titre": "Monash University Maxwell King PhD Scholarships 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_253f3143dc8ab3",
+    "titre": "Native Hawaiian Health Scholarship Program (NHHSP)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5292e7e4e10c81",
+    "titre": "Howard Club of Southwest Florida Scholarship, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_954d7b2d3d91b6",
+    "titre": "A*STAR ACIS Scholarships 2026, Singapore",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4ec3686f346df3",
+    "titre": "NMBU PhD Scholarships 2026, Norway",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_828f82b0ec6c46",
+    "titre": "University of Reading Global Sustainability Leader",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fdfaa7448026ae",
+    "titre": "Aarhus University Scholarships 2026 for Internatio",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_32eacfa7fd5182",
+    "titre": "Universitas Gadjah Mada Engineering PhD Scholarshi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a6cd5ef7cd2b6f",
+    "titre": "Khazar University Scholarships 2026, Azerbaijan",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_20293c1ed2a39e",
+    "titre": "ISU Bocconi Scholarship 2027 in Italy",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d633362ce2a604",
+    "titre": "SK Global Scholarship 2026 in South Korea (Fully F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0f5ccb25260b3e",
+    "titre": "Canadian Francophonie Scholarship Program (CFSP) 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_67fb078ca39752",
+    "titre": "ETH Zurich PhD Scholarship in Climate and Agricult",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fdc116a486c8c4",
+    "titre": "University of Cambridge Studentships Entry Registr",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ff7bcb11aa9f94",
+    "titre": "Sustainable Metallurgy IMPRS PhD Scholarships 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_df6fe95a5a777f",
+    "titre": "University of Pavia CICOPS Scholarships 2027 in It",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_718d41c515b78e",
+    "titre": "Rhodes Southern Africa Scholarships Programme 2027",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bea2868d03f546",
+    "titre": "Rhodes West Africa Scholarships 2027 for postgradu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_052b5c453eadfe",
+    "titre": "Rhodes Kenya Scholarships 2027 for Postgraduate St",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_940a9a395b5a2f",
+    "titre": "Celtic Scholars Scholarship in Connecticut, USA ($",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d0f2b0d990ab56",
+    "titre": "Bourses d’Étude du Gouvernement Japonais (Master, ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_401ed8d8c17da6",
+    "titre": "Bourses du Gouvernement Japonais (MEXT) Pour Premi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_89cbee7c12a43a",
+    "titre": "Enoka Rukare Family Scholarships Program at Bishop",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_dde514f9f1d9c6",
+    "titre": "Italy’s Gran Sasso Science Institute (GSSI) Schola",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b90bf54a5dcc06",
+    "titre": "Arkansas Health Education Grant (ARHEG), USA (Up t",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3be95969a6199a",
+    "titre": "DC Tuition Assistance Grant (DCTAG) (Study Support",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_22eb2ed1f160fa",
+    "titre": "Bond University Transformer Scholarship 2026, Aust",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9fbd14db1734ce",
+    "titre": "Ruhr University DAAD-EPOS Scholarships 2028 for De",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3f34a3cd5524d3",
+    "titre": "Academy of Art University International Student Sc",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_35bf4d22410f87",
+    "titre": "Hawaii Association of Public Accountants Scholarsh",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ab5285d99937fc",
+    "titre": "Hawai'i Community Foundation Scholarships in USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_52c611794d6802",
+    "titre": "Prince Kuhio Hawaiian Civic Club Scholarships in U",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3f3291b7cf5125",
+    "titre": "Global Advanced NIHR Fellowships 2026 in UK (Up to",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5ca2feb2a434e3",
+    "titre": "University of Pretoria MasterCard Foundation Schol",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d95c5c66b6d9b3",
+    "titre": "DAAD STEM Scholarships 2026 in Germany",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b70dae6d28c994",
+    "titre": "DAAD Helmut-Schmidt Scholarships 2026. Germany (Pu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ce8ea33d422ae8",
+    "titre": "DAAD Master’s Scholarships 2026, Germany",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6ae6958c107f7d",
+    "titre": "German DAAD GROW Scholarship 2026 in Germany (€2,1",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b4e95ccb78933e",
+    "titre": "Technical University of Munich (TUM) Scholarships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8791c0bc5319a3",
+    "titre": "Erasmus Mundus Joint Master’s Degree NOHA Scholars",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ad4202151ccd48",
+    "titre": "James Madison Graduate Fellowship 2026, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b4650ab589d353",
+    "titre": "Konrad-Adenauer-Stiftung (KAS) International Schol",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a4f27fc1f19940",
+    "titre": "JSPS International Fellowships 2027, Japan",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_311cd002764d60",
+    "titre": "IAS Media Scholarships Programme in Rwanda",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4ca2623b6ba547",
+    "titre": "Canon Collins Sol Plaatje Postgraduate Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f2efd1c5a6d025",
+    "titre": "Elmhurst University Project RISE Scholarship 2028,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_55980f6fea8510",
+    "titre": "University of Glasgow Global Leadership Scholarshi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_450a0411c64de6",
+    "titre": "Erasmus Mundus Joint Master in Imaging Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_da8f0334b53791",
+    "titre": "Barbara Huber Scholarship 2026, Germany",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fbf67ab0e8dbd8",
+    "titre": "Max Planck Research School IMPRS-CellDevoSys PhD S",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4dae2cf00673e9",
+    "titre": "Lingnan University of Hong Kong HKPFS Fellowship 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0653b60fa13f26",
+    "titre": "Ritsumeikan Asia Pacific University (APU) MEXT Uni",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_db3c77fc587ee0",
+    "titre": "Nanjing University China Government Scholarship (C",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ab2a368466acd3",
+    "titre": "Italian Government (MAECI) Scholarships 2026 (Full",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9902820ff18df6",
+    "titre": "Jefferson Scholars Foundation National Fellowship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1c8080991d7657",
+    "titre": "Government of Indonesia KNB Scholarship 2026 , Ind",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f7979b24b73cdc",
+    "titre": "South Korea Government Global Korea Scholarship (G",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_67375d57c75473",
+    "titre": "Qingdao University Presidential Scholarship 2026 ,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_be695ffff8d76f",
+    "titre": "Edith Cowan University (ECU) Higher Degree by Rese",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_30ccc6aa81e7f4",
+    "titre": "CAS-ANSO Scholarship 2026 , China (Fully Funded Ma",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6a8483b6fdcf0e",
+    "titre": "A*STAR International Fellowship 2026 , Singapore (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fb655671e1f4ef",
+    "titre": "Pennsylvania State University Musser Fellowship 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3c8cf03f5fdc86",
+    "titre": "Australia Government Australia Awards Fellowships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_37bf9e200338cb",
+    "titre": "USA Hansen Leadership Institute Fellowship 2026 (F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7dd9d4f32702f8",
+    "titre": "India NLSIU Research Fellowships 2025 (Fully Funde",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4a91a4670d89f3",
+    "titre": "NNPC–SNEPCo Postgraduate Scholarship 2026 for stud",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_92d72d139acc3b",
+    "titre": "Single Parent Scholarship Fund of Northwest Arkans",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8312bfeb89647e",
+    "titre": "Modul University Partial Scholarships 2027 for Int",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c46726059e6659",
+    "titre": "National Louis University Scholarships for Interna",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ead705f0bc119a",
+    "titre": "Early Applicant Postgraduate Scholarships in UK",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e0cbce0e92b9d4",
+    "titre": "School of Veterinary Medicine International Schola",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3395ef8043a8ee",
+    "titre": "Royal Agricultural University Africa Scholarship 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ab4f6e45748c7a",
+    "titre": "The Regent Global-Pankaj Award to End Conflict – (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ba277d64a6db90",
+    "titre": "Kids’ Chance of Florida Scholarship in USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_dfe2317bec209c",
+    "titre": "Bocconi University Horizon Europe Fellowship 2026,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ae4e07b969de7e",
+    "titre": "Jeffery Isaiah David Memorial Foundation Education",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2935e20675c198",
+    "titre": "ARRL Helen Laughlin AM Mode Memorial Scholarship (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7de7d355ee0ee6",
+    "titre": "Leipzig University DAAD-SEPT MBA Scholarship 2026,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8e7f76aafc7419",
+    "titre": "Australia Awards Scholarships 2027 for Internation",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8dea91624d58b0",
+    "titre": "Alice L. Haltom Educational Fund Scholarship (USA ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_28079afc1fc2f4",
+    "titre": "Slovakia Government National Scholarship Programme",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bb4495331a4797",
+    "titre": "Minority Teacher Education Scholarship, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_901a81e8936c48",
+    "titre": "AISES Burlington Northern Santa Fe (BNSF) Foundati",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ca88a504df26c1",
+    "titre": "Arkansas Chamber Singers Music/Vocal Scholarship (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_da4c94ff0c301b",
+    "titre": "Hubert H. Humphrey Fellowship Program 2028, USA (F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f41e451a435600",
+    "titre": "Canadian University Dubai Scholarships 2026, UAE",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0507193b8829ed",
+    "titre": "UK Manchester Metropolitan University Ferguson Tru",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5af1e23c95ceb5",
+    "titre": "Slovakia International Visegrad Fund (IVF) Scholar",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ad3a65cae97353",
+    "titre": "Faraday Institution Scholarships and Fellowships 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d9aa28715ad59c",
+    "titre": "Cameron Impact Scholarship 2026 , USA (Fully Funde",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0c565c56c4e04c",
+    "titre": "Maastricht University UM Global Studies Scholarshi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9b596a445ca7c9",
+    "titre": "Hertz Foundation $250,000 PhD Fellowships, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_175fe68379ec45",
+    "titre": "Lazord Fellowship Program 2026 (Funding Opportunit",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1effb9f68a4c9f",
+    "titre": "The International Council on Mining and Metals (IC",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0b8880cee46045",
+    "titre": "Pernod Ricard Scholarship to attend the One Young ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_527ffaf5f01371",
+    "titre": "ANU Australian Government RTP Stipend Scholarship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_25a83102931ce6",
+    "titre": "ANU Chancellor’s International Scholarship 2026 in",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3bdfcf3b83cdbf",
+    "titre": "Swiss Government Excellence Scholarships 2026, Swi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_17115175d8491a",
+    "titre": "WICHE Professional Student Exchange Program (PSEP)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_01d4ff688119cd",
+    "titre": "NAJA Scholarships 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_21bf179233389e",
+    "titre": "University of Bath GREAT Scholarship 2026 , UK",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f80aff44cd51e9",
+    "titre": "University of Winchester International Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_998ba6d8110991",
+    "titre": "AAUW International Fellowships for Women 2026 , US",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d3bb92fbb3aa9a",
+    "titre": "Monash University Museums Victoria PhD Research Sc",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_df04bd9d2b1a6d",
+    "titre": "Azerbaijan Government Scholarship 2026 | Fully Fun",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_cbf22bf4470aff",
+    "titre": "Doha Institute for Graduate Studies Scholarships 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ae0f27b1fbb167",
+    "titre": "Italian Catholic Federation First Year Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fd145a6f8c1b6b",
+    "titre": "Smith Scholarship Foundation 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_63ffcfecc4bd24",
+    "titre": "Hagan Scholarship 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0a3516fa4b7491",
+    "titre": "ACHE Student Grant Scholarship Program 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b578ae0b1b73fe",
+    "titre": "Teesside University Vice-Chancellor’s Scholarship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_41a9bb1a952261",
+    "titre": "7×24 Exchange Rocky Mountain Chapter Scholarship 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d652c08ebb9409",
+    "titre": "Xi’an Jiaotong University International Undergradu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a112afdd2b8d0f",
+    "titre": "Royal Academy of Engineering Enterprise Fellowship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ad719a34f0cffb",
+    "titre": "Australia University of Canberra Research Scholars",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a5fd3eb1acc2d8",
+    "titre": "University of Tokyo MEXT Scholarship for Internati",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c2c14494aab9f9",
+    "titre": "University of Galway Scholarships 2026 , Ireland (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_60a37cbae42d9b",
+    "titre": "Queen’s University Belfast Jetset Your Degree Fina",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_47bb5097e294a4",
+    "titre": "University of Nicosia PhD Scholarships 2026 | Rese",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_62b7aecaaabbae",
+    "titre": "Estonian University of Life Sciences Funded PhD Po",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_57e03d4ff5e60d",
+    "titre": "Schlumberger Foundation Faculty for the Future Fel",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_cbfcdefc7941b4",
+    "titre": "Argonne National Laboratory Maria Goeppert Mayer F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4d6bdcb9a69674",
+    "titre": "King Abdulaziz University Scholarships 2026 , Saud",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ab5d917fb527e4",
+    "titre": "UESTC Chinese Government Scholarship – Chinese Uni",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_60f61fa4d82a7a",
+    "titre": "Hungary Government (Stipendium Hungaricum) Scholar",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_18604eb52e7de4",
+    "titre": "UCLA Carter Postdoctoral Fellowship 2027, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_cc922bcf44fe7b",
+    "titre": "CrossCulture Programme (CCP) Fellowships 2026, Ger",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5aac50818641bc",
+    "titre": "McDonald Fellowships 2026, UK (Fully Funded)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_35ce41767bb98b",
+    "titre": "National Institute of Genetics Postdoctoral Fellow",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ae751bbf7102f4",
+    "titre": "Human Frontier Science Program Postdoctoral Fellow",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_08170d39bbcdbf",
+    "titre": "Netherlands Vrije Universiteit Amsterdam VU Fellow",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_17d1b8c56dcea7",
+    "titre": "Austria The IAEA Marie Sklodowska-Curie Fellowship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2910adbae770ad",
+    "titre": "Austria NOMIS-ISTA Fellowship 2025 (Fully Funded)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c36240d1bb38ee",
+    "titre": "The Embassy of France in Uganda Master’s degree sc",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e2e15461baab88",
+    "titre": "DAAD Helmut-Schmidt-Programme Master’s Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_99e867e5e5b944",
+    "titre": "Fulbright South African Research Scholar Program 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_510a78b3c0fe71",
+    "titre": "The Vodacom External Bursary Programme 2026 for yo",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b7cd277f71378e",
+    "titre": "The South African Reserve Bank (SARB) Full Art Sch",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6bf0734180f4d4",
+    "titre": "The South African Reserve Bank (SARB) Master’s in ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_275df73f522220",
+    "titre": "Dr. Lorraine G. Spranzo Memorial Scholarship (Grad",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3d018a8fa68674",
+    "titre": "Petroleum Technology Development Fund (PTDF) 2026/",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4ee17c1809344a",
+    "titre": "Spain Government Scholarships 2026-2027 (Fully Fun",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_32c30426b438ac",
+    "titre": "Collaboratory Scholarship Program 2027, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_735d6247668eff",
+    "titre": "NASA Dragonfly Student Investigator Scholarship Pr",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_75d031490022fb",
+    "titre": "ICIQ IVORI Master Fellowships 2026, Spain (Fully F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6d26a215ef9ff2",
+    "titre": "DAAD Scholarship 2026 for International Students, ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b696bbc17ddf07",
+    "titre": "Arkadelphia Promise Scholarship, USA (Up to $29,00",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_98478847e028f1",
+    "titre": "Humboldt Research Fellowship 2026 , Germany (Fully",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bc2aca4b12bb23",
+    "titre": "University of Liverpool Irish Studies MRes 2026 | ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9076e137c639bb",
+    "titre": "J.C. Cote Scholarship in Arkansas, USA ($1,000 HR ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c6679ef8bd26a9",
+    "titre": "New York Women in Communications (NYWICI) Scholars",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2c0b977f190f9a",
+    "titre": "ACI Foundation Fellowships and Scholarships 2026 ,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_93ddf199ee981f",
+    "titre": "University of Cambridge Herchel Smith Postdoctoral",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e66a0bb9b77dab",
+    "titre": "Bourse MPOWER pour les femmes dans les STIM",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_abfdffcaef6c77",
+    "titre": "Japanese Government (MEXT) Scholarships 2027 for T",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ae4e7796c2116e",
+    "titre": "French Government’s Make Our Planet Great Again (M",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_cf6a9b24476587",
+    "titre": "Silk Road Scholarships Offering Universities in Ch",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9901b4d51b3716",
+    "titre": "Monash University Scholarships 2027, Australia",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bf513fd98abb20",
+    "titre": "Kaunas University of Technology (KTU) Lithuanian S",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e4d7d9b83bbbcc",
+    "titre": "University of Portsmouth MA Applied Linguistics an",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_91c4d8a911d2e8",
+    "titre": "AGA Boston Chapter Walter Frese Memorial Scholarsh",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8562bfceed8859",
+    "titre": "Kyungpook National University (KNU) Scholarships 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9e02de6f3962c1",
+    "titre": "France Eiffel Excellence Scholarship 2026 (Fully F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_03951bdacabd1b",
+    "titre": "Confucius Institute Scholarship 2026 , China (Full",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3a349e6cd5d9f0",
+    "titre": "Leiden University Minerva Scholarship Fund 2026 , ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2a1f5e9fe5269a",
+    "titre": "University of Brunei Darussalam Scholarship 2026 (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ea835f0482b973",
+    "titre": "University of Tokyo ADB-JSP Scholarship 2027, Japa",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9e382a51018e1e",
+    "titre": "University of Melbourne Australia Graduate Researc",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e004f77993c931",
+    "titre": "Canyon Institute Arizona Resident Scholarship 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2903e4a0b97f5c",
+    "titre": "NYCU International Student Scholarship 2026 , Taiw",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8862dc976bc8c7",
+    "titre": "Mennonite Aid Plan Scholarship 2026 , USA (Funding",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c0064d640e6643",
+    "titre": "CMAA Undergraduate & Graduate Scholarship 2026 , U",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a03c4436d5af03",
+    "titre": "University of Bath Global Excellence Scholarship 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9b4c20b39bc378",
+    "titre": "Islamic University of Madinah Scholarships 2026, S",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fecc97a5937e34",
+    "titre": "Italy University of Trieste PhD Scholarships 2027",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e2905c09ed11f5",
+    "titre": "Harvard Academy Scholars Program 2026 , USA (Fully",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0c80d662ba257b",
+    "titre": "Pierre Elliott Trudeau Foundation Doctoral Scholar",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9a0a284f23382d",
+    "titre": "IRP Research Grant Scholarship 2026 , Europe (Fund",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2d495f455ed145",
+    "titre": "Ireland Government Scholarships 2026 (Fully Funded",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e71dcb83fab015",
+    "titre": "University of Oxford OCIS – Oxford Scholarships 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1c94578d51c62a",
+    "titre": "Universitas Muhammadiyah Surakarta (UMS) Scholarsh",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6ea869c3b8a02e",
+    "titre": "Monash University Humanitarian Scholarship 2026 , ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e4da606388ec6e",
+    "titre": "Yale University Scholarships 2026 , USA (Fully Fun",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_cece1cd5ba4289",
+    "titre": "JSPS International Fellowships for Research 2026 ,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7ca1f18b0a6026",
+    "titre": "MEXT Scholarship (Japanese Government Sponsored) 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_44d5f54a730542",
+    "titre": "Koç University Turkish Government Türkiye Scholars",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f3ab5f31a1f292",
+    "titre": "Central South University Scholarship 2026 , China ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b7c2542bba6335",
+    "titre": "IsDB Scholarship 2026 | Fully Funded Programs (Und",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9d767753eabd18",
+    "titre": "University of Mississippi Scholarships 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_06ecbd219647ee",
+    "titre": "University of Winnipeg Scholarships for Internatio",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5416bb6244499d",
+    "titre": "Xiamen University Scholarships 2026 , China (Parti",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4779f15e19cae6",
+    "titre": "University of Oxford Rhodes Scholarship 2026 (Full",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_516d2925bd3802",
+    "titre": "Cornerstone Scholarship Charitable Trust in Arkans",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1eb35a1249d374",
+    "titre": "Linly Heflin Scholarship 2026, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_affb8ed76d5edd",
+    "titre": "CU Succeed Scholarship 2026 , USA ($8,000 Renewabl",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ecb044e3b1ebc6",
+    "titre": "Clark University Scholarships 2026 , USA (Fully Fu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_92dfb606747fed",
+    "titre": "University of Groningen Eric Bleumink Fellowship 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_12fc5205c661c7",
+    "titre": "Maitri Fellowships Program 2026 (Australia–India R",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8153b14fc7f024",
+    "titre": "Truist Foundation Fellowship 2026 , USA (Fully Fun",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b4ab0e162d4df4",
+    "titre": "Stigler Center Journalists in Residence Program 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_60e22fe3175314",
+    "titre": "Reagan-Fascell Democracy Fellowship 2026 , USA (Fu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6193274f5b1e46",
+    "titre": "Karlsruhe Institute of Technology International Ex",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_35a3b2f0a33f0c",
+    "titre": "South Korea AKS Hanmun Fellowship 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e3099609815c78",
+    "titre": "King Abdullah University of Science and technology",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e56c7f368cc7d5",
+    "titre": "Seoul National University South Korea President Fe",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b49965d702c916",
+    "titre": "Delfina Foundation UK Residency 2026 (Fully Funded",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b7bd406e088fae",
+    "titre": "Casement Fellowship in Human Rights 2026, Ireland ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_be0f161fb79bac",
+    "titre": "UST International Scholarships 2026 , South Korea ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8fa0368b0ba66b",
+    "titre": "Shenzhen University PhD Scholarships 2026 , China ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ad475ce3e57501",
+    "titre": "Shandong University Scholarship 2026 , China (Full",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6b998c24adb525",
+    "titre": "Government of Canada Graduate Research Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_39ce19931d529c",
+    "titre": "Police and Firefighters Survivors Educational Assi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9cafa9cfb0bda8",
+    "titre": "Berea College Scholarships 2026 , USA (No Tuition ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_14bb37a0e6db71",
+    "titre": "AIMS Master of Science in Mathematical Sciences fo",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d10c4b641a81d0",
+    "titre": "Fulbright Foreign Student Program 2027 (Masters & ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c24413dd5455e8",
+    "titre": "The Government of ​Brunei Darussalam Scholarships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9ee8e324e1be7f",
+    "titre": "Swiss Government Excellence Scholarships 2026/2027",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5748062a534e64",
+    "titre": "Geneva Peace Fellowships 2026, Switzerland",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c6188962536db0",
+    "titre": "Military Family Support Trust Scholarship, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ee6c62fbf2d4d5",
+    "titre": "South Korea Government Global Korea Scholarship (G",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2934c15a7b2069",
+    "titre": "Budapest Metropolitan University METU Scholarships",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ef6053e8e2c7c4",
+    "titre": "Beaty Martinez Foundation Scholarship 2026, USA (F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_63ac6d6baf33c1",
+    "titre": "Jack Kent Cooke College Scholarship Program 2026, ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_23d7f27249cf81",
+    "titre": "Chevening Clore Leadership UK Fellowship 2026 (Ful",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0c5753b6f41464",
+    "titre": "Carolyn Wilson Dialysis Patient Scholarship, USA (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9c3449b96b70b4",
+    "titre": "Polish American Arts Association Scholarship in US",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e01df5e41dfd0b",
+    "titre": "Newcastle University Excellence Australia Internat",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_716c7c0d252c1d",
+    "titre": "SP Jain School of Global Management Scholarships 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_46099a3a9589f2",
+    "titre": "World Aquatics Scholarships 2026, USA (Fully Funde",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1753fd671398a8",
+    "titre": "Europe-Korea Student Exchange DUO-Korea Fellowship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_553b2ecfc36b98",
+    "titre": "Canon Foundation Research Fellowships 2027 in Euro",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6b40f61c083687",
+    "titre": "Delaware Scholarship Incentive Program (SIP) – USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_29e073f7560907",
+    "titre": "Delaware Educator Support Scholarship, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d32090120f0e20",
+    "titre": "RUFORUM and Mastercard TAGDev 2.0 Scholarships 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ef8d84f64c1720",
+    "titre": "London Metropolitan University Global British Citi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_12ee11629b90b6",
+    "titre": "University of Siena €12,000 Master’s Scholarship 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_99ba12ff5ab304",
+    "titre": "EPOC Environmental Scholarship Fund in USA ($500 f",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_696ca25e723ba5",
+    "titre": "SOAS University of London Master’s Scholarships 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_606b301f6a5819",
+    "titre": "Linköping University (LiU) International Scholarsh",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c704d306f37696",
+    "titre": "Joint Japan/World Bank Graduate Scholarship Progra",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5d889cc520b0b3",
+    "titre": "ACHE Military Educational Benefits Scholarship 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f4e071fd837870",
+    "titre": "GSBA Scholarship Fund 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_16034cc487cf6e",
+    "titre": "Pride Foundation Scholarships , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_465cbf1621d75d",
+    "titre": "University of Sydney International Student Award 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6e8cde91f83e8d",
+    "titre": "Mastercard Foundation Scholarship Program 2026 (Fu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_57208bc1b82206",
+    "titre": "Heinrich Boll Foundation Scholarships 2026, German",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a3819542d7c9ca",
+    "titre": "Monash University Australian Government RTP Schola",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0e0e6a452bce81",
+    "titre": "Beijing Government Scholarship (BGS) 2026, China (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3ca992214f5f32",
+    "titre": "Eastern Mediterranean University Graduate Scholars",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4fa3c8aa780ad9",
+    "titre": "Monash University Sir James McNeill Postgraduate R",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5fde3bc0a92a35",
+    "titre": "Ton Duc Thang University Scholarships for Internat",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_33b2fa9e945d03",
+    "titre": "Aga Khan Foundation International Scholarship Prog",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bddc66b39b23fc",
+    "titre": "Farm Credit Foundation for Agricultural Advancemen",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d52e402a9a1237",
+    "titre": "Wilmington Women in Business Fresh Start Scholarsh",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c0e6e321abb598",
+    "titre": "CTASLA Scholarships, USA ($2,500 Landscape Archite",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e3d6376a11bae7",
+    "titre": "Pen Air Credit Union Scholarship 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bb5bdc61c16129",
+    "titre": "University of New Mexico Scholarships 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_454de34d252783",
+    "titre": "AlaskaAdvantage Education Grant (AEG) 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1411f1b0974dae",
+    "titre": "University of Alabama International Freshman Schol",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9945f138da42e2",
+    "titre": "Princeton Prize in Race Relations (PPRR) Scholarsh",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5e24dfe91cb97a",
+    "titre": "University of Minnesota Duluth International Stude",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_75be886beeb1b7",
+    "titre": "Seattle University Scholarships and Grants 2026 , ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a1dbb0182675e5",
+    "titre": "University of Miami Stamps Scholarship 2026 , USA ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6b7d628a76df18",
+    "titre": "Institute of International Education IIE-SRF Fello",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1257c4045bf1b2",
+    "titre": "Harvard University Berkman Klein Center Fellowship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0bbde73e022094",
+    "titre": "Cancer Research Institute Postdoctoral Fellowships",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6c63fe4e5ad7a1",
+    "titre": "Harrison Middleton University Fellowship in Ideas ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2f717c2a85d604",
+    "titre": "UK King’s Commonwealth Fellowship Programme 2026 (",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1398da31eb25ae",
+    "titre": "University of Galway Ireland Frank Ferguson Fellow",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_89af9159017362",
+    "titre": "DAAD Weimar Triangle PhD Scholarship 2026, Europe",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9235d511b89be0",
+    "titre": "The Airtel Africa Foundation University Tech Schol",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5ddaf62d35b706",
+    "titre": "Laura Bassi Scholarships 2026, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e4f2bffeb1441d",
+    "titre": "University of Padua Italy International Excellence",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fcff5366551830",
+    "titre": "Sun Yat-sen University Silk Road Scholarship 2027,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c649c5b128e4ec",
+    "titre": "Tianjin University Silk Road Scholarship 2026, Chi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_986a1248033238",
+    "titre": "Roothbert Fund Scholarships, USA ($7,000 Need-Base",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3cb6dfb7c77714",
+    "titre": "ICTP & University of Trieste Med Physics Scholarsh",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6553795a82b77b",
+    "titre": "Saudi Government Scholarships for International St",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_18b3b3d60df422",
+    "titre": "Sabancı University Graduate Scholarships 2026 in T",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_176d2ed035a902",
+    "titre": "Imperial College London President’s PhD Scholarshi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c2e998b316e88d",
+    "titre": "Heidelberg University DAAD-GSSP Scholarship 2026, ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_10caeecdd4177e",
+    "titre": "Nanyang Technological University (NTU) Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0164b9b15245a1",
+    "titre": "Hankuk University of Foreign Studies 6.25 UN Veter",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7a8170d59ee0f9",
+    "titre": "BAYHOST Program Study in Bavaria Scholarships 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0934c77947333a",
+    "titre": "Gran Sasso Science Institute (GSSI) PhD Scholarshi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d74eb1b4010159",
+    "titre": "ENS de Lyon Grants and Scholarships 2026 , France ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e06ec27bc7554e",
+    "titre": "Australian Government Research Training Program (R",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_690c37125129f4",
+    "titre": "University of Calgary Canada Entrance Scholarship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_36569138107ffa",
+    "titre": "Arizona BPW Foundation Scholarship 2026 , USA (Fun",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1ab2e11991877e",
+    "titre": "Tall Clubs International Student Scholarships 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8decf8a43ab43f",
+    "titre": "AWS Airgas Terry Jarvis Memorial Scholarship 2026 ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_71fb357bd4a0e2",
+    "titre": "Simmons University Kotzen Scholarship 2026, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d630ca81e1cc79",
+    "titre": "InteRussia Energy Fellowship 2026, Russia (Funded ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d17ab4376251b5",
+    "titre": "CATS Fellowships 2026–2027 in Germany (Fully Funde",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4b1a2a5005c481",
+    "titre": "DAAD-JSPS Fellowships 2026, Japan (Short-Term Rese",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_eefe7a3d61c91d",
+    "titre": "Leo Baeck Fellowship Programme 2026 , Germany (Ful",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_97be0914b7537e",
+    "titre": "USA Harvard University Environmental Fellowship 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5c1e1af91cf2c2",
+    "titre": "UK British Academy Mid-Career Fellowships 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c1697b46e8113d",
+    "titre": "The Mo Ibrahim Foundation SOAS University of Londo",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_28ee1db312d9b0",
+    "titre": "ARRL Charles Clarke Cordle Memorial Scholarship 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d8dd3d2a824b5a",
+    "titre": "Berlin Mathematical School (BMS) Scholarships 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_de39b61ea7f158",
+    "titre": "Commonwealth Scholarship 2026 , UK (Fully Funded M",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bd11257358ee16",
+    "titre": "University of Macau China Athletes Scholarship 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ec8b5faa1aa965",
+    "titre": "Royal Society Wolfson Visiting Fellowship 2025 (Fu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bb6769a06b9990",
+    "titre": "Cranfield University Chevening Scholarships 2027, ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_02ceda8d57115d",
+    "titre": "Murdoch International Welcome Scholarships 2028 in",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c1738851c83e89",
+    "titre": "Erasmus Mundus WOP-P Scholarships 2026 in Europe |",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8b8cab97a244c2",
+    "titre": "University of British Columbia Blue Grant Scholars",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f5deb91918b251",
+    "titre": "EuroMarine Young Scientist Fellowship 2026 for Ear",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_55a40bbdc15809",
+    "titre": "SEAFWA’s Law Enforcement Chief’s Scholarship 2026 ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5a18c344e780ae",
+    "titre": "Thunderbirds Scholars Program 2026 , USA (Fully Fu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2cb9062eec4ac9",
+    "titre": "Green RISE Africa Fellowships 2026 (Leadership Tra",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_376ef86cad9c6e",
+    "titre": "IMU Breakout Graduate Fellowship Program 2026 (Ful",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d0f2168b40f00e",
+    "titre": "USA Council on Foreign Relations International Aff",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8e97e476fb44b5",
+    "titre": "Old Mutual Chartered Accounting Bursary Programme ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_95f2f4933ab9b6",
+    "titre": "Old Mutual Actuarial Science Bursary Programme 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_76f62988d29557",
+    "titre": "2027 ifa Scholarship on the Management of Cultural",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d4cce6ca963dba",
+    "titre": "South African Reserve Bank External Bursary Scheme",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9990b7aaa86edf",
+    "titre": "South African Reserve Bank External Bursary Scheme",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a7938b4e3e825f",
+    "titre": "The South African National Roads Agency SOC Limite",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_938c0a6778f908",
+    "titre": "CECIL Renaud Overseas Scholarships 2027 for young ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_71e9dc4420b458",
+    "titre": "The African Volunteers Health Corps (AVoHC) Kofi A",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3d98e92a2d91b0",
+    "titre": "A.S.Hornby Educational Trust Scholarships 2025/202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_34ce963e0cacd8",
+    "titre": "The Mandela Institute for Development Studies (MIN",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1b6dacf2da163c",
+    "titre": "Bourses de l’Université Nationale de Taiwan pour É",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6b8cde9f51113e",
+    "titre": "Alexander Foundation Scholarships in USA (Up to $3",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9d71f1d00277a5",
+    "titre": "Phoenix Pride Scholarship 2026 , USA ($8,000 Award",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0e9e9fea4f24a6",
+    "titre": "Alaska Bar Association Law School Scholarships 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ebc39560e4e024",
+    "titre": "Koniag Education Foundation General Scholarship 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_37e6e21ab3c349",
+    "titre": "University of Waterloo David Johnston – Lebovic Fo",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_35fd8cee13ced3",
+    "titre": "Gdańsk University Scholarships 2026 for PhD Studen",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b12e5e5de9dbd7",
+    "titre": "Gates Cambridge Scholarship 2026 , UK (Fully Funde",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7f5ce6d12a4587",
+    "titre": "University of Minnesota Humphrey School Tuition & ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b9395fb52bf85f",
+    "titre": "University of Waikato Scholarships 2026 , New Zeal",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ed2c946c46a33b",
+    "titre": "Honjo International Scholarship Foundation (HISF) ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e57e33a31b6a32",
+    "titre": "HBCU Week x Michael S. Purzycki Changemaker Schola",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6bc31777767da5",
+    "titre": "Saint Patrick’s Scholarship Fund in USA ($24,000 R",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3ef63685558273",
+    "titre": "WMGA Foundation Scholarship, USA (Women’s Golf Sch",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_20ef3ab6aa9aa7",
+    "titre": "Credit Union of Colorado Foundation Scholarships, ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_37b70403c2f0e5",
+    "titre": "InspirASIAN Scholarships 2026 ,USA ($2,000 Award)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f171f87ea68c28",
+    "titre": "HUSTLE Hearts Foundation Scholarship 2026 , USA (F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a01f831828f4bb",
+    "titre": "AWS Airgas Jerry Baker Scholarship 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_aa81bffed86da1",
+    "titre": "Dorrance Scholarship 2026 , USA (Funding up to $48",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6fda5347314504",
+    "titre": "WICHE Western Undergraduate Exchange (WUE) 2026 , ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_dce242119662aa",
+    "titre": "Simon Youth Greg Saunders Legacy Scholarship Progr",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bf776784c4492b",
+    "titre": "TheDream.US Opportunity Scholarship 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fce3daf3512467",
+    "titre": "Arizona Nurses Foundation Academic Nursing Scholar",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7576bbde8be455",
+    "titre": "Dalai Lama Fellowship Program 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7fc5ad5652973a",
+    "titre": "University of Minnesota National Scholarship, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a9db2a86a83e81",
+    "titre": "HAHPERD Student Scholarship, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_814cb98e172e27",
+    "titre": "Preventive Measures Legacy Scholarship, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_26b9954d9fa196",
+    "titre": "University of Freiburg DAAD EPOS Scholarship 2027 ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_68812b4232136d",
+    "titre": "The Dick and Mary Earle Scholarship in Technology ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_439ef0766b806f",
+    "titre": "Griffith University Scholarships 2026 , Australia",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5f095c097056c0",
+    "titre": "Southern Cross University Vice Chancellor’s Academ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7c29ef8b8bb507",
+    "titre": "Musical Merit Foundation of Greater San Diego Scho",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_56bbeb0b683407",
+    "titre": "Chicana Latina Foundation Scholarships, USA ($2,00",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_23c3ab0c824c39",
+    "titre": "Japan Takeda Science Foundation Fellowships 2027",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2d3fb165ef78a0",
+    "titre": "Germany CEMES International Fellowships for resear",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e8c49ef9fb8301",
+    "titre": "LCEL Luxembourg Scholarship 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_bc38c483159ad9",
+    "titre": "Kazakhstan Workshop in Global Governance Program 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d9743466405ac5",
+    "titre": "University of Rochester Chemistry PhD Scholarship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3d11e5d3130a7f",
+    "titre": "Miami International University (MIU) Scholarships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_82e519e4bfb3dd",
+    "titre": "Monash University Monash Graduate Scholarship 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e51978d305d6e2",
+    "titre": "Sciences Po Menton Campus Chalhoub Scholarship 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a79fead32a9182",
+    "titre": "Rosa-Luxemburg-Stiftung Scholarships 2026 , German",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8376e60734f2df",
+    "titre": "McGill University Scholarships 2026 , Canada (Full",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e931776eff665c",
+    "titre": "University of Westminster Scholarships 2026, UK (F",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ca83ff9f792c79",
+    "titre": "Muhammad Bin Zayed University MBZUAI Scholarships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4a5da91d7aa4f2",
+    "titre": "Bill Countryman Scholarship 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fbdbd857215fba",
+    "titre": "Minecraft Scholarship 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_be8d679ad158cd",
+    "titre": "The Gates Scholarship 2026 , USA (Fully Funded)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_05c8d52a8c7dd7",
+    "titre": "University of Auckland International Student Excel",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_58e3b228ebd3c7",
+    "titre": "France FIAS fully funded Fellowships 2027–2028 in ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e0beb99e88baf5",
+    "titre": "Just Tech Fellowship 2027 in the USA ($60,000 Fund",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b198528f15c708",
+    "titre": "Romania Foreign Researchers Fellowships 2026 in Ro",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a26aa97f012509",
+    "titre": "Netherlands Food Lab Fellowships 2027 with €1,750 ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a824680e52d423",
+    "titre": "ICIQ Master Projects Fellowships 2026 Open with €7",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9b1e6f1881b2af",
+    "titre": "KIT Schmidt Science Fellows 2027: Fully Funded $11",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7f2ffa1ef5a9e8",
+    "titre": "Barbro Klein Fellowship Programme 2027–2028 in Swe",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ca0a14d266bfd8",
+    "titre": "Marie Skłodowska-Curie Actions Postdoctoral Fellow",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5e96baffc1f343",
+    "titre": "Pierre Elliott Trudeau Foundation Fellowship 2027,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_83ee54eed086c9",
+    "titre": "NSFC Invitational Visiting Fellowships 2027, China",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_918d8e279e8351",
+    "titre": "International Council of Ophthalmology (ICO) Fello",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9bbf095b2b4db0",
+    "titre": "Northeastern University Pharmaceutical Industry Fe",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_a2c8ab25e78d7a",
+    "titre": "IE Foundation Fellowship 2026 , Spain",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0463bdcbc4745c",
+    "titre": "University of Jember CHRM2 Fellowship, Internship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1e61f988372621",
+    "titre": "MOFA Taiwan Fellowship 2026 (Fully Funded)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_1d9e06e602fd63",
+    "titre": "Forrest Research Foundation Postdoctoral Fellowshi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_67bc605c3079c2",
+    "titre": "University of Padua MSCA MaRaThoN Training Program",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c333ee566b3d93",
+    "titre": "Wittenstein Foundation Einstein Fellowship 2026, G",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7d4ecba761c7ef",
+    "titre": "Research Ireland Public Service Fellowship 2026 (U",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_239de8cee0b2e2",
+    "titre": "North Carolina Sea Grants Sea to Stars Fellowship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7337441525d00c",
+    "titre": "NATO Defense College Resident Fellowship Programme",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f8b894bc0c453e",
+    "titre": "Spain ICFO DigiQ Student Research Fellowships Prog",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_35a1f444ce4ba0",
+    "titre": "Switzerland CERN Research Fellowship in Theoretica",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_090d79fcc0f4b7",
+    "titre": "Harvard Kennedy School American Service Fellowship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_906fe28f3c6f47",
+    "titre": "Finland EDUFI Fellowship 2025 for International St",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6ad7989ac688ac",
+    "titre": "National Bank of Belgium (NBB) Research Fellowship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7789a5220e50e1",
+    "titre": "DAAD Re-invitation Scholarship and Fellowship Prog",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_84dbc94b21c706",
+    "titre": "International Journalists‘ Programmes (IJP) Middle",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5d65dc158abdd6",
+    "titre": "Southern Cross University Scholarships 2026 , Aust",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0a499f5434ffc0",
+    "titre": "University of Montreal Scholarships 2026 , Canada",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0f5619d91a52c5",
+    "titre": "University of British Columbia Four Year Doctoral ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d7585b93b4ba2e",
+    "titre": "University of Southern Indiana (USI) Scholarships ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_81de1ecb39bf55",
+    "titre": "Prince of Songkla University Thailand Graduate Sch",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e7095f2026ef4d",
+    "titre": "Ara International Student Academic Scholarship 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2e843889c1f666",
+    "titre": "UK Government DSIT Fellowship, UK 2026/2027 (Paid ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d08b7163a59543",
+    "titre": "Vienna BioCenter VIP³ Postdoc Fellowship 2026, Aus",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f53c5cd3b86f0b",
+    "titre": "European Research Council (ERC) Fellowships 2025",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fa435ea10cc7e3",
+    "titre": "LAF USA Fellowship for Innovation and Leadership 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d7da697a52418f",
+    "titre": "UKRI Future Leaders Fellowships 2025 (Up to £3 Mil",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3ce5bd4da899f8",
+    "titre": "Hasegawa International Scholarship Foundation Scho",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7b7eb5edc96e44",
+    "titre": "PinPoint Leak Detection Innovation Scholarship 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_54feaabf4dff6d",
+    "titre": "DCU Business School John Thompson Scholarship 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_43b056be41277a",
+    "titre": "University of Waterloo International Master’s Awar",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_51bdd83aacf592",
+    "titre": "Sophie’s Live Out Loud Award in USA ($5,000 Schola",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0dac6f40a6839b",
+    "titre": "WCADC Visual Arts Scholarship in the USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c7422ee8ab7bf2",
+    "titre": "DSEA Christopher K. Smith Memorial Future Teacher ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4b0fb0c9343fd9",
+    "titre": "Built Ford Tough Scholarship 2026 (National FFA Fo",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9bb4e458ef7c42",
+    "titre": "Swinburne University Scholarships 2026 ,Australia",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ef24dd5546d96e",
+    "titre": "EMBO Postdoctoral Fellowships 2026, Europe",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_85a407786cc4e9",
+    "titre": "University of Western Australia Global Excellence ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_14f3fe47b7e9fd",
+    "titre": "Ilia State University Government of the Czech Repu",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_84c4746cad4306",
+    "titre": "Aig-Imoukhuede Foundation (AIG) Visiting Fellowshi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b80d8677bd5d97",
+    "titre": "RUFORUM/Mastercard Foundation TAGDev 2.0 Scholarsh",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6deb5970a0b9f9",
+    "titre": "Arizona State University (ASU ) Mastercard Foundat",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_6471ff0c9ac480",
+    "titre": "KAS Scholarship Program 2026/2027 for Master’s Deg",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_621eed8371c2b2",
+    "titre": "Schneider Electric Young Industry Leaders’ Scholar",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5aa0431c50672b",
+    "titre": "Türkiye Scholarships 2026 for Undergraduate, Maste",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_dcee5473de1b4a",
+    "titre": "DAAD Development-Related Postgraduate Courses Scho",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e976cf27fd092a",
+    "titre": "NNPC Ltd/ TotalEnergies International Masters Degr",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e5b69b2aba7b0f",
+    "titre": "The DAAD Hilde Domin Scholarship Programme 2026/20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3e6e2433da542d",
+    "titre": "University of California Berkeley MasterCard Found",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_86b6588a3a0d19",
+    "titre": "Commonwealth Shared Scholarships 2026/2027 for ful",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_89bcc506c1ac31",
+    "titre": "The University of Cambridge Mastercard Foundation ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_32ef9e716119da",
+    "titre": "Bank of Tanzania Mwalimu Julius Nyerere Memorial S",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8a29d605eb45a7",
+    "titre": "University of Rwanda Mastercard Foundation Scholar",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d2be3ae4a4213d",
+    "titre": "Feodor Lynen Research Fellowships 2026, Germany",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b1aa217387ca03",
+    "titre": "The Dawna J. Colbert & John Fitzpatrick Scholarshi",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7fa9e5889ae60e",
+    "titre": "Jewish Community Foundation Scholarships, USA ($3,",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f70ab5ea6e106d",
+    "titre": "Hearts for Community Service Scholarship 2026, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_30e55b0185ecca",
+    "titre": "APCF Mega Bank Scholarship Program, USA (Study in ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_c6aaee0e52998f",
+    "titre": "ECTRIMS Postdoctoral Research Training Fellowship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_51ea667a0e3714",
+    "titre": "PhD Scholarships in Europe EUTOPIA PhD Co-Tutelle ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_e05055db98f108",
+    "titre": "American University of Beirut (AUB) Scholarships 2",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_eb6b6f9e246370",
+    "titre": "Women’s Empowerment Scholarship, USA ($1,500 Award",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f3fb95504617fb",
+    "titre": "FMC Ice Sports Skaters Scholarship, USA ($1,000 Aw",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ddf4226a4f9273",
+    "titre": "AWS John C. Lincoln Memorial Scholarship 2026 , US",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_f28eb6deb391ae",
+    "titre": "Douglas College Scholarships 2026 , Canada",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_0690d6ede70a1b",
+    "titre": "Boise State University Automatic Scholarships for ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9ae40e34f77908",
+    "titre": "Jamie Bax Memorial Scholarship 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3e35626ab49ba5",
+    "titre": "National Ocean Scholar Program 2026 , USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8072880e963c9d",
+    "titre": "DYB Scholarship Program 2026 , USA ($2,000 Award)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3a442ff61f04f3",
+    "titre": "The American University in Cairo (AUC) Donor-Funde",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_79150550ec84e0",
+    "titre": "Don Diego Vocational Education Scholarship, USA",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_8048c6e542e456",
+    "titre": "Google Creative Fellowship 2026 in the USA (6-Mont",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_59c4b32638812c",
+    "titre": "University of Melbourne Law School Visiting Fellow",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_3cfeb590eadfc5",
+    "titre": "Turkey Government Scholarships 2026 (Fully Funded)",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_326614bf70e002",
+    "titre": "Stephen Phillips Memorial Scholarship Fund in USA ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4ca8416f839563",
+    "titre": "Resilience Fellowship 2027, East Africa",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d29fba25e59da4",
+    "titre": "Google Career Certificate Scholarships 2026 for yo",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_7c3c37280ae96a",
+    "titre": "Flour Mills of Nigeria (FMN)-George S. Coumantaros",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_231dac0578debd",
+    "titre": "Klaus Töpfer Sustainability Fellowships 2027, Germ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9fe1988ad9f05c",
+    "titre": "UK University of Edinburgh Leverhulme Early Career",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_349fe371266855",
+    "titre": "Maynooth University International Scholarships 202",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_9cd105f8ca2262",
+    "titre": "University of Manitoba Canada Graduate Fellowship ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_ec6b3f0a625a8e",
+    "titre": "DAAD IFI Research Fellowships – International AI a",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_22b00bea28f194",
+    "titre": "Laurel House Social Work Racial Equity Scholarship",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_4eb0858eaa1041",
+    "titre": "SDU Danish Government Scholarships 2026 , Denmark ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_fcaec553e2ccd9",
+    "titre": "PAFMG Annual Pre-Med Scholarship Awards, USA (Up t",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_d20a23a12b596c",
+    "titre": "Visegrad Fellowships 2026 in Central Europe (Fully",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b904a81cd4673b",
+    "titre": "Sheffield Hallam University Vice-Chancellor’s Awar",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_2d7e486220978a",
+    "titre": "Hong Kong PhD Fellowship Scheme 2026 (Fully Funded",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_65d453504157e7",
+    "titre": "Belgium ISPD Scholarship And Fellowship Program 20",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_099de51d3cb904",
+    "titre": "UKRI Smart Data Research UK Fellowships 2026",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_5fc5c19aa320c8",
+    "titre": "The Pan‑Atlantic University Mastercard Foundation ",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  },
+  {
+    "type": "supabase",
+    "id": "fly_b1edc5e11853a1",
+    "titre": "South African Cultural Observatory (SACO) Scholars",
+    "error": "{'message': \"Could not find the 'qualite_details' column of 'bourses' in the schema cache\", 'code': 'PGRST204', 'hint': None, 'details': None}"
+  }
+]
