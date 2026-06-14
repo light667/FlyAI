@@ -1,0 +1,46 @@
+name: flyai
+description: "Fly AI est une plateforme propulsée par l'intelligence artificielle qui aide les étudiants africains à trouver des bourses, améliorer leurs candidatures et maximiser leurs chances de réussite grâce à des recommandations personnalisées."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.8
+  lottie: ^3.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/images/logo.png"
+  ios: true
+  background_color: "#000000"
+  min_sdk_android: 21
+
+flutter_native_splash:
+  color: "#000000"
+  image: "assets/images/logo.png"
+  android_12:
+    image: "assets/images/logo.png"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/logo.png
+    - assets/images/onboarding1.jpg
+    - assets/images/onboarding2.jpg
+    - assets/images/onboarding3.jpg
+    - assets/lotties/flyai.json
+    - assets/images/
+  
