@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "83333785148",
+    "project_id": "flyai-org",
+    "storage_bucket": "flyai-org.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83333785148:android:b837a5210a5587fad20539",
+        "android_client_info": {
+          "package_name": "com.example.flyai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "83333785148-7k1qutu0vuvi3d3g076dj2kgf61ilrcs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flyai",
+            "certificate_hash": "c94b48069a076e7977a9168ffba3987d99a5c9d3"
+          }
+        },
+        {
+          "client_id": "83333785148-a9pk1drigupsftisvv5mq6h88ms544fu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGZmLguHdnH9IZ7yCNQ_hauzGtC8HYcLE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "83333785148-a9pk1drigupsftisvv5mq6h88ms544fu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "83333785148-shi86uh6js5q8kgto0vddfrho1lodgdu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flyai"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
