@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/social_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -43,9 +43,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
       if (mounted) await _navigateAfterAuth();
     } on FirebaseAuthException catch (e) {
-      _showError(AuthService.mapFirebaseError(e));
+      _showError(AuthService.mapFirebaseError(
+        e,
+        fr: ref.read(localeProvider).languageCode == 'fr',
+      ));
     } catch (e) {
-      _showError(AppStrings.genericError);
+      _showError(ref.read(stringsProvider).genericError);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -55,9 +58,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       await ref.read(authNotifierProvider.notifier).signInWithGoogle();
-      if (mounted) await _navigateAfterAuth();
+      if (mounted && FirebaseAuth.instance.currentUser != null) {
+        await _navigateAfterAuth();
+      }
     } catch (e) {
-      _showError(AppStrings.genericError);
+      _showError(ref.read(stringsProvider).genericError);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -69,7 +74,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref.read(authNotifierProvider.notifier).signInWithApple();
       if (mounted) await _navigateAfterAuth();
     } catch (e) {
-      _showError(AppStrings.genericError);
+      _showError(ref.read(stringsProvider).genericError);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -78,11 +83,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _navigateAfterAuth() async {
     final exists = await ref.read(profileExistsProvider.future);
     if (!mounted) return;
-    if (exists) {
-      context.go(AppRoutes.home);
-    } else {
-      context.go(AppRoutes.profileSetup);
-    }
+    context.go(exists ? AppRoutes.home : AppRoutes.profileSetup);
   }
 
   void _showError(String message) {
@@ -98,45 +99,63 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(stringsProvider);
+    final currentLocale = ref.watch(localeProvider);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 16),
-                // Logo + Title
-                Center(
-                  child: Image.asset(
-                    'assets/images/symbol.png',
-                    height: 56,
+                // Language Selector
+                Align(
+                  alignment: Alignment.topRight,
+                  child: PopupMenuButton<Locale>(
+                    initialValue: currentLocale,
+                    icon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.language_rounded, size: 18, color: AppColors.textSecondary),
+                        const SizedBox(width: 4),
+                        Text(
+                          currentLocale.languageCode.toUpperCase(),
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                        ),
+                        const Icon(Icons.arrow_drop_down_rounded, color: AppColors.textSecondary),
+                      ],
+                    ),
+                    onSelected: (locale) => ref.read(localeProvider.notifier).setLocale(locale),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(value: const Locale('fr'), child: Text(strings.french)),
+                      PopupMenuItem(value: const Locale('en'), child: Text(strings.english)),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 32),
-                Text(
-                  'Welcome back 👋',
-                  style: AppTextStyles.displayMedium,
-                ),
                 const SizedBox(height: 8),
-                Text(
-                  'Sign in to continue your journey',
-                  style: AppTextStyles.bodyMedium,
-                ),
+
+                // Logo
+                Center(child: Image.asset('assets/images/symbol.png', height: 56)),
+                const SizedBox(height: 32),
+
+                Text(strings.welcomeBack, style: AppTextStyles.displayMedium),
+                const SizedBox(height: 8),
+                Text(strings.welcomeBackSub, style: AppTextStyles.bodyMedium),
                 const SizedBox(height: 40),
 
                 // Email
                 AppTextField(
                   controller: _emailCtrl,
-                  label: AppStrings.emailLabel,
-                  hint: 'you@example.com',
+                  label: strings.emailLabel,
+                  hint: strings.emailHint,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.email_outlined,
                   validator: (v) {
-                    if (v == null || v.isEmpty) return AppStrings.fieldRequired;
-                    if (!v.contains('@')) return AppStrings.invalidEmail;
+                    if (v == null || v.isEmpty) return strings.fieldRequired;
+                    if (!v.contains('@')) return strings.invalidEmail;
                     return null;
                   },
                 ),
@@ -145,23 +164,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 // Password
                 AppTextField(
                   controller: _passwordCtrl,
-                  label: AppStrings.passwordLabel,
+                  label: strings.passwordLabel,
                   hint: '••••••••',
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outline,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                       color: AppColors.textSecondary,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return AppStrings.fieldRequired;
-                    if (v.length < 6) return AppStrings.passwordTooShort;
+                    if (v == null || v.isEmpty) return strings.fieldRequired;
+                    if (v.length < 6) return strings.passwordTooShort;
                     return null;
                   },
                 ),
@@ -172,18 +188,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () => context.push(AppRoutes.forgotPassword),
-                    child: Text(AppStrings.forgotPassword),
+                    child: Text(
+                      strings.forgotPassword,
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
                 // Sign In Button
                 PrimaryButton(
-                  label: AppStrings.signIn,
+                  label: strings.signIn,
                   isLoading: _isLoading,
                   onPressed: _signIn,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
                 // Divider
                 Row(
@@ -191,7 +210,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const Expanded(child: Divider(color: AppColors.glassBorder)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('or', style: AppTextStyles.bodySmall),
+                      child: Text(strings.orContinueWith, style: AppTextStyles.bodySmall),
                     ),
                     const Expanded(child: Divider(color: AppColors.glassBorder)),
                   ],
@@ -200,13 +219,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Social Buttons
                 SocialButton(
-                  label: AppStrings.continueWithGoogle,
+                  label: strings.continueWithGoogle,
                   iconPath: 'assets/images/google.jpg',
                   onPressed: _isLoading ? null : _googleSignIn,
                 ),
                 const SizedBox(height: 12),
                 SocialButton(
-                  label: AppStrings.continueWithApple,
+                  label: strings.continueWithApple,
                   iconPath: 'assets/images/apple.png',
                   onPressed: _isLoading ? null : _appleSignIn,
                 ),
@@ -217,10 +236,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        AppStrings.dontHaveAccount,
-                        style: AppTextStyles.bodyMedium,
-                      ),
+                      Text(strings.dontHaveAccount, style: AppTextStyles.bodyMedium),
                       TextButton(
                         onPressed: () => context.push(AppRoutes.signup),
                         style: TextButton.styleFrom(
@@ -229,10 +245,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
-                          AppStrings.signUp,
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.primary,
-                          ),
+                          strings.signUp,
+                          style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
                         ),
                       ),
                     ],

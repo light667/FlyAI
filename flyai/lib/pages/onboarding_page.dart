@@ -91,9 +91,8 @@ class OnboardingPageState extends State<OnboardingPage> {
                       height: 10,
                       width: currentPage == index ? 20 : 10,
                       decoration: BoxDecoration(
-                        color: currentPage == index
-                            ? Colors.blue
-                            : Colors.white,
+                        color:
+                            currentPage == index ? Colors.blue : Colors.white,
                         borderRadius: BorderRadius.circular(50),
                       ),
                     ),
@@ -106,7 +105,8 @@ class OnboardingPageState extends State<OnboardingPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SignInPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const SignInPage()),
                       );
                     },
                     style: ElevatedButton.styleFrom(

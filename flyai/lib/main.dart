@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flyai/core/router/app_router.dart';
 import 'package:flyai/core/theme/app_theme.dart';
 import 'package:flyai/core/services/supabase_service.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flyai/core/providers/locale_provider.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -30,11 +32,29 @@ class FlyAIApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
+    final locale = ref.watch(localeProvider);
+    final themeMode = ref.watch(themeModeProvider);
+
+    // Synchronize AppColors state
+    AppColors.isDark = themeMode == ThemeMode.dark;
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Fly AI',
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
       routerConfig: router,
+      locale: locale,
+      supportedLocales: const [
+        Locale('fr'),
+        Locale('en'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
     );
   }
 }

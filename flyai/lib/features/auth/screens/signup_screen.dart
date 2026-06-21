@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/social_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../providers/auth_provider.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -47,11 +47,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             password: _passwordCtrl.text,
             fullName: _nameCtrl.text,
           );
-      if (mounted) context.go(AppRoutes.profileSetup);
+      if (mounted) {
+        context.go(AppRoutes.profileSetup);
+      }
     } on FirebaseAuthException catch (e) {
-      _showError(AuthService.mapFirebaseError(e));
+      _showError(AuthService.mapFirebaseError(
+        e,
+        fr: ref.read(localeProvider).languageCode == 'fr',
+      ));
     } catch (e) {
-      _showError(AppStrings.genericError);
+      _showError(ref.read(stringsProvider).genericError);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -61,19 +66,19 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     setState(() => _isLoading = true);
     try {
       await ref.read(authNotifierProvider.notifier).signInWithGoogle();
-      if (mounted) {
+      if (mounted && FirebaseAuth.instance.currentUser != null) {
         final exists = await ref.read(profileExistsProvider.future);
-        if (!mounted) return;
-        context.go(exists ? AppRoutes.home : AppRoutes.profileSetup);
+        if (mounted) context.go(exists ? AppRoutes.home : AppRoutes.profileSetup);
       }
     } catch (e) {
-      _showError(AppStrings.genericError);
+      _showError(ref.read(stringsProvider).genericError);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _showError(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -85,6 +90,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = ref.watch(stringsProvider);
+
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -94,43 +102,37 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back button
                 IconButton(
                   onPressed: () => context.pop(),
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                      color: AppColors.textPrimary),
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
                   padding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 24),
-                Text('Create Account ✨', style: AppTextStyles.displayMedium),
+                Text(strings.createAccount, style: AppTextStyles.displayMedium),
                 const SizedBox(height: 8),
-                Text(
-                  'Start your scholarship journey today',
-                  style: AppTextStyles.bodyMedium,
-                ),
+                Text(strings.createAccountSub, style: AppTextStyles.bodyMedium),
                 const SizedBox(height: 40),
 
                 // Full Name
                 AppTextField(
                   controller: _nameCtrl,
-                  label: AppStrings.fullNameLabel,
-                  hint: 'Your full name',
+                  label: strings.fullNameLabel,
+                  hint: strings.fullNameLabel,
                   prefixIcon: Icons.person_outline,
-                  validator: (v) =>
-                      (v == null || v.isEmpty) ? AppStrings.fieldRequired : null,
+                  validator: (v) => (v == null || v.isEmpty) ? strings.fieldRequired : null,
                 ),
                 const SizedBox(height: 16),
 
                 // Email
                 AppTextField(
                   controller: _emailCtrl,
-                  label: AppStrings.emailLabel,
-                  hint: 'you@example.com',
+                  label: strings.emailLabel,
+                  hint: strings.emailHint,
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: Icons.email_outlined,
                   validator: (v) {
-                    if (v == null || v.isEmpty) return AppStrings.fieldRequired;
-                    if (!v.contains('@')) return AppStrings.invalidEmail;
+                    if (v == null || v.isEmpty) return strings.fieldRequired;
+                    if (!v.contains('@')) return strings.invalidEmail;
                     return null;
                   },
                 ),
@@ -139,23 +141,20 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 // Password
                 AppTextField(
                   controller: _passwordCtrl,
-                  label: AppStrings.passwordLabel,
+                  label: strings.passwordLabel,
                   hint: '••••••••',
                   obscureText: _obscurePassword,
                   prefixIcon: Icons.lock_outline,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                       color: AppColors.textSecondary,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return AppStrings.fieldRequired;
-                    if (v.length < 6) return AppStrings.passwordTooShort;
+                    if (v == null || v.isEmpty) return strings.fieldRequired;
+                    if (v.length < 6) return strings.passwordTooShort;
                     return null;
                   },
                 ),
@@ -164,32 +163,27 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 // Confirm Password
                 AppTextField(
                   controller: _confirmCtrl,
-                  label: AppStrings.confirmPasswordLabel,
+                  label: strings.confirmPasswordLabel,
                   hint: '••••••••',
                   obscureText: _obscureConfirm,
                   prefixIcon: Icons.lock_outline,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureConfirm
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+                      _obscureConfirm ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                       color: AppColors.textSecondary,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscureConfirm = !_obscureConfirm),
+                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return AppStrings.fieldRequired;
-                    if (v != _passwordCtrl.text) {
-                      return AppStrings.passwordsDoNotMatch;
-                    }
+                    if (v == null || v.isEmpty) return strings.fieldRequired;
+                    if (v != _passwordCtrl.text) return strings.passwordsDoNotMatch;
                     return null;
                   },
                 ),
                 const SizedBox(height: 32),
 
                 PrimaryButton(
-                  label: AppStrings.signUp,
+                  label: strings.signUp,
                   isLoading: _isLoading,
                   onPressed: _signUp,
                 ),
@@ -200,7 +194,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     const Expanded(child: Divider(color: AppColors.glassBorder)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('or', style: AppTextStyles.bodySmall),
+                      child: Text(strings.orContinueWith, style: AppTextStyles.bodySmall),
                     ),
                     const Expanded(child: Divider(color: AppColors.glassBorder)),
                   ],
@@ -208,7 +202,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 const SizedBox(height: 24),
 
                 SocialButton(
-                  label: AppStrings.continueWithGoogle,
+                  label: strings.continueWithGoogle,
                   iconPath: 'assets/images/google.jpg',
                   onPressed: _isLoading ? null : _googleSignIn,
                 ),
@@ -218,8 +212,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(AppStrings.alreadyHaveAccount,
-                          style: AppTextStyles.bodyMedium),
+                      Text(strings.alreadyHaveAccount, style: AppTextStyles.bodyMedium),
                       TextButton(
                         onPressed: () => context.pop(),
                         style: TextButton.styleFrom(
@@ -228,9 +221,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
-                          AppStrings.signIn,
-                          style: AppTextStyles.labelLarge
-                              .copyWith(color: AppColors.primary),
+                          strings.signIn,
+                          style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
                         ),
                       ),
                     ],

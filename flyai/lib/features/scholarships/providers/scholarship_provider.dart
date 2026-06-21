@@ -66,7 +66,7 @@ final likedScholarshipsProvider = FutureProvider<List<ScholarshipModel>>((ref) a
   if (ids.isEmpty) return [];
 
   final scholarships = await SupabaseService.client
-      .from('scholarships')
+      .from('bourses')
       .select()
       .inFilter('id', ids);
 

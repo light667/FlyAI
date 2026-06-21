@@ -13,6 +13,7 @@ class ProfileModel extends Equatable {
   final double gpa;
   final String englishLevel;
   final String frenchLevel;
+  final Map<String, String> otherLanguages;
   final List<String> targetCountries;
   final List<String> targetFields;
   final String academicGoals;
@@ -33,6 +34,7 @@ class ProfileModel extends Equatable {
     required this.gpa,
     required this.englishLevel,
     required this.frenchLevel,
+    this.otherLanguages = const {},
     required this.targetCountries,
     required this.targetFields,
     required this.academicGoals,
@@ -57,6 +59,7 @@ class ProfileModel extends Equatable {
       gpa: (json['gpa'] as num?)?.toDouble() ?? 0.0,
       englishLevel: json['english_level'] as String? ?? '',
       frenchLevel: json['french_level'] as String? ?? '',
+      otherLanguages: _parseMap(json['other_languages']),
       targetCountries: _parseList(json['target_countries']),
       targetFields: _parseList(json['target_fields']),
       academicGoals: json['academic_goals'] as String? ?? '',
@@ -80,6 +83,7 @@ class ProfileModel extends Equatable {
         'gpa': gpa,
         'english_level': englishLevel,
         'french_level': frenchLevel,
+        'other_languages': otherLanguages,
         'target_countries': targetCountries,
         'target_fields': targetFields,
         'academic_goals': academicGoals,
@@ -93,6 +97,14 @@ class ProfileModel extends Equatable {
     return [];
   }
 
+  static Map<String, String> _parseMap(dynamic value) {
+    if (value == null) return {};
+    if (value is Map) {
+      return value.map((key, val) => MapEntry(key.toString(), val.toString()));
+    }
+    return {};
+  }
+
   ProfileModel copyWith({
     String? fullName,
     String? country,
@@ -104,6 +116,7 @@ class ProfileModel extends Equatable {
     double? gpa,
     String? englishLevel,
     String? frenchLevel,
+    Map<String, String>? otherLanguages,
     List<String>? targetCountries,
     List<String>? targetFields,
     String? academicGoals,
@@ -123,6 +136,7 @@ class ProfileModel extends Equatable {
       gpa: gpa ?? this.gpa,
       englishLevel: englishLevel ?? this.englishLevel,
       frenchLevel: frenchLevel ?? this.frenchLevel,
+      otherLanguages: otherLanguages ?? this.otherLanguages,
       targetCountries: targetCountries ?? this.targetCountries,
       targetFields: targetFields ?? this.targetFields,
       academicGoals: academicGoals ?? this.academicGoals,
@@ -133,5 +147,5 @@ class ProfileModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, firebaseUid];
+  List<Object?> get props => [id, firebaseUid, otherLanguages];
 }

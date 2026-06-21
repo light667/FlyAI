@@ -44,24 +44,75 @@ class ScholarshipModel extends Equatable {
   });
 
   factory ScholarshipModel.fromJson(Map<String, dynamic> json) {
+    final title = json['title'] as String? ?? json['titre'] as String? ?? '';
+    final provider = json['provider'] as String? ?? json['source'] as String? ?? '';
+    final university = json['university'] as String? ?? json['universite'] as String? ?? '';
+    
+    // In bourses, pays_destination is a list of strings
+    final countryRaw = json['country'];
+    final String country = countryRaw is String
+        ? countryRaw
+        : _parseStringList(json['pays_destination'] ?? json['pays_destination_raw']).join(', ');
+
+    final description = json['description'] as String? ?? '';
+    final fundingType = json['funding_type'] as String? ?? json['financement'] as String? ?? 'Unknown';
+    
+    // In bourses, niveau_etude is a list of strings
+    final degreeLevelRaw = json['degree_level'];
+    final String degreeLevel = degreeLevelRaw is String
+        ? degreeLevelRaw
+        : _parseStringList(json['niveau_etude'] ?? json['niveau_raw']).join(', ');
+
+    final fields = _parseStringList(json['fields'] ?? json['domaines']);
+
+    // Build structured eligibility for matching engine
+    Map<String, dynamic> eligibility = {};
+    if (json['eligibility'] is Map) {
+      eligibility = Map<String, dynamic>.from(json['eligibility'] as Map);
+    } else {
+      eligibility = {
+        'nationalities': _parseStringList(json['nationalites_eligibles'] ?? json['nationalite_raw']),
+        'continent': (json['africains_eligibles'] as bool? ?? false) ? 'africa' : '',
+        'min_gpa': 0.0,
+      };
+    }
+
+    final requirements = _parseStringList(json['requirements'] ?? json['avantages'] ?? json['criteres']);
+
+    // Build structured language requirements for matching engine
+    Map<String, dynamic> languageRequirements = {};
+    if (json['language_requirements'] is Map) {
+      languageRequirements = Map<String, dynamic>.from(json['language_requirements'] as Map);
+    } else if (json['langues_requises'] != null) {
+      final langs = _parseStringList(json['langues_requises']);
+      for (final l in langs) {
+        final low = l.toLowerCase();
+        if (low.contains('anglais') || low.contains('english')) {
+          languageRequirements['english'] = 'intermediate';
+        }
+        if (low.contains('français') || low.contains('french') || low.contains('francais')) {
+          languageRequirements['french'] = 'intermediate';
+        }
+      }
+    }
+
     return ScholarshipModel(
-      id: json['id'] as String,
-      title: json['title'] as String? ?? '',
-      provider: json['provider'] as String? ?? '',
-      university: json['university'] as String? ?? '',
-      country: json['country'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      fundingType: json['funding_type'] as String? ?? 'Unknown',
-      degreeLevel: json['degree_level'] as String? ?? '',
-      fields: _parseStringList(json['fields']),
-      eligibility: (json['eligibility'] as Map<String, dynamic>?) ?? {},
-      requirements: _parseStringList(json['requirements']),
-      languageRequirements:
-          (json['language_requirements'] as Map<String, dynamic>?) ?? {},
+      id: json['id'] as String? ?? '',
+      title: title,
+      provider: provider,
+      university: university,
+      country: country.isNotEmpty ? country : 'International',
+      description: description,
+      fundingType: fundingType,
+      degreeLevel: degreeLevel.isNotEmpty ? degreeLevel : 'Undergraduate/Postgraduate',
+      fields: fields,
+      eligibility: eligibility,
+      requirements: requirements,
+      languageRequirements: languageRequirements,
       deadline: json['deadline'] != null
           ? DateTime.tryParse(json['deadline'] as String)
           : null,
-      applicationUrl: json['application_url'] as String?,
+      applicationUrl: json['application_url'] as String? ?? json['lien_candidature'] as String?,
       imageUrl: json['image_url'] as String?,
       source: json['source'] as String?,
       active: json['active'] as bool? ?? true,

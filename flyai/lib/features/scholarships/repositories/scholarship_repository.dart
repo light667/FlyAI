@@ -2,7 +2,7 @@ import '../../../core/services/supabase_service.dart';
 import '../models/scholarship_model.dart';
 
 class ScholarshipRepository {
-  static const _table = 'scholarships';
+  static const _table = 'bourses';
 
   Future<List<ScholarshipModel>> fetchScholarships({
     int page = 0,

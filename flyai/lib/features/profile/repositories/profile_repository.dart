@@ -6,11 +6,12 @@ class ProfileRepository {
 
   Future<ProfileModel?> getProfile(String firebaseUid) async {
     try {
-      final data = await SupabaseService.fetchOne(_table, 'firebase_uid', firebaseUid);
+      final data =
+          await SupabaseService.fetchOne(_table, 'firebase_uid', firebaseUid);
       if (data == null) return null;
       return ProfileModel.fromJson(data);
-    } catch (e) {
-      // Return null on error (e.g. table doesn't exist yet, or network failure)
+    } catch (_) {
+      // Retourne null en cas d'erreur réseau ou de table manquante.
       return null;
     }
   }
@@ -23,25 +24,45 @@ class ProfileRepository {
     await SupabaseService.upsert(_table, json);
   }
 
-  Future<String?> uploadProfilePhoto(String firebaseUid, List<int> bytes, String fileExtension) async {
-    final path = 'avatars/$firebaseUid/photo.$fileExtension';
-    // images bucket
-    return SupabaseService.uploadFile(
-      'images',
-      path,
-      bytes,
-      'image/$fileExtension',
-    );
+  /// Tente d'uploader la photo de profil.
+  /// Retourne l'URL publique ou null en cas d'échec (bucket inexistant, réseau…).
+  Future<String?> uploadProfilePhoto(
+    String firebaseUid,
+    List<int> bytes,
+    String fileExtension,
+  ) async {
+    try {
+      final path = 'avatars/$firebaseUid/photo.$fileExtension';
+      return await SupabaseService.uploadFile(
+        'images',
+        path,
+        bytes,
+        'image/$fileExtension',
+      );
+    } catch (_) {
+      return null; // Upload optionnel, ne bloque pas la création du profil.
+    }
   }
 
-  Future<String?> uploadCV(String firebaseUid, List<int> bytes, String fileExtension) async {
-    final path = 'cvs/$firebaseUid/cv.$fileExtension';
-    // documents bucket
-    return SupabaseService.uploadFile(
-      'documents',
-      path,
-      bytes,
-      fileExtension == 'pdf' ? 'application/pdf' : 'application/octet-stream',
-    );
+  /// Tente d'uploader le CV.
+  /// Retourne l'URL publique ou null en cas d'échec.
+  Future<String?> uploadCV(
+    String firebaseUid,
+    List<int> bytes,
+    String fileExtension,
+  ) async {
+    try {
+      final path = 'cvs/$firebaseUid/cv.$fileExtension';
+      return await SupabaseService.uploadFile(
+        'documents',
+        path,
+        bytes,
+        fileExtension == 'pdf'
+            ? 'application/pdf'
+            : 'application/octet-stream',
+      );
+    } catch (_) {
+      return null; // Upload optionnel, ne bloque pas la création du profil.
+    }
   }
 }

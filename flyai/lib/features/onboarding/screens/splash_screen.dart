@@ -53,11 +53,17 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Lottie.asset(
-              'assets/lotties/flyai.json',
-              width: 200,
-              height: 200,
-              repeat: false,
+            ClipOval(
+              child: Container(
+                color: Colors.white, // Optionnel : couleur de fond si votre logo est transparent
+                child: Lottie.asset(
+                  'assets/lotties/flyai.json',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover, // Assure que le logo remplit bien le cercle
+                  repeat: false,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             ShaderMask(

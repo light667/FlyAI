@@ -15,22 +15,47 @@ class AuthNotifier extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
-  Future<void> signUpWithEmail({
-    required String email,
-    required String password,
-    required String fullName,
-  }) async {
+  /// Envoie un lien magique à [email].
+  Future<void> sendSignInLink(String email) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final cred = await AuthService.signUpWithEmail(
-        email: email,
-        password: password,
-      );
-      // Update display name
-      await cred.user?.updateDisplayName(fullName);
+      await AuthService.sendSignInLinkToEmail(email);
     });
   }
 
+  /// Complète la connexion avec le lien reçu par email.
+  Future<void> completeSignInWithLink({
+    required String email,
+    required String emailLink,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await AuthService.signInWithEmailLink(
+        email: email,
+        emailLink: emailLink,
+      );
+    });
+  }
+
+  /// Inscription avec email + mot de passe.
+  Future<void> signUpWithEmail({
+    required String email,
+    required String password,
+    String? fullName,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final result = await AuthService.signUpWithEmail(
+        email: email,
+        password: password,
+      );
+      if (fullName != null && fullName.isNotEmpty) {
+        await result.user?.updateDisplayName(fullName);
+      }
+    });
+  }
+
+  /// Connexion avec email + mot de passe.
   Future<void> signInWithEmail({
     required String email,
     required String password,
@@ -38,6 +63,14 @@ class AuthNotifier extends AsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await AuthService.signInWithEmail(email: email, password: password);
+    });
+  }
+
+  /// Envoi d'un email de réinitialisation du mot de passe.
+  Future<void> sendPasswordReset(String email) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      await AuthService.sendPasswordReset(email);
     });
   }
 
@@ -52,13 +85,6 @@ class AuthNotifier extends AsyncNotifier<void> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       await AuthService.signInWithApple();
-    });
-  }
-
-  Future<void> sendPasswordReset(String email) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      await AuthService.sendPasswordReset(email);
     });
   }
 
@@ -78,10 +104,14 @@ final authNotifierProvider =
 final profileExistsProvider = FutureProvider<bool>((ref) async {
   final user = AuthService.currentUser;
   if (user == null) return false;
-  final profile = await SupabaseService.fetchOne(
-    'profiles',
-    'firebase_uid',
-    user.uid,
-  );
-  return profile != null;
+  try {
+    final profile = await SupabaseService.fetchOne(
+      'profiles',
+      'firebase_uid',
+      user.uid,
+    );
+    return profile != null;
+  } catch (_) {
+    return false;
+  }
 });

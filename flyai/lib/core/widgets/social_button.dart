@@ -23,13 +23,14 @@ class SocialButton extends StatelessWidget {
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           backgroundColor: AppColors.card,
-          side: const BorderSide(color: AppColors.glassBorder, width: 1.2),
+          side: BorderSide(color: AppColors.glassBorder, width: 1.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
@@ -41,7 +42,13 @@ class SocialButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Text(label, style: AppTextStyles.labelLarge),
+            Flexible(
+              child: Text(
+                label,
+                style: AppTextStyles.labelLarge,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
       ),

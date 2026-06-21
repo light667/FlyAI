@@ -38,7 +38,7 @@ class ApplicationModel extends Equatable {
       });
     }
 
-    final scholarshipRaw = json['scholarships'];
+    final scholarshipRaw = json['bourses'] ?? json['scholarships'];
     final ScholarshipModel? fetchedScholarship = scholarshipRaw != null
         ? ScholarshipModel.fromJson(scholarshipRaw as Map<String, dynamic>)
         : null;

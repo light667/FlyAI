@@ -88,7 +88,7 @@ class AppStrings {
   static const String flyAssistant = 'Fly Assistant';
   static const String askAnything = 'Ask me anything...';
   static const String assistantWelcome =
-      'Hi! I\'m Fly Assistant 🚀\n\nI can help you with:\n• CV Review\n• Motivation Letters\n• SOP Writing\n• Interview Prep\n• Scholarship Strategy\n\nWhat can I help you with today?';
+      'Hi! I\'m Fly Assistant \n\nI can help you with:\n• CV Review\n• Motivation Letters\n• SOP Writing\n• Interview Prep\n• Scholarship Strategy\n\nWhat can I help you with today?';
 
   // Application
   static const String applicationProgress = 'Application Progress';

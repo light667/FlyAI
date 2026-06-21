@@ -22,19 +22,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       title: AppStrings.onboarding1Title,
       description: AppStrings.onboarding1Desc,
       image: 'assets/images/onboarding1.jpg',
-      emoji: '🎓',
     ),
     _OnboardingData(
       title: AppStrings.onboarding2Title,
       description: AppStrings.onboarding2Desc,
       image: 'assets/images/onboarding2.jpg',
-      emoji: '🤖',
     ),
     _OnboardingData(
       title: AppStrings.onboarding3Title,
       description: AppStrings.onboarding3Desc,
       image: 'assets/images/onboarding3.jpg',
-      emoji: '🚀',
     ),
   ];
 
@@ -155,13 +152,11 @@ class _OnboardingData {
   final String title;
   final String description;
   final String image;
-  final String emoji;
 
   const _OnboardingData({
     required this.title,
     required this.description,
     required this.image,
-    required this.emoji,
   });
 }
 
@@ -185,8 +180,8 @@ class _OnboardingSlide extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.3),
-                Colors.black.withOpacity(0.7),
+                Colors.black.withOpacity(0.15),
+                Colors.black.withOpacity(0.55),
                 AppColors.background,
               ],
               stops: const [0.0, 0.5, 1.0],
@@ -202,11 +197,6 @@ class _OnboardingSlide extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                data.emoji,
-                style: const TextStyle(fontSize: 48),
-              ),
-              const SizedBox(height: 16),
               Text(data.title, style: AppTextStyles.displayMedium),
               const SizedBox(height: 12),
               Text(data.description, style: AppTextStyles.bodyMedium),

@@ -14,6 +14,8 @@ import '../../features/scholarships/models/scholarship_model.dart';
 import '../../features/settings/screens/settings_screen.dart';
 
 
+import '../../features/auth/screens/finish_sign_in_screen.dart';
+
 // Route paths
 class AppRoutes {
   static const String splash = '/';
@@ -21,6 +23,7 @@ class AppRoutes {
   static const String login = '/login';
   static const String signup = '/signup';
   static const String forgotPassword = '/forgot-password';
+  static const String finishSignIn = '/finish-sign-in';
   static const String profileSetup = '/profile-setup';
   static const String home = '/home';
   static const String scholarshipDetail = '/scholarship/:id';
@@ -36,7 +39,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           state.matchedLocation == AppRoutes.signup ||
           state.matchedLocation == AppRoutes.onboarding ||
           state.matchedLocation == AppRoutes.splash ||
-          state.matchedLocation == AppRoutes.forgotPassword;
+          state.matchedLocation == AppRoutes.forgotPassword ||
+          state.matchedLocation == AppRoutes.finishSignIn;
 
       if (user == null && !isAuthRoute) {
         return AppRoutes.login;
@@ -63,6 +67,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.finishSignIn,
+        builder: (context, state) => const FinishSignInScreen(),
       ),
       GoRoute(
         path: AppRoutes.profileSetup,

@@ -8,7 +8,7 @@ class ApplicationRepository {
     // Join with scholarships table
     final response = await SupabaseService.client
         .from(_table)
-        .select('*, scholarships(*)')
+        .select('*, bourses(*)')
         .eq('firebase_uid', firebaseUid)
         .order('created_at', ascending: false);
 
@@ -24,7 +24,7 @@ class ApplicationRepository {
     // Check if application already exists
     final existing = await SupabaseService.client
         .from(_table)
-        .select('*, scholarships(*)')
+        .select('*, bourses(*)')
         .eq('firebase_uid', firebaseUid)
         .eq('scholarship_id', scholarshipId)
         .maybeSingle();
@@ -53,7 +53,7 @@ class ApplicationRepository {
     final inserted = await SupabaseService.client
         .from(_table)
         .insert(data)
-        .select('*, scholarships(*)')
+        .select('*, bourses(*)')
         .single();
 
     return ApplicationModel.fromJson(inserted);

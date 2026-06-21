@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +6,10 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
+import '../../dashboard/providers/dashboard_provider.dart';
+import '../../scholarships/providers/scholarship_provider.dart';
+import '../../scholarships/models/scholarship_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -14,6 +17,8 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(profileNotifierProvider);
+    final statsAsync = ref.watch(dashboardStatsProvider);
+    final likedAsync = ref.watch(likedScholarshipsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -54,7 +59,7 @@ class ProfileScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.school_rounded, size: 72, color: AppColors.glassBorder),
+                    Icon(Icons.school_rounded, size: 72, color: AppColors.glassBorder),
                     const SizedBox(height: 24),
                     Text('Profile not complete', style: AppTextStyles.headlineSmall),
                     const SizedBox(height: 8),
@@ -117,7 +122,7 @@ class ProfileScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.location_on_outlined, size: 14, color: AppColors.textSecondary),
+                          Icon(Icons.location_on_outlined, size: 14, color: AppColors.textSecondary),
                           const SizedBox(width: 4),
                           Text(
                             '${profile.country} • ${profile.nationality}',
@@ -141,6 +146,10 @@ class ProfileScreen extends ConsumerWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
+                const SizedBox(height: 24),
+
+                // Stats Grid
+                _buildStatsGrid(context, statsAsync),
                 const SizedBox(height: 32),
 
                 // Academic Information Card
@@ -168,9 +177,9 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 _buildInfoCard([
                   _buildTagRow('Target Countries', profile.targetCountries),
-                  const Divider(color: AppColors.glassBorder, height: 16),
+                  Divider(color: AppColors.glassBorder, height: 16),
                   _buildTagRow('Target Fields', profile.targetFields),
-                  const Divider(color: AppColors.glassBorder, height: 16),
+                  Divider(color: AppColors.glassBorder, height: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -215,6 +224,12 @@ class ProfileScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 32),
+
+                // Saved Scholarships
+                _buildSectionTitle('Saved Scholarships'),
+                const SizedBox(height: 12),
+                _buildSavedScholarshipsList(context, likedAsync),
                 const SizedBox(height: 48),
               ],
             ),
@@ -293,6 +308,210 @@ class ProfileScreen extends ConsumerWidget {
                 }).toList(),
               ),
       ],
+    );
+  }
+
+  Widget _buildStatsGrid(BuildContext context, AsyncValue<DashboardStats> statsAsync) {
+    return statsAsync.when(
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (stats) => GridView.count(
+        crossAxisCount: 2,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.4,
+        children: [
+          _StatCard(
+            label: 'Total Matches',
+            value: '${stats.totalMatches}',
+            icon: Icons.favorite_rounded,
+            color: AppColors.success,
+          ),
+          _StatCard(
+            label: 'Saved',
+            value: '${stats.savedScholarships}',
+            icon: Icons.bookmark_rounded,
+            color: AppColors.primary,
+          ),
+          _StatCard(
+            label: 'Active',
+            value: '${stats.activeApplications}',
+            icon: Icons.assignment_rounded,
+            color: AppColors.secondary,
+          ),
+          _StatCard(
+            label: 'Avg. Match',
+            value: '${stats.avgCompatibility.round()}%',
+            icon: Icons.bolt_rounded,
+            color: AppColors.warning,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSavedScholarshipsList(BuildContext context, AsyncValue<List<ScholarshipModel>> likedAsync) {
+    return likedAsync.when(
+      loading: () => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (scholarships) {
+        if (scholarships.isEmpty) {
+          return _buildInfoCard([
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  'No saved scholarships yet.',
+                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                ),
+              ),
+            ),
+          ]);
+        }
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: scholarships.length,
+          itemBuilder: (context, index) {
+            return _ScholarshipListTile(scholarship: scholarships[index]);
+          },
+        );
+      },
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.glassBorder),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withOpacity(0.08),
+            Colors.transparent,
+          ],
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value,
+                  style: AppTextStyles.headlineLarge.copyWith(color: color)),
+              Text(label, style: AppTextStyles.caption),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScholarshipListTile extends StatelessWidget {
+  final ScholarshipModel scholarship;
+  const _ScholarshipListTile({required this.scholarship});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.glassBorder),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.primary.withOpacity(0.1),
+            ),
+            child: scholarship.imageUrl != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: CachedNetworkImage(
+                      imageUrl: scholarship.imageUrl!,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => const Icon(
+                          Icons.school_rounded, color: AppColors.primary),
+                    ),
+                  )
+                : const Icon(Icons.school_rounded, color: AppColors.primary),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(scholarship.title,
+                    style: AppTextStyles.titleMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+                Text(
+                  '${scholarship.country} · ${scholarship.fundingType}',
+                  style: AppTextStyles.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(50),
+            ),
+            child: Text(
+              '${scholarship.compatibilityScore}%',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

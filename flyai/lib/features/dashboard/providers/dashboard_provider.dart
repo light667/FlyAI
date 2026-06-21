@@ -68,7 +68,7 @@ final recentActivityProvider = FutureProvider<List<Map<String, dynamic>>>((ref) 
 
   final res = await SupabaseService.client
       .from('swipes')
-      .select('action, scholarship_id, scholarships(title, country)')
+      .select('action, scholarship_id, bourses(titre, pays_destination)')
       .eq('firebase_uid', user.uid)
       .order('id', ascending: false)
       .limit(10);

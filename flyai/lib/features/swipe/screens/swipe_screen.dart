@@ -222,7 +222,7 @@ class _EmptyView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.school_rounded, size: 80, color: AppColors.glassBorder),
+          Icon(Icons.school_rounded, size: 80, color: AppColors.glassBorder),
           const SizedBox(height: 24),
           Text(AppStrings.noMoreScholarships, style: AppTextStyles.headlineMedium),
           const SizedBox(height: 8),

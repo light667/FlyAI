@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../swipe/screens/swipe_screen.dart';
-import '../../dashboard/screens/dashboard_screen.dart';
+import 'community_feed_screen.dart';
 import '../../ai_assistant/screens/ai_assistant_screen.dart';
 import '../../applications/screens/applications_screen.dart';
 import '../../profile/screens/profile_screen.dart';
+import '../../../core/providers/locale_provider.dart';
 
 class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key});
@@ -18,12 +19,12 @@ class MainShell extends ConsumerStatefulWidget {
 class _MainShellState extends ConsumerState<MainShell> {
   int _currentIndex = 0;
 
-  static const _screens = [
-    SwipeScreen(),
-    DashboardScreen(),
-    AiAssistantScreen(),
-    ApplicationsScreen(),
-    ProfileScreen(),
+  static final _screens = [
+    const SwipeScreen(),
+    const CommunityFeedScreen(),
+    const AiAssistantScreen(),
+    const ApplicationsScreen(),
+    const ProfileScreen(),
   ];
 
   @override
@@ -60,9 +61,9 @@ class _MainShellState extends ConsumerState<MainShell> {
                   onTap: () => setState(() => _currentIndex = 0),
                 ),
                 _NavItem(
-                  icon: Icons.dashboard_outlined,
-                  activeIcon: Icons.dashboard_rounded,
-                  label: AppStrings.dashboard,
+                  icon: Icons.forum_outlined,
+                  activeIcon: Icons.forum_rounded,
+                  label: ref.watch(localeProvider).languageCode == 'fr' ? 'Communauté' : 'Community',
                   index: 1,
                   currentIndex: _currentIndex,
                   onTap: () => setState(() => _currentIndex = 1),
