@@ -142,7 +142,7 @@ class ProfileScreen extends ConsumerWidget {
                   label: const Text('Edit Profile Details', style: TextStyle(color: Colors.white)),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 48),
-                    side: const BorderSide(color: AppColors.glassBorder),
+                    side: BorderSide(color: AppColors.glassBorder),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),

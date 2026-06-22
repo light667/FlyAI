@@ -139,7 +139,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
             ),
           ),
 
-          const Divider(height: 1, color: AppColors.glassBorder),
+          Divider(height: 1, color: AppColors.glassBorder),
 
           // Expandable checklist
           Theme(
@@ -167,7 +167,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                           value: isDone,
                           activeColor: AppColors.success,
                           checkColor: Colors.white,
-                          side: const BorderSide(color: AppColors.glassBorder, width: 1.5),
+                          side: BorderSide(color: AppColors.glassBorder, width: 1.5),
                           onChanged: (val) {
                             if (val != null) {
                               ref
@@ -258,7 +258,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.card,
         title: const Text('Cancel Tracking?'),
-        content: const Text(
+        content: Text(
           'Are you sure you want to stop tracking this scholarship application? This cannot be undone.',
           style: TextStyle(color: AppColors.textSecondary),
         ),
@@ -318,7 +318,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.assignment_outlined,
               size: 72,
               color: AppColors.glassBorder,

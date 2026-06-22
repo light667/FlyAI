@@ -352,7 +352,7 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.feed_outlined, size: 64, color: AppColors.glassBorder),
+                            Icon(Icons.feed_outlined, size: 64, color: AppColors.glassBorder),
                             const SizedBox(height: 16),
                             Text(strings.noPosts, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
                           ],
@@ -572,7 +572,7 @@ class _PostCard extends ConsumerWidget {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.more_vert_rounded, color: AppColors.textSecondary),
+                icon: Icon(Icons.more_vert_rounded, color: AppColors.textSecondary),
                 onPressed: () {},
               ),
             ],

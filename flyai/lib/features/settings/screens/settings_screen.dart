@@ -199,7 +199,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       leading: Icon(icon, color: AppColors.textSecondary),
       title: Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
       subtitle: subtitle != null ? Text(subtitle, style: AppTextStyles.bodySmall) : null,
-      trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+      trailing: Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
       onTap: onTap,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );

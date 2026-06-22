@@ -62,7 +62,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             children: [
               IconButton(
                 onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
                 padding: EdgeInsets.zero,
               ),
               const SizedBox(height: 40),

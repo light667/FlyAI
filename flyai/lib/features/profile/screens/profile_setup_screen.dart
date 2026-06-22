@@ -176,7 +176,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: Colors.white,
               surface: AppColors.card,
@@ -287,7 +287,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(strings.close, style: const TextStyle(color: AppColors.textSecondary)),
+                  child: Text(strings.close, style: TextStyle(color: AppColors.textSecondary)),
                 ),
                 ElevatedButton(
                   onPressed: selectedLang == null
@@ -607,7 +607,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.calendar_month_outlined, color: AppColors.textSecondary),
+                Icon(Icons.calendar_month_outlined, color: AppColors.textSecondary),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -619,7 +619,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     ),
                   ),
                 ),
-                const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
+                Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
               ],
             ),
           ),

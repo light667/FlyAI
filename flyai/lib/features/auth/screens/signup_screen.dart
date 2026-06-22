@@ -104,7 +104,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               children: [
                 IconButton(
                   onPressed: () => context.pop(),
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
                   padding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 24),
@@ -191,12 +191,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
                 Row(
                   children: [
-                    const Expanded(child: Divider(color: AppColors.glassBorder)),
+                    Expanded(child: Divider(color: AppColors.glassBorder)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(strings.orContinueWith, style: AppTextStyles.bodySmall),
                     ),
-                    const Expanded(child: Divider(color: AppColors.glassBorder)),
+                    Expanded(child: Divider(color: AppColors.glassBorder)),
                   ],
                 ),
                 const SizedBox(height: 24),

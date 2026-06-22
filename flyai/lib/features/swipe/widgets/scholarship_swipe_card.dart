@@ -40,7 +40,7 @@ class ScholarshipSwipeCard extends StatelessWidget {
                         fit: BoxFit.cover,
                         placeholder: (_, __) => Container(
                           color: AppColors.background,
-                          child: const Center(
+                          child: Center(
                             child: Icon(Icons.school_rounded,
                                 size: 64, color: AppColors.glassBorder),
                           ),
@@ -233,7 +233,7 @@ class _CountryChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.location_on_rounded, size: 12, color: AppColors.textSecondary),
+          Icon(Icons.location_on_rounded, size: 12, color: AppColors.textSecondary),
           const SizedBox(width: 4),
           Text(country, style: AppTextStyles.caption),
         ],

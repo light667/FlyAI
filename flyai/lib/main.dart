@@ -6,6 +6,7 @@ import 'package:flyai/core/theme/app_theme.dart';
 import 'package:flyai/core/services/supabase_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flyai/core/providers/locale_provider.dart';
+import 'package:flyai/core/constants/app_colors.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

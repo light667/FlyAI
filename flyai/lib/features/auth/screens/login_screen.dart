@@ -119,13 +119,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     icon: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.language_rounded, size: 18, color: AppColors.textSecondary),
+                        Icon(Icons.language_rounded, size: 18, color: AppColors.textSecondary),
                         const SizedBox(width: 4),
                         Text(
                           currentLocale.languageCode.toUpperCase(),
                           style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
                         ),
-                        const Icon(Icons.arrow_drop_down_rounded, color: AppColors.textSecondary),
+                        Icon(Icons.arrow_drop_down_rounded, color: AppColors.textSecondary),
                       ],
                     ),
                     onSelected: (locale) => ref.read(localeProvider.notifier).setLocale(locale),
@@ -207,12 +207,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 // Divider
                 Row(
                   children: [
-                    const Expanded(child: Divider(color: AppColors.glassBorder)),
+                    Expanded(child: Divider(color: AppColors.glassBorder)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(strings.orContinueWith, style: AppTextStyles.bodySmall),
                     ),
-                    const Expanded(child: Divider(color: AppColors.glassBorder)),
+                    Expanded(child: Divider(color: AppColors.glassBorder)),
                   ],
                 ),
                 const SizedBox(height: 24),
