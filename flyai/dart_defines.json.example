@@ -1,0 +1,7 @@
+{
+  "SUPABASE_URL": "https://xxxxxxxxxxxxxxxxxxxx.supabase.co",
+  "SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "GEMINI_API_KEY": "AIzaSy...",
+  "MISTRAL_API_KEY": "...",
+  "GROQ_API_KEY": "gsk_..."
+}

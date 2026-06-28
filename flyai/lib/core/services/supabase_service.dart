@@ -1,19 +1,44 @@
 import 'dart:typed_data';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../config/app_config.dart';
 
 class SupabaseService {
   SupabaseService._();
 
   static SupabaseClient get client => Supabase.instance.client;
 
+  /// Initialise Supabase.
+  ///
+  /// En local : charge `assets/.env` via dotenv → lit SUPABASE_URL / KEY.
+  /// En production (Firebase Hosting) : le `.env` n'existe pas (404).
+  ///   → le try/catch absorbe l'erreur sans crasher le splash screen.
+  ///   → [AppConfig] lit les constantes compilées via --dart-define-from-file.
   static Future<void> initialize() async {
-    await dotenv.load(fileName: '.env');
+    // Tentative de chargement du .env (développement local uniquement).
+    try {
+      await dotenv.load(fileName: '.env');
+    } catch (_) {
+      // Silencieux en production — les valeurs viennent de AppConfig.
+      if (kDebugMode) {
+        // ignore: avoid_print
+        print('[SupabaseService] .env introuvable — '
+            'utilisation des constantes compilées (AppConfig).');
+      }
+    }
 
-    await Supabase.initialize(
-      url: dotenv.env['SUPABASE_URL']!,
-      anonKey: dotenv.env['SUPABASE_KEY']!,
+    final url = AppConfig.supabaseUrl;
+    final key = AppConfig.supabaseKey;
+
+    assert(
+      url.isNotEmpty && key.isNotEmpty,
+      '[SupabaseService] SUPABASE_URL / SUPABASE_KEY manquants.\n'
+      'Local : vérifiez assets/.env\n'
+      'Production : flutter build web --dart-define-from-file=dart_defines.json',
     );
+
+    await Supabase.initialize(url: url, anonKey: key);
   }
 
   // ── Generic fetch ─────────────────────────────────────────────────────────
@@ -25,8 +50,6 @@ class SupabaseService {
     int? limit,
     Map<String, dynamic>? filters,
   }) async {
-    // Build query with filters applied before ordering/limiting.
-    // filters are applied via .eq() chaining on the PostgrestFilterBuilder.
     var query = client.from(table).select();
 
     if (filters != null) {
@@ -57,7 +80,6 @@ class SupabaseService {
 
   // ── Write operations ──────────────────────────────────────────────────────
 
-  /// Upsert basique (conflit sur la clé primaire).
   static Future<void> upsert(
     String table,
     Map<String, dynamic> data,
@@ -65,8 +87,6 @@ class SupabaseService {
     await client.from(table).upsert(data);
   }
 
-  /// Upsert avec résolution de conflit sur une colonne spécifique.
-  /// Utiliser pour les tables avec UNIQUE contrainte (ex: firebase_uid).
   static Future<void> upsertWithConflict(
     String table,
     Map<String, dynamic> data, {
@@ -101,9 +121,6 @@ class SupabaseService {
 
   // ── Storage ───────────────────────────────────────────────────────────────
 
-  /// Upload un fichier binaire vers un bucket Supabase Storage.
-  /// [upsert: true] permet d'écraser un fichier existant au même chemin
-  /// sans renvoyer d'erreur 400 (conflict).
   static Future<String?> uploadFile(
     String bucket,
     String path,
@@ -115,10 +132,9 @@ class SupabaseService {
           Uint8List.fromList(bytes),
           fileOptions: FileOptions(
             contentType: mimeType,
-            upsert: true, // ← Evite les erreurs 400 sur re-upload
+            upsert: true,
           ),
         );
-    final url = client.storage.from(bucket).getPublicUrl(path);
-    return url;
+    return client.storage.from(bucket).getPublicUrl(path);
   }
 }

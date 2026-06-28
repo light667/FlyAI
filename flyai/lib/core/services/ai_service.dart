@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../config/app_config.dart';
 
 enum AIProvider { gemini, mistral, groq }
 
@@ -22,7 +22,7 @@ class AIService {
           return await _callGroq(messages, systemPrompt);
       }
     } catch (e) {
-      // Fallback chain: Gemini → Mistral → Groq
+      // Chaîne de fallback : Gemini → Mistral → Groq
       if (provider == AIProvider.gemini) {
         try {
           return await _callMistral(messages, systemPrompt);
@@ -34,11 +34,13 @@ class AIService {
     }
   }
 
+  // ── Gemini ─────────────────────────────────────────────────────────────────
+
   static Future<String> _callGemini(
     List<Map<String, String>> messages,
     String? systemPrompt,
   ) async {
-    final apiKey = dotenv.env['GEMINI_API_KEY']!;
+    final apiKey = AppConfig.geminiApiKey;
     final url =
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey';
 
@@ -47,18 +49,24 @@ class AIService {
     if (systemPrompt != null) {
       contents.add({
         'role': 'user',
-        'parts': [{'text': systemPrompt}],
+        'parts': [
+          {'text': systemPrompt}
+        ],
       });
       contents.add({
         'role': 'model',
-        'parts': [{'text': 'Understood. I will follow these instructions.'}],
+        'parts': [
+          {'text': 'Understood. I will follow these instructions.'}
+        ],
       });
     }
 
     for (final msg in messages) {
       contents.add({
         'role': msg['role'] == 'assistant' ? 'model' : 'user',
-        'parts': [{'text': msg['content']}],
+        'parts': [
+          {'text': msg['content']}
+        ],
       });
     }
 
@@ -75,11 +83,13 @@ class AIService {
     throw Exception('Gemini API error: ${response.statusCode}');
   }
 
+  // ── Mistral ────────────────────────────────────────────────────────────────
+
   static Future<String> _callMistral(
     List<Map<String, String>> messages,
     String? systemPrompt,
   ) async {
-    final apiKey = dotenv.env['MISTRAL_API_KEY']!;
+    final apiKey = AppConfig.mistralApiKey;
     const url = 'https://api.mistral.ai/v1/chat/completions';
 
     final allMessages = <Map<String, String>>[];
@@ -107,11 +117,13 @@ class AIService {
     throw Exception('Mistral API error: ${response.statusCode}');
   }
 
+  // ── Groq ───────────────────────────────────────────────────────────────────
+
   static Future<String> _callGroq(
     List<Map<String, String>> messages,
     String? systemPrompt,
   ) async {
-    final apiKey = dotenv.env['GROQ_API_KEY']!;
+    final apiKey = AppConfig.groqApiKey;
     const url = 'https://api.groq.com/openai/v1/chat/completions';
 
     final allMessages = <Map<String, String>>[];
@@ -139,7 +151,8 @@ class AIService {
     throw Exception('Groq API error: ${response.statusCode}');
   }
 
-  // Scholarship-specific system prompt
+  // ── System prompt ──────────────────────────────────────────────────────────
+
   static const String scholarshipSystemPrompt = '''
 You are Fly Assistant, an expert AI scholarship advisor helping African students access global academic opportunities.
 
