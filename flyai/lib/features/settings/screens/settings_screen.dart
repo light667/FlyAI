@@ -232,7 +232,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(strings.close, style: const TextStyle(color: Colors.white)),
+            child: Text(strings.close, style: const TextStyle(color: AppColors.primary)),
           ),
         ],
       ),

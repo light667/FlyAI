@@ -33,7 +33,8 @@ class ProfileRepository {
     );
   }
 
-  /// Tente d'uploader la photo de profil dans le bucket 'images'.
+  /// Tente d'uploader la photo de profil dans le bucket 'documents' (sous-dossier photos/).
+  /// Le bucket 'images' n'est pas configuré — on réutilise 'documents' qui fonctionne.
   /// Retourne l'URL publique ou null en cas d'échec.
   Future<String?> uploadProfilePhoto(
     String firebaseUid,
@@ -41,14 +42,16 @@ class ProfileRepository {
     String fileExtension,
   ) async {
     try {
-      final path = 'avatars/$firebaseUid/photo.$fileExtension';
+      final path = 'photos/$firebaseUid/photo.$fileExtension';
       return await SupabaseService.uploadFile(
-        'images',
+        'documents',
         path,
         bytes,
         'image/$fileExtension',
       );
-    } catch (_) {
+    } catch (e) {
+      // ignore: avoid_print
+      print('[ProfileRepository] uploadProfilePhoto error: $e');
       return null;
     }
   }

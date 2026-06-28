@@ -174,12 +174,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (context, child) {
+        // Use dark scheme regardless of app theme — the dialog is always dark-styled
         return Theme(
-          data: Theme.of(context).copyWith(
+          data: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: Colors.white,
-              surface: AppColors.card,
+              surface: const Color(0xFF1E293B),
               onSurface: Colors.white,
             ),
           ),
@@ -484,7 +485,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       child: OutlinedButton(
                         onPressed: _isSaving ? null : _prevStep,
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.textPrimary,
                           side: BorderSide(color: AppColors.glassBorder),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -615,7 +616,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         ? strings.dateOfBirth
                         : DateFormat('MMM dd, yyyy').format(_birthDate!),
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: _birthDate == null ? AppColors.textSecondary : Colors.white,
+                      color: _birthDate == null ? AppColors.textSecondary : AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -805,7 +806,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           children: _destinationCountries.map((country) {
             final isSelected = _targetCountries.contains(country);
             return FilterChip(
-              label: Text(country, style: const TextStyle(color: Colors.white)),
+              label: Text(country, style: TextStyle(color: AppColors.textPrimary)),
               selected: isSelected,
               onSelected: (selected) {
                 setState(() {
@@ -839,7 +840,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           children: _targetFieldsList.map((field) {
             final isSelected = _targetFields.contains(field);
             return FilterChip(
-              label: Text(field, style: const TextStyle(color: Colors.white)),
+              label: Text(field, style: TextStyle(color: AppColors.textPrimary)),
               selected: isSelected,
               onSelected: (selected) {
                 setState(() {
@@ -906,9 +907,10 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: _pickPhoto,
-                icon: const Icon(Icons.camera_alt_outlined, color: Colors.white),
-                label: Text(strings.changePhoto, style: const TextStyle(color: Colors.white)),
+                icon: Icon(Icons.camera_alt_outlined, color: AppColors.textPrimary),
+                label: Text(strings.changePhoto, style: TextStyle(color: AppColors.textPrimary)),
                 style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.textPrimary,
                   side: BorderSide(color: AppColors.glassBorder),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),

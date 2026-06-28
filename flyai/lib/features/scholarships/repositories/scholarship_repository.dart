@@ -14,7 +14,7 @@ class ScholarshipRepository {
         .from(_table)
         .select()
         .eq('active', true)
-        .order('created_at', ascending: false)
+        .order('qualite_score', ascending: false) // Best quality first
         .range(page * pageSize, (page + 1) * pageSize - 1);
 
     final response = await query;
@@ -27,6 +27,7 @@ class ScholarshipRepository {
     }
     return all;
   }
+
 
   Future<ScholarshipModel?> fetchById(String id) async {
     final json = await SupabaseService.fetchOne(_table, 'id', id);

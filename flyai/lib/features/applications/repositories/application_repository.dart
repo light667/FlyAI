@@ -5,16 +5,35 @@ class ApplicationRepository {
   static const _table = 'applications';
 
   Future<List<ApplicationModel>> getApplications(String firebaseUid) async {
-    // Join with scholarships table
-    final response = await SupabaseService.client
-        .from(_table)
-        .select('*, bourses(*)')
-        .eq('firebase_uid', firebaseUid)
-        .order('created_at', ascending: false);
+    try {
+      // Try with join first
+      final response = await SupabaseService.client
+          .from(_table)
+          .select('*, scholarships(*)')
+          .eq('firebase_uid', firebaseUid)
+          .order('created_at', ascending: false);
 
-    return (response as List)
-        .map((json) => ApplicationModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+      return (response as List)
+          .map((json) => ApplicationModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      // Fallback: fetch without join (scholarships table may be empty)
+      try {
+        final response = await SupabaseService.client
+            .from(_table)
+            .select()
+            .eq('firebase_uid', firebaseUid)
+            .order('created_at', ascending: false);
+
+        return (response as List)
+            .map((json) => ApplicationModel.fromJson(json as Map<String, dynamic>))
+            .toList();
+      } catch (e) {
+        // ignore: avoid_print
+        print('[ApplicationRepository] getApplications error: $e');
+        return [];
+      }
+    }
   }
 
   Future<ApplicationModel> createApplication({
@@ -24,7 +43,7 @@ class ApplicationRepository {
     // Check if application already exists
     final existing = await SupabaseService.client
         .from(_table)
-        .select('*, bourses(*)')
+        .select()
         .eq('firebase_uid', firebaseUid)
         .eq('scholarship_id', scholarshipId)
         .maybeSingle();
@@ -53,7 +72,7 @@ class ApplicationRepository {
     final inserted = await SupabaseService.client
         .from(_table)
         .insert(data)
-        .select('*, bourses(*)')
+        .select()
         .single();
 
     return ApplicationModel.fromJson(inserted);

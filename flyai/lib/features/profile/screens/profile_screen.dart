@@ -137,9 +137,10 @@ class ProfileScreen extends ConsumerWidget {
                 // Edit Button
                 OutlinedButton.icon(
                   onPressed: () => context.push(AppRoutes.profileSetup),
-                  icon: const Icon(Icons.edit_outlined, size: 16, color: Colors.white),
-                  label: const Text('Edit Profile Details', style: TextStyle(color: Colors.white)),
+                  icon: Icon(Icons.edit_outlined, size: 16, color: AppColors.textPrimary),
+                  label: Text('Edit Profile Details', style: TextStyle(color: AppColors.textPrimary)),
                   style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.textPrimary,
                     minimumSize: const Size(double.infinity, 48),
                     side: BorderSide(color: AppColors.glassBorder),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -302,7 +303,7 @@ class ProfileScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: AppColors.glassBorder),
                     ),
-                    child: Text(t, style: AppTextStyles.bodySmall.copyWith(color: Colors.white)),
+                    child: Text(t, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textPrimary)),
                   );
                 }).toList(),
               ),

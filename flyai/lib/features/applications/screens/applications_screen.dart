@@ -179,7 +179,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
                         title: Text(
                           item,
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: isDone ? AppColors.textSecondary : Colors.white,
+                            color: isDone ? AppColors.textSecondary : AppColors.textPrimary,
                             decoration: isDone ? TextDecoration.lineThrough : null,
                           ),
                         ),
@@ -265,7 +265,7 @@ class _ApplicationCardState extends ConsumerState<_ApplicationCard> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('No, keep it', style: TextStyle(color: Colors.white)),
+            child: Text('No, keep it', style: TextStyle(color: AppColors.textPrimary)),
           ),
           TextButton(
             onPressed: () {
@@ -290,7 +290,7 @@ class _StatusBadge extends StatelessWidget {
       'submitted' => ('Submitted', AppColors.primary.withOpacity(0.2), AppColors.primary),
       'accepted' => ('Accepted 🎉', AppColors.success.withOpacity(0.2), AppColors.success),
       'rejected' => ('Rejected', AppColors.error.withOpacity(0.2), AppColors.error),
-      _ => ('Draft', AppColors.glassBorder, Colors.white),
+      _ => ('Draft', AppColors.glassBorder, AppColors.textSecondary),
     };
 
     return Container(

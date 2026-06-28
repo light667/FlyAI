@@ -84,9 +84,10 @@ class ScholarshipSwipeCard extends StatelessWidget {
           Expanded(
             flex: 4,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     scholarship.title,
@@ -94,38 +95,44 @@ class ScholarshipSwipeCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     scholarship.university,
                     style: AppTextStyles.bodyMedium,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 16),
-                  // Chips row
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _InfoChip(
-                        icon: Icons.school_outlined,
-                        label: scholarship.degreeLevel,
-                        color: AppColors.primary,
-                      ),
-                      _InfoChip(
-                        icon: Icons.attach_money_rounded,
-                        label: scholarship.fundingType,
-                        color: AppColors.success,
-                      ),
-                      if (scholarship.deadline != null)
+                  const SizedBox(height: 10),
+                  // Chips row — single line, no runSpacing overflow
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
                         _InfoChip(
-                          icon: Icons.calendar_today_outlined,
-                          label: _formatDeadline(scholarship.deadline!),
-                          color: scholarship.isDeadlineSoon
-                              ? AppColors.warning
-                              : AppColors.textSecondary,
+                          icon: Icons.school_outlined,
+                          label: scholarship.degreeLevel.length > 20
+                              ? '${scholarship.degreeLevel.substring(0, 18)}…'
+                              : scholarship.degreeLevel,
+                          color: AppColors.primary,
                         ),
-                    ],
+                        const SizedBox(width: 6),
+                        _InfoChip(
+                          icon: Icons.attach_money_rounded,
+                          label: scholarship.fundingType,
+                          color: AppColors.success,
+                        ),
+                        if (scholarship.deadline != null) ...[
+                          const SizedBox(width: 6),
+                          _InfoChip(
+                            icon: Icons.calendar_today_outlined,
+                            label: _formatDeadline(scholarship.deadline!),
+                            color: scholarship.isDeadlineSoon
+                                ? AppColors.warning
+                                : AppColors.textSecondary,
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                   const Spacer(),
                   // Swipe hint
