@@ -7,20 +7,33 @@ import '../constants/app_colors.dart';
 // ── Theme Provider ──────────────────────────────────────────────────────────
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier() : super(ThemeMode.light); // Light mode by default
+  ThemeModeNotifier() : super(ThemeMode.light) {
+    // Initialiser AppColors en cohérence avec le thème par défaut.
+    AppColors.isDark = false;
+  }
 
   void toggleTheme() {
-    state = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    final newMode =
+        state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    state = newMode;
+    // CRITIQUE : synchroniser AppColors.isDark à chaque changement de thème.
+    // Sans cela, les getters de AppColors (textPrimary, card, etc.) restent
+    // bloqués sur la valeur initiale → textes invisibles, dropdowns cassés.
+    AppColors.isDark = newMode == ThemeMode.dark;
   }
 
   void setThemeMode(ThemeMode mode) {
     state = mode;
+    AppColors.isDark = mode == ThemeMode.dark;
   }
 }
 
-final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+final themeModeProvider =
+    StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
   return ThemeModeNotifier();
 });
+
+// ── AppTheme ────────────────────────────────────────────────────────────────
 
 class AppTheme {
   AppTheme._();
@@ -30,6 +43,12 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+
+      // canvasColor contrôle le fond des menus DropdownButton (widget legacy).
+      // Sans cette valeur, le fond hérite de Colors.grey[50] sur certaines
+      // versions de Flutter, ce qui donne du texte blanc invisible sur fond clair.
+      canvasColor: Colors.white,
+
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
@@ -164,6 +183,67 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
+
+      // ── Dropdown & Popup menus ────────────────────────────────────────────
+      // Fix principal pour les listes de pays/champs invisibles en thème clair.
+      // DropdownButton utilise PopupMenuTheme pour les items de menu.
+      popupMenuTheme: PopupMenuThemeData(
+        color: Colors.white,
+        elevation: 6,
+        shadowColor: const Color(0x1A000000),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+        ),
+        textStyle: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: const Color(0xFF0F172A), // Texte sombre sur fond blanc
+        ),
+      ),
+      // Pour les widgets DropdownMenu (Material 3)
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: GoogleFonts.inter(
+          fontSize: 14,
+          color: const Color(0xFF0F172A),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFFF1F5F9),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+          ),
+        ),
+        menuStyle: const MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(Colors.white),
+          elevation: WidgetStatePropertyAll(6),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              side: BorderSide(color: Color(0xFFE2E8F0)),
+            ),
+          ),
+        ),
+      ),
+
+      // Dialogue (picker de date, alertes)
+      dialogTheme: DialogThemeData(
+        backgroundColor: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        titleTextStyle: GoogleFonts.inter(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF0F172A),
+        ),
+        contentTextStyle: GoogleFonts.inter(
+          fontSize: 14,
+          color: const Color(0xFF64748B),
+        ),
+      ),
     );
   }
 
@@ -172,10 +252,11 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: const Color(0xFF0F172A),
+      canvasColor: const Color(0xFF1E293B),
       colorScheme: const ColorScheme.dark(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
-        surface: const Color(0xFF1E293B),
+        surface: Color(0xFF1E293B),
         error: AppColors.error,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
@@ -213,7 +294,7 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 54),
-          side: const BorderSide(color: const Color(0x33FFFFFF), width: 1.5),
+          side: const BorderSide(color: Color(0x33FFFFFF), width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -251,7 +332,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: const Color(0x33FFFFFF), width: 1),
+          borderSide: const BorderSide(color: Color(0x33FFFFFF), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -271,7 +352,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: const Color(0x33FFFFFF), width: 1),
+          side: const BorderSide(color: Color(0x33FFFFFF), width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -282,19 +363,19 @@ class AppTheme {
           fontSize: 13,
           color: Colors.white,
         ),
-        side: const BorderSide(color: const Color(0x33FFFFFF)),
+        side: const BorderSide(color: Color(0x33FFFFFF)),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
         ),
       ),
       dividerTheme: const DividerThemeData(
-        color: const Color(0x33FFFFFF),
+        color: Color(0x33FFFFFF),
         thickness: 1,
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: Color(0xFF1E293B),
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: const Color(0xFFCBD5E1),
+        unselectedItemColor: Color(0xFFCBD5E1),
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
@@ -305,6 +386,55 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
         ),
         behavior: SnackBarBehavior.floating,
+      ),
+
+      // ── Dropdown & Popup menus (dark) ─────────────────────────────────────
+      popupMenuTheme: PopupMenuThemeData(
+        color: const Color(0xFF1E293B),
+        elevation: 6,
+        shadowColor: Colors.black38,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Color(0x33FFFFFF), width: 1),
+        ),
+        textStyle: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: Colors.white,
+        ),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: GoogleFonts.inter(
+          fontSize: 14,
+          color: Colors.white,
+        ),
+        menuStyle: const MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(Color(0xFF1E293B)),
+          elevation: WidgetStatePropertyAll(6),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+              side: BorderSide(color: Color(0x33FFFFFF)),
+            ),
+          ),
+        ),
+      ),
+
+      dialogTheme: DialogThemeData(
+        backgroundColor: const Color(0xFF1E293B),
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        titleTextStyle: GoogleFonts.inter(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+        ),
+        contentTextStyle: GoogleFonts.inter(
+          fontSize: 14,
+          color: const Color(0xFFCBD5E1),
+        ),
       ),
     );
   }

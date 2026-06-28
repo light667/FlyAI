@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
 import '../../dashboard/providers/dashboard_provider.dart';
 import '../../scholarships/providers/scholarship_provider.dart';
@@ -99,7 +98,7 @@ class ProfileScreen extends ConsumerWidget {
                           border: Border.all(color: AppColors.primary, width: 2),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(0.2),
+                              color: AppColors.primary.withValues(alpha: 0.2),
                               blurRadius: 16,
                               spreadRadius: 1,
                             ),
@@ -412,7 +411,7 @@ class _StatCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.08),
+            color.withValues(alpha: 0.08),
             Colors.transparent,
           ],
         ),
@@ -424,7 +423,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),

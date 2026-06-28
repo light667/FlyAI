@@ -16,7 +16,8 @@ class SupabaseService {
     );
   }
 
-  // Generic fetch with error handling
+  // ── Generic fetch ─────────────────────────────────────────────────────────
+
   static Future<List<Map<String, dynamic>>> fetchAll(
     String table, {
     String? orderBy,
@@ -24,15 +25,17 @@ class SupabaseService {
     int? limit,
     Map<String, dynamic>? filters,
   }) async {
+    // Build query with filters applied before ordering/limiting.
+    // filters are applied via .eq() chaining on the PostgrestFilterBuilder.
     var query = client.from(table).select();
 
-    if (orderBy != null) {
-      // Ordering is done at the end
+    if (filters != null) {
+      for (final entry in filters.entries) {
+        query = query.eq(entry.key, entry.value);
+      }
     }
 
-    final response = await client
-        .from(table)
-        .select()
+    final response = await query
         .order(orderBy ?? 'created_at', ascending: ascending)
         .limit(limit ?? 50);
 
@@ -52,11 +55,24 @@ class SupabaseService {
     return response;
   }
 
+  // ── Write operations ──────────────────────────────────────────────────────
+
+  /// Upsert basique (conflit sur la clé primaire).
   static Future<void> upsert(
     String table,
     Map<String, dynamic> data,
   ) async {
     await client.from(table).upsert(data);
+  }
+
+  /// Upsert avec résolution de conflit sur une colonne spécifique.
+  /// Utiliser pour les tables avec UNIQUE contrainte (ex: firebase_uid).
+  static Future<void> upsertWithConflict(
+    String table,
+    Map<String, dynamic> data, {
+    required String onConflict,
+  }) async {
+    await client.from(table).upsert(data, onConflict: onConflict);
   }
 
   static Future<void> insert(
@@ -83,7 +99,11 @@ class SupabaseService {
     await client.from(table).delete().eq(column, value);
   }
 
-  // Storage upload
+  // ── Storage ───────────────────────────────────────────────────────────────
+
+  /// Upload un fichier binaire vers un bucket Supabase Storage.
+  /// [upsert: true] permet d'écraser un fichier existant au même chemin
+  /// sans renvoyer d'erreur 400 (conflict).
   static Future<String?> uploadFile(
     String bucket,
     String path,
@@ -93,7 +113,10 @@ class SupabaseService {
     await client.storage.from(bucket).uploadBinary(
           path,
           Uint8List.fromList(bytes),
-          fileOptions: FileOptions(contentType: mimeType),
+          fileOptions: FileOptions(
+            contentType: mimeType,
+            upsert: true, // ← Evite les erreurs 400 sur re-upload
+          ),
         );
     final url = client.storage.from(bucket).getPublicUrl(path);
     return url;

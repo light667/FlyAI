@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 
 class SwipeActionOverlay extends StatelessWidget {
   final String label;
@@ -23,7 +22,7 @@ class SwipeActionOverlay extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: color, width: 3),
           borderRadius: BorderRadius.circular(12),
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
         ),
         child: Text(
           label.toUpperCase(),

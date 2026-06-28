@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/services/auth_service.dart';
@@ -37,7 +36,7 @@ class DashboardScreen extends ConsumerWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.primary.withOpacity(0.15),
+                      AppColors.primary.withValues(alpha: 0.15),
                       Colors.transparent,
                     ],
                   ),
@@ -61,7 +60,7 @@ class DashboardScreen extends ConsumerWidget {
                         ),
                         CircleAvatar(
                           radius: 26,
-                          backgroundColor: AppColors.primary.withOpacity(0.2),
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.2),
                           backgroundImage: user?.photoURL != null
                               ? CachedNetworkImageProvider(user!.photoURL!)
                               : null,
@@ -214,7 +213,7 @@ class _StatCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.08),
+            color.withValues(alpha: 0.08),
             Colors.transparent,
           ],
         ),
@@ -226,7 +225,7 @@ class _StatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),

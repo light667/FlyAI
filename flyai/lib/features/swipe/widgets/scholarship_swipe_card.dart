@@ -18,7 +18,7 @@ class ScholarshipSwipeCard extends StatelessWidget {
         color: AppColors.card,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -57,7 +57,7 @@ class ScholarshipSwipeCard extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          AppColors.card.withOpacity(0.9),
+                          AppColors.card.withValues(alpha: 0.9),
                         ],
                         stops: const [0.5, 1.0],
                       ),
@@ -191,11 +191,11 @@ class _CompatibilityBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: _color.withOpacity(0.15),
+        color: _color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(50),
-        border: Border.all(color: _color.withOpacity(0.5)),
+        border: Border.all(color: _color.withValues(alpha: 0.5)),
         boxShadow: [
-          BoxShadow(color: _color.withOpacity(0.2), blurRadius: 8),
+          BoxShadow(color: _color.withValues(alpha: 0.2), blurRadius: 8),
         ],
       ),
       child: Row(
@@ -226,7 +226,7 @@ class _CountryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(50),
         border: Border.all(color: AppColors.glassBorder),
       ),
@@ -253,7 +253,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -285,11 +285,11 @@ class _SwipeHint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: color.withOpacity(0.6), size: 20),
+        Icon(icon, color: color.withValues(alpha: 0.6), size: 20),
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(color: color.withOpacity(0.6), fontSize: 10),
+          style: TextStyle(color: color.withValues(alpha: 0.6), fontSize: 10),
         ),
       ],
     );

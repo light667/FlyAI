@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/router/app_router.dart';
 import '../../scholarships/models/scholarship_model.dart';
 import '../../scholarships/providers/scholarship_provider.dart';
 import '../providers/swipe_provider.dart';
@@ -97,7 +96,7 @@ class _SwipeScreenState extends ConsumerState<SwipeScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.15),
+                        color: AppColors.primary.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Text(

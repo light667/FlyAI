@@ -11,21 +11,30 @@ class ProfileRepository {
       if (data == null) return null;
       return ProfileModel.fromJson(data);
     } catch (_) {
-      // Retourne null en cas d'erreur réseau ou de table manquante.
       return null;
     }
   }
 
   Future<void> saveProfile(ProfileModel profile) async {
     final Map<String, dynamic> json = profile.toJson();
+
+    // Inclure l'id uniquement s'il existe déjà (update), sinon Supabase le génère.
     if (profile.id.isNotEmpty) {
       json['id'] = profile.id;
     }
-    await SupabaseService.upsert(_table, json);
+
+    // onConflict: 'firebase_uid' est indispensable ici.
+    // Sans lui, Supabase tente un INSERT et échoue avec 409/400 si
+    // firebase_uid est déjà présent (contrainte UNIQUE sur le schéma).
+    await SupabaseService.upsertWithConflict(
+      _table,
+      json,
+      onConflict: 'firebase_uid',
+    );
   }
 
-  /// Tente d'uploader la photo de profil.
-  /// Retourne l'URL publique ou null en cas d'échec (bucket inexistant, réseau…).
+  /// Tente d'uploader la photo de profil dans le bucket 'images'.
+  /// Retourne l'URL publique ou null en cas d'échec.
   Future<String?> uploadProfilePhoto(
     String firebaseUid,
     List<int> bytes,
@@ -40,11 +49,11 @@ class ProfileRepository {
         'image/$fileExtension',
       );
     } catch (_) {
-      return null; // Upload optionnel, ne bloque pas la création du profil.
+      return null;
     }
   }
 
-  /// Tente d'uploader le CV.
+  /// Tente d'uploader le CV dans le bucket 'documents'.
   /// Retourne l'URL publique ou null en cas d'échec.
   Future<String?> uploadCV(
     String firebaseUid,
@@ -62,7 +71,7 @@ class ProfileRepository {
             : 'application/octet-stream',
       );
     } catch (_) {
-      return null; // Upload optionnel, ne bloque pas la création du profil.
+      return null;
     }
   }
 }
