@@ -39,13 +39,9 @@ class ProfileNotifier extends AutoDisposeAsyncNotifier<ProfileModel?> {
     try {
       final repo = ref.read(profileRepositoryProvider);
       await repo.saveProfile(profile);
-
-      if (!mounted) return;
-
       ref.invalidate(profileExistsProvider);
       state = AsyncValue.data(profile);
     } catch (e, st) {
-      if (!mounted) return;
       state = AsyncValue.error(e, st);
       Error.throwWithStackTrace(e, st);
     }
@@ -63,7 +59,6 @@ class ProfileNotifier extends AutoDisposeAsyncNotifier<ProfileModel?> {
     final url = await repo.uploadProfilePhoto(user.uid, bytes, fileExtension);
 
     if (url != null && state.value != null && updateDb) {
-      if (!mounted) return url;
       final updatedProfile = state.value!.copyWith(photoUrl: url);
       await updateProfile(updatedProfile);
     }
@@ -82,7 +77,6 @@ class ProfileNotifier extends AutoDisposeAsyncNotifier<ProfileModel?> {
     final url = await repo.uploadCV(user.uid, bytes, fileExtension);
 
     if (url != null && state.value != null && updateDb) {
-      if (!mounted) return url;
       final updatedProfile = state.value!.copyWith(cvUrl: url);
       await updateProfile(updatedProfile);
     }

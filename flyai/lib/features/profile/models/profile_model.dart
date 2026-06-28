@@ -83,13 +83,14 @@ class ProfileModel extends Equatable {
         'gpa': gpa,
         'english_level': englishLevel,
         'french_level': frenchLevel,
-        'other_languages': otherLanguages,
+        // Note: 'other_languages' intentionally omitted — column not in DB schema yet
         'target_countries': targetCountries,
         'target_fields': targetFields,
         'academic_goals': academicGoals,
         'cv_url': cvUrl,
         'photo_url': photoUrl,
       };
+
 
   static List<String> _parseList(dynamic value) {
     if (value == null) return [];

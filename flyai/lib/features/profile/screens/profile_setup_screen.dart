@@ -254,7 +254,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     items: commonLanguages.map((l) {
                       return DropdownMenuItem(
                         value: l,
-                        child: Text(l, style: const TextStyle(color: Colors.white)),
+                        child: Text(l, style: TextStyle(color: AppColors.textPrimary)),
                       );
                     }).toList(),
                     onChanged: (val) {
@@ -273,7 +273,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     items: _languageLevels.map((l) {
                       return DropdownMenuItem(
                         value: l,
-                        child: Text(l, style: const TextStyle(color: Colors.white)),
+                        child: Text(l, style: TextStyle(color: AppColors.textPrimary)),
                       );
                     }).toList(),
                     onChanged: (val) {
@@ -983,11 +983,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               value: items.contains(value) ? value : items.first,
               isExpanded: true,
               dropdownColor: AppColors.card,
-              style: AppTextStyles.bodyMedium,
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
+              iconEnabledColor: AppColors.textSecondary,
               items: items.map((i) {
                 return DropdownMenuItem<String>(
                   value: i,
-                  child: Text(i, style: const TextStyle(color: Colors.white)),
+                  child: Text(i, style: TextStyle(color: AppColors.textPrimary)),
                 );
               }).toList(),
               onChanged: onChanged,

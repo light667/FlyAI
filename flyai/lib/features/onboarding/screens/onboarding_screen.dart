@@ -99,14 +99,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             right: 0,
             child: Container(
               padding: const EdgeInsets.fromLTRB(24, 32, 24, 48),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    AppColors.background.withOpacity(0.95),
-                    AppColors.background,
+                    Color(0xCC0F172A),
+                    Color(0xFF0F172A),
                   ],
                 ),
               ),
@@ -173,23 +173,23 @@ class _OnboardingSlide extends StatelessWidget {
         // Background image
         Image.asset(data.image, fit: BoxFit.cover),
 
-        // Dark overlay
+        // Dark overlay — always dark regardless of theme since we have a photo BG
         Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.15),
-                Colors.black.withOpacity(0.55),
-                AppColors.background,
+                Color(0x26000000), // 15% black at top
+                Color(0x8C000000), // 55% black at middle
+                Color(0xFF0F172A), // nearly opaque dark at bottom
               ],
-              stops: const [0.0, 0.5, 1.0],
+              stops: [0.0, 0.5, 1.0],
             ),
           ),
         ),
 
-        // Content
+        // Content — white text always readable on dark overlay
         Positioned(
           bottom: 180,
           left: 24,
@@ -197,9 +197,33 @@ class _OnboardingSlide extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(data.title, style: AppTextStyles.displayMedium),
+              Text(
+                data.title,
+                style: AppTextStyles.displayMedium.copyWith(
+                  color: Colors.white,
+                  shadows: [
+                    const Shadow(
+                      blurRadius: 8,
+                      color: Color(0x80000000),
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 12),
-              Text(data.description, style: AppTextStyles.bodyMedium),
+              Text(
+                data.description,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: Colors.white70,
+                  shadows: [
+                    const Shadow(
+                      blurRadius: 4,
+                      color: Color(0x80000000),
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
