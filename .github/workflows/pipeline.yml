@@ -1,0 +1,47 @@
+# =====================================================================
+# Ce fichier va dans : FlyAI-app/.github/workflows/pipeline.yml
+# =====================================================================
+
+name: FlyAI Pipeline
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # Chaque jour à 06:00 UTC — pipeline complet
+    - cron: "0 * * * *"   # Chaque heure — refresh des statuts seulement
+  workflow_dispatch:       # Bouton "Run workflow" manuel sur GitHub
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: pipeline/scripts/requirements.txt
+
+      - name: Installer les dépendances
+        run: pip install -r pipeline/scripts/requirements.txt
+
+      - name: Pipeline complet (06h ou manuel)
+        if: >
+          github.event_name == 'workflow_dispatch' ||
+          github.event.schedule == '0 6 * * *'
+        working-directory: pipeline/scripts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: python pipeline.py
+
+      - name: Refresh statuts seulement (chaque heure)
+        if: github.event.schedule == '0 * * * *'
+        working-directory: pipeline/scripts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: python pipeline.py --status-only
