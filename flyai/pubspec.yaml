@@ -50,9 +50,6 @@ dependencies:
   http: ^1.2.2
   dio: ^5.7.0
 
-  # Environment
-  flutter_dotenv: ^5.2.1
-
   # File / Image Picking
   image_picker: ^1.1.2
   file_picker: ^8.1.2
@@ -69,6 +66,8 @@ dependencies:
   equatable: ^2.0.5
   url_launcher: ^6.3.2
   universal_html: ^2.2.4
+  pdf: ^3.13.0
+  printing: ^5.15.0
 
 dev_dependencies:
   flutter_test:
@@ -95,4 +94,3 @@ flutter:
   assets:
     - assets/images/
     - assets/lotties/
-    - .env

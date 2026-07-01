@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/utils/pdf_generator.dart';
 import '../models/chat_message_model.dart';
 import '../providers/chat_provider.dart';
 
@@ -22,11 +24,11 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   bool _isSending = false;
 
   final _quickActions = [
-    ('Review my CV 📄', 'Can you help me review my CV and suggest improvements?'),
-    ('Write a motivation letter ✍️', 'Help me write a compelling motivation letter for a scholarship.'),
-    ('Interview prep 🎯', 'Help me prepare for a scholarship interview.'),
-    ('SOP tips 📝', 'Give me tips for writing a strong Statement of Purpose.'),
-    ('Scholarship strategy 🚀', 'What strategy should I use to maximize my scholarship applications?'),
+    ('Review my CV', 'Can you help me review my CV and suggest improvements?'),
+    ('Write a motivation letter', 'Help me write a compelling motivation letter for a scholarship.'),
+    ('Interview prep', 'Help me prepare for a scholarship interview.'),
+    ('SOP tips', 'Give me tips for writing a strong Statement of Purpose.'),
+    ('Scholarship strategy', 'What strategy should I use to maximize my scholarship applications?'),
   ];
 
   @override
@@ -85,6 +87,11 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'New chat',
             onPressed: () => ref.read(chatProvider.notifier).clearChat(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
+            tooltip: 'Settings',
           ),
         ],
       ),
@@ -289,12 +296,60 @@ class _MessageBubble extends StatelessWidget {
                 ),
                 border: isUser ? null : Border.all(color: AppColors.glassBorder),
               ),
-              child: Text(
-                message.content,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: isUser ? Colors.white : AppColors.textPrimary,
-                  height: 1.5,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    message.content,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: isUser ? Colors.white : AppColors.textPrimary,
+                      height: 1.5,
+                    ),
+                  ),
+                  if (!isUser && message.content.length > 200) ...[
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          backgroundColor: AppColors.background,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: AppColors.glassBorder),
+                          ),
+                        ),
+                        onPressed: () {
+                          String title = 'Motivation Letter';
+                          final contentLower = message.content.toLowerCase();
+                          if (contentLower.contains('curriculum vitae') || contentLower.contains('cv')) {
+                            title = 'CV Feedback Analysis';
+                          } else if (contentLower.contains('sop') || contentLower.contains('statement of purpose')) {
+                            title = 'Statement of Purpose Draft';
+                          } else if (contentLower.contains('checklist') || contentLower.contains('document')) {
+                            title = 'Application Checklist Strategy';
+                          }
+                          PdfGenerator.generateAndShare(
+                            title: title,
+                            content: message.content,
+                          );
+                        },
+                        icon: const Icon(Icons.picture_as_pdf_rounded, size: 14, color: AppColors.primary),
+                        label: const Text(
+                          'Export PDF',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),

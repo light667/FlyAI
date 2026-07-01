@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/app_config.dart';
 
@@ -9,36 +8,27 @@ class SupabaseService {
 
   static SupabaseClient get client => Supabase.instance.client;
 
-  /// Initialise Supabase.
-  ///
-  /// En local : charge `assets/.env` via dotenv → lit SUPABASE_URL / KEY.
-  /// En production (Firebase Hosting) : le `.env` n'existe pas (404).
-  ///   → le try/catch absorbe l'erreur sans crasher le splash screen.
-  ///   → [AppConfig] lit les constantes compilées via --dart-define-from-file.
+  /// Initialise Supabase depuis les constantes compilées (AppConfig).
+  /// Aucun chargement de fichier .env au runtime.
   static Future<void> initialize() async {
-    // Tentative de chargement du .env (développement local uniquement).
-    try {
-      await dotenv.load(fileName: '.env');
-    } catch (_) {
-      // Silencieux en production — les valeurs viennent de AppConfig.
-      if (kDebugMode) {
-        // ignore: avoid_print
-        print('[SupabaseService] .env introuvable — '
-            'utilisation des constantes compilées (AppConfig).');
-      }
-    }
-
-    final url = AppConfig.supabaseUrl;
-    final key = AppConfig.supabaseKey;
-
     assert(
-      url.isNotEmpty && key.isNotEmpty,
-      '[SupabaseService] SUPABASE_URL / SUPABASE_KEY manquants.\n'
-      'Local : vérifiez assets/.env\n'
-      'Production : flutter build web --dart-define-from-file=dart_defines.json',
+      AppConfig.supabaseUrl.isNotEmpty && AppConfig.supabaseKey.isNotEmpty,
+      '\n\n[SupabaseService] Clés manquantes !\n'
+      'Lance l\'app avec :\n'
+      '  flutter run --dart-define-from-file=dart_defines.json\n'
+      'ou pour le build web :\n'
+      '  flutter build web --dart-define-from-file=dart_defines.json\n',
     );
 
-    await Supabase.initialize(url: url, anonKey: key);
+    if (kDebugMode && AppConfig.missingKeys.isNotEmpty) {
+      // ignore: avoid_print
+      print('[AppConfig] Clés manquantes : ${AppConfig.missingKeys}');
+    }
+
+    await Supabase.initialize(
+      url: AppConfig.supabaseUrl,
+      anonKey: AppConfig.supabaseKey,
+    );
   }
 
   // ── Generic fetch ─────────────────────────────────────────────────────────
@@ -130,10 +120,7 @@ class SupabaseService {
     await client.storage.from(bucket).uploadBinary(
           path,
           Uint8List.fromList(bytes),
-          fileOptions: FileOptions(
-            contentType: mimeType,
-            upsert: true,
-          ),
+          fileOptions: FileOptions(contentType: mimeType, upsert: true),
         );
     return client.storage.from(bucket).getPublicUrl(path);
   }

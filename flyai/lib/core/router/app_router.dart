@@ -12,9 +12,9 @@ import '../../features/dashboard/screens/main_shell.dart';
 import '../../features/scholarships/screens/scholarship_detail_screen.dart';
 import '../../features/scholarships/models/scholarship_model.dart';
 import '../../features/settings/screens/settings_screen.dart';
-
-
 import '../../features/auth/screens/finish_sign_in_screen.dart';
+import '../../features/dashboard/screens/direct_chat_screen.dart';
+import '../../features/profile/models/profile_model.dart';
 
 // Route paths
 class AppRoutes {
@@ -89,6 +89,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '/chat/:peerId',
+        builder: (context, state) {
+          final peerId = state.pathParameters['peerId']!;
+          final peerProfile = state.extra as ProfileModel?;
+          return DirectChatScreen(peerId: peerId, peerProfile: peerProfile);
+        },
       ),
       GoRoute(
         path: AppRoutes.settings,

@@ -6,8 +6,13 @@ import '../../scholarships/models/scholarship_model.dart';
 
 class ScholarshipSwipeCard extends StatelessWidget {
   final ScholarshipModel scholarship;
+  final bool showSwipeHints;
 
-  const ScholarshipSwipeCard({super.key, required this.scholarship});
+  const ScholarshipSwipeCard({
+    super.key,
+    required this.scholarship,
+    this.showSwipeHints = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -148,26 +153,27 @@ class ScholarshipSwipeCard extends StatelessWidget {
                   ),
 
                   // Bottom section: swipe hints (pushed down by spaceBetween)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _SwipeHint(
-                        icon: Icons.close_rounded,
-                        color: AppColors.error,
-                        label: 'Pass',
-                      ),
-                      _SwipeHint(
-                        icon: Icons.star_rounded,
-                        color: AppColors.secondary,
-                        label: 'Priority',
-                      ),
-                      _SwipeHint(
-                        icon: Icons.favorite_rounded,
-                        color: AppColors.success,
-                        label: 'Like',
-                      ),
-                    ],
-                  ),
+                  if (showSwipeHints)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _SwipeHint(
+                          icon: Icons.close_rounded,
+                          color: AppColors.error,
+                          label: 'Pass',
+                        ),
+                        _SwipeHint(
+                          icon: Icons.star_rounded,
+                          color: AppColors.secondary,
+                          label: 'Priority',
+                        ),
+                        _SwipeHint(
+                          icon: Icons.favorite_rounded,
+                          color: AppColors.success,
+                          label: 'Like',
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

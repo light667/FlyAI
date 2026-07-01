@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,6 +26,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRedirectResult();
+  }
+
+  Future<void> _checkRedirectResult() async {
+    if (!kIsWeb) return;
+    setState(() => _isLoading = true);
+    try {
+      final credential = await AuthService.getRedirectResult();
+      if (credential != null && mounted) {
+        await _navigateAfterAuth();
+      }
+    } catch (e) {
+      _showError(ref.read(stringsProvider).genericError);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   void dispose() {

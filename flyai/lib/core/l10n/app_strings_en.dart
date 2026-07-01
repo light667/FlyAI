@@ -20,9 +20,9 @@ class AppStringsEn implements AppStringsBase {
   @override String get getStarted => 'Get Started';
 
   // Auth
-  @override String get welcomeBack => 'Welcome back 👋';
+  @override String get welcomeBack => 'Welcome back';
   @override String get welcomeBackSub => 'Sign in to continue your journey';
-  @override String get createAccount => 'Create Account ✨';
+  @override String get createAccount => 'Create Account';
   @override String get createAccountSub => 'Start your scholarship journey today';
   @override String get signIn => 'Sign In';
   @override String get signUp => 'Sign Up';
@@ -34,7 +34,7 @@ class AppStringsEn implements AppStringsBase {
   @override String get emailLabel => 'Email address';
   @override String get emailHint => 'you@example.com';
   @override String get sendMagicLink => 'Send sign-in link';
-  @override String get emailSentTitle => 'Email Sent! ✉️';
+  @override String get emailSentTitle => 'Email Sent!';
   @override String get emailSentDesc => 'Check your inbox and click the link to sign in.';
   @override String get checkSpam => 'Also check your spam folder if you don\'t receive anything.';
   @override String get resendLink => 'Resend link';
@@ -47,15 +47,15 @@ class AppStringsEn implements AppStringsBase {
   @override String get passwordTooShort => 'Password must be at least 6 characters.';
   @override String get passwordsDoNotMatch => 'Passwords do not match.';
   @override String get forgotPassword => 'Forgot password?';
-
+ 
   // Email link auth
   @override String get verifyingLink => 'Verifying link…';
   @override String get linkExpired => 'Link expired or invalid';
   @override String get enterEmailAgain => 'Enter your email address to continue';
   @override String get confirm => 'Confirm';
-
+ 
   // Profile
-  @override String get setupProfile => 'Set Up Profile 🎓';
+  @override String get setupProfile => 'Set Up Profile';
   @override String get profileSetupDesc => 'Help us find the best scholarships for you.';
   @override String get stepOf => 'Step';
   @override String get country => 'Country';
@@ -131,14 +131,14 @@ class AppStringsEn implements AppStringsBase {
   @override String get flyAssistant => 'Fly Assistant';
   @override String get askAnything => 'Ask me anything…';
   @override String get assistantWelcome =>
-      'Hi! I\'m Fly Assistant 🚀\n\nI can help you with:\n• CV Review\n• Motivation Letters\n• SOP Writing\n• Interview Prep\n• Scholarship Strategy\n\nWhat can I help you with today?';
+      'Hi! I\'m Fly Assistant\n\nI can help you with:\n• CV Review\n• Motivation Letters\n• SOP Writing\n• Interview Prep\n• Scholarship Strategy\n\nWhat can I help you with today?';
 
   // Application
   @override String get applicationProgress => 'Application Progress';
   @override String get checklist => 'Checklist';
 
   // Settings
-  @override String get settings => 'Settings ⚙️';
+  @override String get settings => 'Settings';
   @override String get account => 'Account';
   @override String get editProfile => 'Edit Profile Details';
   @override String get editProfileSub => 'Update academic targets and language levels';

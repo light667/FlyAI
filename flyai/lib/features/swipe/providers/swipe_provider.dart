@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/auth_service.dart';
 import '../../scholarships/models/scholarship_model.dart';
 import '../../scholarships/providers/scholarship_provider.dart';
+import '../../applications/providers/application_provider.dart';
+import '../../dashboard/providers/dashboard_provider.dart';
 import '../repositories/swipe_repository.dart';
 
 enum SwipeAction { like, dislike, superLike }
@@ -32,19 +34,29 @@ class SwipeNotifier extends AsyncNotifier<void> {
       action: actionStr,
     );
 
-    // If liked/super-liked → create match with compatibility score
+    // If liked/super-liked → create match with compatibility score AND create draft application
     if (action == SwipeAction.like || action == SwipeAction.superLike) {
       await repo.createMatch(
         firebaseUid: user.uid,
         scholarshipId: scholarship.id,
         compatibilityScore: scholarship.compatibilityScore,
       );
+
+      try {
+        final appRepo = ref.read(applicationRepositoryProvider);
+        await appRepo.createApplication(
+          firebaseUid: user.uid,
+          scholarshipId: scholarship.id,
+        );
+      } catch (_) {}
     }
 
-    // Invalidate swipe history and scholarship list
+    // Invalidate swipe history, scholarship list, liked list, dashboard stats, and applications
     ref.invalidate(swipedIdsProvider);
     ref.invalidate(scholarshipProvider);
     ref.invalidate(likedScholarshipsProvider);
+    ref.invalidate(dashboardStatsProvider);
+    ref.invalidate(applicationNotifierProvider);
   }
 }
 

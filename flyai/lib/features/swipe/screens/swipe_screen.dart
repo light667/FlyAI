@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/router/app_router.dart';
 import '../../scholarships/models/scholarship_model.dart';
 import '../../scholarships/providers/scholarship_provider.dart';
 import '../providers/swipe_provider.dart';
@@ -19,6 +20,7 @@ class SwipeScreen extends ConsumerStatefulWidget {
 
 class _SwipeScreenState extends ConsumerState<SwipeScreen> {
   final CardSwiperController _cardController = CardSwiperController();
+  bool _isSwipeMode = true;
 
   @override
   void dispose() {
@@ -55,20 +57,19 @@ class _SwipeScreenState extends ConsumerState<SwipeScreen> {
     final scholarshipsAsync = ref.watch(scholarshipProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/symbol.png', height: 24),
-            const SizedBox(width: 8),
-            Text('Discover', style: AppTextStyles.headlineSmall),
-          ],
-        ),
+        title: Text('Discover', style: AppTextStyles.headlineSmall),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list_rounded),
-            onPressed: () {},
-            tooltip: 'Filter',
+            icon: Icon(_isSwipeMode ? Icons.format_list_bulleted_rounded : Icons.swipe_rounded),
+            onPressed: () => setState(() => _isSwipeMode = !_isSwipeMode),
+            tooltip: _isSwipeMode ? 'List View' : 'Swipe View',
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push(AppRoutes.settings),
+            tooltip: 'Settings',
           ),
         ],
       ),
@@ -81,6 +82,33 @@ class _SwipeScreenState extends ConsumerState<SwipeScreen> {
           if (scholarships.isEmpty) {
             return _EmptyView();
           }
+
+          if (!_isSwipeMode) {
+            // Scrollable list view of scholarships
+            return ListView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+              itemCount: scholarships.length,
+              itemBuilder: (context, index) {
+                final scholarship = scholarships[index];
+                return Container(
+                  height: 380,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  child: GestureDetector(
+                    onTap: () => context.push(
+                      '/home/scholarship/${scholarship.id}',
+                      extra: scholarship,
+                    ),
+                    child: ScholarshipSwipeCard(
+                      scholarship: scholarship,
+                      showSwipeHints: false,
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+
+          // Tinder-like Card Swiper
           return Column(
             children: [
               // Count indicator
@@ -96,7 +124,7 @@ class _SwipeScreenState extends ConsumerState<SwipeScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
+                        color: AppColors.primary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Text(

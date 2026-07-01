@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
@@ -22,7 +23,7 @@ class ProfileScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('My Profile 👤', style: AppTextStyles.headlineSmall),
+        title: Text('My Profile', style: AppTextStyles.headlineSmall),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -214,9 +215,20 @@ class ProfileScreen extends ConsumerWidget {
                           style: AppTextStyles.bodyMedium,
                         ),
                       ),
-                      if (profile.cvUrl != null)
-                        const Icon(Icons.check_circle, color: AppColors.success, size: 20)
-                      else
+                      if (profile.cvUrl != null) ...[
+                        IconButton(
+                          icon: const Icon(Icons.visibility_outlined, color: AppColors.primary),
+                          onPressed: () async {
+                            final url = Uri.parse(profile.cvUrl!);
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url, mode: LaunchMode.externalApplication);
+                            }
+                          },
+                          tooltip: 'Preview CV',
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                      ] else
                         TextButton(
                           onPressed: () => context.push(AppRoutes.profileSetup),
                           child: const Text('Upload'),

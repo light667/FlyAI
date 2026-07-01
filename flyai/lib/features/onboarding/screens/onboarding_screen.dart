@@ -21,17 +21,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _OnboardingData(
       title: AppStrings.onboarding1Title,
       description: AppStrings.onboarding1Desc,
-      image: 'assets/images/onboarding1.jpg',
+      icon: Icons.school_rounded,
     ),
     _OnboardingData(
       title: AppStrings.onboarding2Title,
       description: AppStrings.onboarding2Desc,
-      image: 'assets/images/onboarding2.jpg',
+      icon: Icons.auto_awesome_rounded,
     ),
     _OnboardingData(
       title: AppStrings.onboarding3Title,
       description: AppStrings.onboarding3Desc,
-      image: 'assets/images/onboarding3.jpg',
+      icon: Icons.rocket_launch_rounded,
     ),
   ];
 
@@ -57,10 +57,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isLast = _currentPage == _pages.length - 1;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background image with gradient overlay
+          // Content Slides
           PageView.builder(
             controller: _pageController,
             onPageChanged: (i) => setState(() => _currentPage = i),
@@ -70,20 +70,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
           ),
 
-          // Top bar
+          // Top bar: Only Skip button on the right
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Image.asset('assets/images/symbol.png', height: 32),
-                  const Spacer(),
                   TextButton(
                     onPressed: () => context.go(AppRoutes.login),
                     child: Text(
                       AppStrings.skip,
                       style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.textSecondary,
+                        color: const Color(0xFF64748B), // Slate 500
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -98,22 +98,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             left: 0,
             right: 0,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 32, 24, 48),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Color(0xCC0F172A),
-                    Color(0xFF0F172A),
-                  ],
-                ),
-              ),
+              color: Colors.white,
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 48),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Dots
+                  // Page Indicators
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
@@ -126,7 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == i
                               ? AppColors.primary
-                              : AppColors.glassBorder,
+                              : const Color(0xFFE2E8F0), // Slate 200
                           borderRadius: BorderRadius.circular(50),
                         ),
                       ),
@@ -151,12 +141,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class _OnboardingData {
   final String title;
   final String description;
-  final String image;
+  final IconData icon;
 
   const _OnboardingData({
     required this.title,
     required this.description,
-    required this.image,
+    required this.icon,
   });
 }
 
@@ -167,67 +157,72 @@ class _OnboardingSlide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Background image
-        Image.asset(data.image, fit: BoxFit.cover),
-
-        // Dark overlay — always dark regardless of theme since we have a photo BG
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0x26000000), // 15% black at top
-                Color(0x8C000000), // 55% black at middle
-                Color(0xFF0F172A), // nearly opaque dark at bottom
-              ],
-              stops: [0.0, 0.5, 1.0],
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Styled Icon Container
+          Container(
+            width: 140,
+            height: 140,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withOpacity(0.12),
+                  AppColors.secondary.withOpacity(0.06),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Center(
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.15),
+                      blurRadius: 16,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  data.icon,
+                  size: 48,
+                  color: AppColors.primary,
+                ),
+              ),
             ),
           ),
-        ),
-
-        // Content — white text always readable on dark overlay
-        Positioned(
-          bottom: 180,
-          left: 24,
-          right: 24,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                data.title,
-                style: AppTextStyles.displayMedium.copyWith(
-                  color: Colors.white,
-                  shadows: [
-                    const Shadow(
-                      blurRadius: 8,
-                      color: Color(0x80000000),
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                data.description,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white70,
-                  shadows: [
-                    const Shadow(
-                      blurRadius: 4,
-                      color: Color(0x80000000),
-                      offset: Offset(0, 1),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          const SizedBox(height: 48),
+          Text(
+            data.title,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.displayMedium.copyWith(
+              color: const Color(0xFF0F172A), // Slate 900
+              fontWeight: FontWeight.w800,
+              height: 1.25,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 16),
+          Text(
+            data.description,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: const Color(0xFF64748B), // Slate 500
+              height: 1.6,
+            ),
+          ),
+          const SizedBox(height: 120), // Spacer to avoid overlapping bottom buttons
+        ],
+      ),
     );
   }
 }

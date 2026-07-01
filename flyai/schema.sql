@@ -95,6 +95,57 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 8. Community Posts Table
+CREATE TABLE IF NOT EXISTS posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  firebase_uid TEXT NOT NULL,
+  author_name TEXT NOT NULL,
+  author_photo TEXT,
+  content TEXT NOT NULL,
+  tags JSONB DEFAULT '[]',
+  likes_count INTEGER DEFAULT 0,
+  comments_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 9. Post Likes Table
+CREATE TABLE IF NOT EXISTS post_likes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
+  firebase_uid TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE (post_id, firebase_uid)
+);
+
+-- 10. Direct Messages Table
+CREATE TABLE IF NOT EXISTS direct_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_uid TEXT NOT NULL,
+  receiver_uid TEXT NOT NULL,
+  content TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Likes Count RPC Helpers
+CREATE OR REPLACE FUNCTION increment_likes(post_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE posts
+  SET likes_count = likes_count + 1
+  WHERE id = post_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION decrement_likes(post_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE posts
+  SET likes_count = GREATEST(likes_count - 1, 0)
+  WHERE id = post_id;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Disable Row Level Security (RLS) for all tables to allow public development testing
 ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
 ALTER TABLE scholarships DISABLE ROW LEVEL SECURITY;
@@ -103,6 +154,9 @@ ALTER TABLE matches DISABLE ROW LEVEL SECURITY;
 ALTER TABLE applications DISABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_sessions DISABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_messages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE posts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE post_likes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE direct_messages DISABLE ROW LEVEL SECURITY;
 
 -- Insert Mock Scholarship Opportunities for Discover Swiper Testing
 INSERT INTO scholarships (title, provider, university, country, description, funding_type, degree_level, fields, eligibility, requirements, language_requirements, deadline, image_url, active)
@@ -110,3 +164,4 @@ VALUES
 ('Master of Computer Science Excellence Scholarship', 'DAAD', 'Technical University of Munich', 'Germany', 'A fully funded master scholarship for top-tier African developers to specialize in advanced AI and cloud systems engineering.', 'Fully Funded', 'Master''s Degree', '["Computer Science", "Software Engineering", "Artificial Intelligence & Data Science"]', '{"min_gpa": 3.0, "nationalities": []}', '["CV", "Academic Transcript", "Motivation Letter", "Degree Certificate"]', '{"english": "advanced"}', '2026-12-01', 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97', true),
 ('African Leaders Undergraduate Award', 'Mastercard Foundation', 'McGill University', 'Canada', 'Comprehensive scholarship covering full tuition, living stipends, healthcare, and airfare for outstanding young African undergraduates.', 'Fully Funded', 'Bachelor''s Degree', '["Computer Science", "Business Administration", "Economics", "Public Health"]', '{"min_gpa": 3.2, "continent": "africa"}', '["Passport", "CV", "Recommendation Letter", "Academic Transcript"]', '{"english": "intermediate"}', '2026-11-15', 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1', true),
 ('Eiffel Excellence Program for Developing Countries', 'French Ministry of Foreign Affairs', 'Sorbonne University', 'France', 'Prestigious program designed to train future decision-makers in public and private sectors in engineering, economics, and law.', 'Fully Funded', 'Master''s Degree', '["Mechanical Engineering", "Law & Jurisprudence", "Finance & Banking", "Political Science"]', '{"min_gpa": 3.0, "nationalities": []}', '["CV", "Motivation Letter", "Degree Certificate", "Language Certificate"]', '{"french": "advanced"}', '2026-10-30', 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34', true);
+

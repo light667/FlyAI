@@ -53,19 +53,29 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ClipOval(
-              child: Container(
-                color: Colors.white, // Optionnel : couleur de fond si votre logo est transparent
-                child: Lottie.asset(
-                  'assets/lotties/flyai.json',
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.cover, // Assure que le logo remplit bien le cercle
-                  repeat: false,
+            Container(
+              width: 160,
+              height: 160,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.25),
+                    blurRadius: 24,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             ShaderMask(
               shaderCallback: (bounds) => const LinearGradient(
                 colors: [AppColors.primary, AppColors.secondary],
@@ -73,14 +83,14 @@ class _SplashScreenState extends State<SplashScreen> {
               child: const Text(
                 'Fly AI',
                 style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.w800,
+                  fontSize: 38,
+                  fontWeight: FontWeight.w900,
                   color: Colors.white,
                   letterSpacing: -1,
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               'Swipe. Match. Apply. Fly.',
               style: TextStyle(

@@ -52,7 +52,7 @@ class DashboardScreen extends ConsumerWidget {
                             children: [
                               Text('Welcome back,', style: AppTextStyles.bodyMedium),
                               Text(
-                                displayName.split(' ').first + ' 👋',
+                                displayName.split(' ').first,
                                 style: AppTextStyles.displayMedium,
                               ),
                             ],

@@ -11,9 +11,10 @@ class MatchingEngine {
 
     // ── Education Level (25 pts) ───────────────────────────────────────
     maxScore += 25;
-    if (_educationMatches(profile.educationLevel, scholarship.degreeLevel)) {
-      score += 25;
+    if (!_educationMatches(profile.educationLevel, scholarship.degreeLevel)) {
+      return 0; // Hard disqualification on education level mismatch
     }
+    score += 25;
 
     // ── Field of Study (20 pts) ────────────────────────────────────────
     maxScore += 20;
@@ -23,15 +24,20 @@ class MatchingEngine {
       final profileField = profile.fieldOfStudy.toLowerCase();
       final targetFields =
           profile.targetFields.map((f) => f.toLowerCase()).toList();
+      bool fieldMatch = false;
       for (final field in scholarship.fields) {
         final f = field.toLowerCase();
         if (profileField.contains(f) ||
             f.contains(profileField) ||
             targetFields.any((t) => t.contains(f) || f.contains(t))) {
-          score += 20;
+          fieldMatch = true;
           break;
         }
       }
+      if (!fieldMatch) {
+        return 0; // Hard disqualification on field of study mismatch
+      }
+      score += 20;
     }
 
     // ── Target Country (20 pts) ────────────────────────────────────────

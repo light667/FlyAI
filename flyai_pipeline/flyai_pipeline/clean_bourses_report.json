@@ -1,0 +1,301 @@
+{
+  "started_at": "2026-06-30T19:46:11.360048",
+  "finished_at": "2026-06-30T19:46:15.376541",
+  "duration_seconds": 4.016493,
+  "sources_analyzed": 4,
+  "collected": 100,
+  "validated": 100,
+  "rejected": 0,
+  "deduplicated": 0,
+  "new_inserted": 0,
+  "updated": 0,
+  "status_refreshed": 0,
+  "errors": [],
+  "status_distribution": {
+    "upcoming": 68,
+    "open": 2,
+    "closing_soon": 0,
+    "closed": 17,
+    "unknown": 13
+  },
+  "quality_score_avg": 57.2,
+  "quality_score_min": 35,
+  "quality_score_max": 85,
+  "sources": {
+    "scholarshipsads.com": 90,
+    "opportunitiesforafricans.com": 6,
+    "greatyop.com": 3,
+    "scholarship-positions.com": 1
+  },
+  "funding_distribution": {
+    "Fully Funded": 46,
+    "Partial": 39,
+    "Unknown": 15
+  },
+  "degree_distribution": {
+    "Research": 16,
+    "Master's Degree": 14,
+    "Bachelor's Degree, Master's Degree, PhD / Doctorate": 13,
+    "Bachelor's Degree, Master's Degree": 12,
+    "Bachelor's Degree": 11,
+    "PhD / Doctorate": 7,
+    "Master's Degree, PhD / Doctorate": 6,
+    "Bachelor's Degree, Master's Degree, Short Course / Training": 4,
+    "Master's Degree, Research": 3,
+    "All Levels": 3,
+    "PhD / Doctorate, Research": 2,
+    "Research, Short Course / Training": 2,
+    "Bachelor's Degree, Master's Degree, PhD / Doctorate, Short Course / Training": 1,
+    "Bachelor's Degree, Master's Degree, PhD / Doctorate, Research": 1,
+    "Bachelor's Degree, Research": 1,
+    "PhD / Doctorate, Post-Doctorate": 1,
+    "Master's Degree, PhD / Doctorate, Short Course / Training": 1,
+    "Master's Degree, PhD / Doctorate, Research": 1,
+    "PhD / Doctorate, Post-Doctorate, Research": 1
+  },
+  "warnings": {
+    "fly_01d4ff688119cd": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_02ceda8d57115d": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_03951bdacabd1b": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0463bdcbc4745c": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_04870c3edefee8": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0507193b8829ed": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_052b5c453eadfe": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_05c8d52a8c7dd7": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_065604abcdc832": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_0690d6ede70a1b": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_090d79fcc0f4b7": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_0934c77947333a": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_099de51d3cb904": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0a3516fa4b7491": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0b8880cee46045": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0bbde73e022094": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0c5753b6f41464": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0c80d662ba257b": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0dac6f40a6839b": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0e0e6a452bce81": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0e9e9fea4f24a6": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0f17e924592da4": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_0f5619d91a52c5": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_103f8446aab9f0": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_10caeecdd4177e": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_1257c4045bf1b2": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_12ee11629b90b6": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_12fc5205c661c7": [
+      "Deadline expirée — statut: closed"
+    ],
+    "fly_1398da31eb25ae": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_1411f1b0974dae": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_14bb37a0e6db71": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_14f3fe47b7e9fd": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_16034cc487cf6e": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_1753fd671398a8": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_176d2ed035a902": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_18604eb52e7de4": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_18b3b3d60df422": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_1d9e06e602fd63": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_1e61f988372621": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_1effb9f68a4c9f": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_1fcc77f30416ee": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_20293c1ed2a39e": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2086a1815c6fc3": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_20ef3ab6aa9aa7": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_21bf179233389e": [
+      "Deadline expirée — statut: closed"
+    ],
+    "fly_22b00bea28f194": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_22eb2ed1f160fa": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_231dac0578debd": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_239de8cee0b2e2": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_23c3ab0c824c39": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_23d7f27249cf81": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_253f3143dc8ab3": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_25a83102931ce6": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_26b9954d9fa196": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_275df73f522220": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2910adbae770ad": [
+      "Deadline expirée — statut: closed"
+    ],
+    "fly_2935e20675c198": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_29e073f7560907": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_2a1f5e9fe5269a": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2a428eaef1064a": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2b46db95701337": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2cb9062eec4ac9": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2d3fb165ef78a0": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2d7e486220978a": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2e843889c1f666": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_2f717c2a85d604": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_30e55b0185ecca": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_326614bf70e002": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_32c30426b438ac": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_32eacfa7fd5182": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_32ef9e716119da": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_3395ef8043a8ee": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_33b2fa9e945d03": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_349fe371266855": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ],
+    "fly_34ce963e0cacd8": [
+      "Pas d'URL de candidature"
+    ],
+    "fly_35a1f444ce4ba0": [
+      "Deadline expirée — statut: closed",
+      "Pas d'URL de candidature"
+    ]
+  },
+  "fuzzy_duplicates": []
+}

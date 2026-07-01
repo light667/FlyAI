@@ -9,6 +9,8 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../scholarships/models/scholarship_model.dart';
 import '../../swipe/providers/swipe_provider.dart';
+import '../../applications/providers/application_provider.dart';
+import '../../dashboard/providers/dashboard_provider.dart';
 
 class ScholarshipDetailScreen extends ConsumerWidget {
   final ScholarshipModel scholarship;
@@ -160,6 +162,13 @@ class ScholarshipDetailScreen extends ConsumerWidget {
                 label: AppStrings.startApplication,
                 icon: Icons.rocket_launch_rounded,
                 onPressed: () async {
+                  try {
+                    await ref
+                        .read(applicationNotifierProvider.notifier)
+                        .startApplication(scholarship.id);
+                    ref.invalidate(dashboardStatsProvider);
+                  } catch (_) {}
+
                   if (scholarship.applicationUrl != null) {
                     final uri = Uri.parse(scholarship.applicationUrl!);
                     if (await canLaunchUrl(uri)) launchUrl(uri);

@@ -1,6 +1,9 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/ai_service.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/services/supabase_service.dart';
 import '../models/chat_message_model.dart';
 import '../repositories/chat_repository.dart';
 
@@ -71,8 +74,46 @@ class ChatNotifier extends StateNotifier<AsyncValue<List<ChatMessage>>> {
           .map((m) => {'role': m.role, 'content': m.content})
           .toList();
 
-      final response = await AIService.chat(
+      // Retrieve RAG Context 1: Student CV PDF
+      String? cvBase64;
+      try {
+        final profileResponse = await SupabaseService.client
+            .from('profiles')
+            .select('cv_url')
+            .eq('firebase_uid', user.uid)
+            .maybeSingle();
+
+        if (profileResponse != null && profileResponse['cv_url'] != null) {
+          final cvUrl = profileResponse['cv_url'] as String;
+          final bytesResponse = await http.get(Uri.parse(cvUrl));
+          if (bytesResponse.statusCode == 200) {
+            cvBase64 = base64Encode(bytesResponse.bodyBytes);
+          }
+        }
+      } catch (_) {}
+
+      // Retrieve RAG Context 2: Top Active Scholarships in DB
+      String? scholarshipsContext;
+      try {
+        final scholarshipsResponse = await SupabaseService.client
+            .from('scholarships')
+            .select()
+            .eq('active', true)
+            .limit(12);
+
+        final list = (scholarshipsResponse as List)
+            .map((s) => '- ${s['title']} by ${s['provider']} (Degree: ${s['degree_level']}, Fields: ${s['fields']}, Country: ${s['country']})')
+            .join('\n');
+
+        if (list.isNotEmpty) {
+          scholarshipsContext = list;
+        }
+      } catch (_) {}
+
+      final response = await AIService.chatWithRAG(
         messages: history,
+        cvBase64: cvBase64,
+        scholarshipsContext: scholarshipsContext,
         systemPrompt: AIService.scholarshipSystemPrompt,
       );
 

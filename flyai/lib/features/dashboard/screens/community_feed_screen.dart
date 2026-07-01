@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/supabase_service.dart';
 import '../../../core/providers/locale_provider.dart';
+import '../../profile/models/profile_model.dart';
+import 'direct_chat_screen.dart';
 
 // ── Models ───────────────────────────────────────────────────────────────────
 
@@ -85,6 +89,24 @@ class PostModel {
   }
 }
 
+class ChatThreadModel {
+  final String peerUid;
+  final String peerName;
+  final String? peerPhoto;
+  final String? peerUniversity;
+  final String lastMessage;
+  final DateTime lastMessageTime;
+
+  const ChatThreadModel({
+    required this.peerUid,
+    required this.peerName,
+    this.peerPhoto,
+    this.peerUniversity,
+    required this.lastMessage,
+    required this.lastMessageTime,
+  });
+}
+
 // ── Providers ────────────────────────────────────────────────────────────────
 
 final communityFeedProvider = StateNotifierProvider<CommunityFeedNotifier, AsyncValue<List<PostModel>>>((ref) {
@@ -96,48 +118,9 @@ class CommunityFeedNotifier extends StateNotifier<AsyncValue<List<PostModel>>> {
     fetchPosts();
   }
 
-  final _mockPosts = [
-    PostModel(
-      id: 'mock_1',
-      firebaseUid: 'user_1',
-      authorName: 'Marie Diallo',
-      authorPhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb',
-      content: 'Je viens de soumettre ma candidature pour la bourse Eiffel en France ! Croisez les doigts pour moi 🤞 Des conseils pour l\'entretien de sélection ?',
-      tags: const ['Eiffel', 'France', 'Master'],
-      likesCount: 12,
-      commentsCount: 3,
-      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-      isLiked: false,
-    ),
-    PostModel(
-      id: 'mock_2',
-      firebaseUid: 'user_2',
-      authorName: 'Kofi Mensah',
-      authorPhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
-      content: 'Est-ce que quelqu\'un prépare le test TOEFL ou IELTS en ce moment ? J\'ai besoin d\'un binôme pour pratiquer l\'oral.',
-      tags: const ['TOEFL', 'IELTS', 'Langues'],
-      likesCount: 8,
-      commentsCount: 5,
-      createdAt: DateTime.now().subtract(const Duration(hours: 5)),
-      isLiked: true,
-    ),
-    PostModel(
-      id: 'mock_3',
-      firebaseUid: 'system',
-      authorName: 'Fly AI Guide',
-      content: '🚀 Astuce du jour : Lors de la rédaction de votre lettre de motivation, concentrez-vous sur l\'impact de vos études de retour dans votre pays d\'origine. Les comités adorent ce point !',
-      tags: const ['Conseils', 'Motivation', 'SOP'],
-      likesCount: 24,
-      commentsCount: 2,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-      isLiked: false,
-    ),
-  ];
-
   Future<void> fetchPosts() async {
     final user = AuthService.currentUser;
     try {
-      // 1. Fetch posts from Supabase
       final postsResponse = await SupabaseService.client
           .from('posts')
           .select()
@@ -145,7 +128,6 @@ class CommunityFeedNotifier extends StateNotifier<AsyncValue<List<PostModel>>> {
 
       final List<PostModel> posts = [];
 
-      // 2. Fetch liked posts by current user to set isLiked flag
       List<String> likedPostIds = [];
       if (user != null) {
         final likesResponse = await SupabaseService.client
@@ -160,15 +142,9 @@ class CommunityFeedNotifier extends StateNotifier<AsyncValue<List<PostModel>>> {
         posts.add(PostModel.fromJson(p as Map<String, dynamic>, isLiked: likedPostIds.contains(postId)));
       }
 
-      // If empty, load mock posts alongside
-      if (posts.isEmpty) {
-        state = AsyncValue.data(_mockPosts);
-      } else {
-        state = AsyncValue.data(posts);
-      }
+      state = AsyncValue.data(posts);
     } catch (e) {
-      // Fallback to mock data if table does not exist or network failure
-      state = AsyncValue.data(_mockPosts);
+      state = AsyncValue.error(e, StackTrace.current);
     }
   }
 
@@ -177,7 +153,7 @@ class CommunityFeedNotifier extends StateNotifier<AsyncValue<List<PostModel>>> {
     if (user == null) return;
 
     final newPostLocal = PostModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: '',
       firebaseUid: user.uid,
       authorName: user.displayName ?? 'Scholar',
       authorPhoto: user.photoURL,
@@ -188,26 +164,16 @@ class CommunityFeedNotifier extends StateNotifier<AsyncValue<List<PostModel>>> {
       commentsCount: 0,
     );
 
-    // Add locally immediately
-    state.whenData((posts) {
-      state = AsyncValue.data([newPostLocal, ...posts]);
-    });
-
     try {
-      // Attempt to save to Supabase
       await SupabaseService.client.from('posts').insert(newPostLocal.toJson());
-      // Re-fetch to sync
       fetchPosts();
-    } catch (_) {
-      // Gracefully continue with local state
-    }
+    } catch (_) {}
   }
 
   Future<void> toggleLike(String postId) async {
     final user = AuthService.currentUser;
     if (user == null) return;
 
-    // Toggle locally immediately
     state.whenData((posts) {
       final updated = posts.map((p) {
         if (p.id == postId) {
@@ -225,26 +191,20 @@ class CommunityFeedNotifier extends StateNotifier<AsyncValue<List<PostModel>>> {
       final post = postsList.firstWhere((p) => p.id == postId);
 
       if (post.isLiked) {
-        // Insert like
         await SupabaseService.client.from('post_likes').insert({
           'post_id': postId,
           'firebase_uid': user.uid,
         });
-        // Increment post likes count
         await SupabaseService.client.rpc('increment_likes', params: {'post_id': postId});
       } else {
-        // Delete like
         await SupabaseService.client
             .from('post_likes')
             .delete()
             .eq('post_id', postId)
             .eq('firebase_uid', user.uid);
-        // Decrement post likes count
         await SupabaseService.client.rpc('decrement_likes', params: {'post_id': postId});
       }
-    } catch (_) {
-      // Silent error fallback (keeps local state)
-    }
+    } catch (_) {}
   }
 }
 
@@ -257,17 +217,124 @@ class CommunityFeedScreen extends ConsumerStatefulWidget {
   ConsumerState<CommunityFeedScreen> createState() => _CommunityFeedScreenState();
 }
 
-class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
-  String _selectedFilter = 'All';
+class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  List<ProfileModel> _members = [];
+  bool _isLoadingMembers = false;
+  List<ChatThreadModel> _threads = [];
+  bool _isLoadingThreads = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabChange);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) return;
+    if (_tabController.index == 1) {
+      _fetchMembers();
+    } else if (_tabController.index == 2) {
+      _fetchInboxThreads();
+    }
+  }
+
+  Future<void> _fetchMembers() async {
+    final user = AuthService.currentUser;
+    if (user == null) return;
+
+    setState(() => _isLoadingMembers = true);
+    try {
+      final response = await SupabaseService.client
+          .from('profiles')
+          .select()
+          .neq('firebase_uid', user.uid);
+
+      final loaded = (response as List)
+          .map((json) => ProfileModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      if (mounted) {
+        setState(() {
+          _members = loaded;
+          _isLoadingMembers = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingMembers = false);
+    }
+  }
+
+  Future<void> _fetchInboxThreads() async {
+    final user = AuthService.currentUser;
+    if (user == null) return;
+
+    setState(() => _isLoadingThreads = true);
+    try {
+      // Query messages where sender or receiver is current user
+      final response = await SupabaseService.client
+          .from('direct_messages')
+          .select()
+          .or('sender_uid.eq.${user.uid},receiver_uid.eq.${user.uid}')
+          .order('created_at', ascending: false);
+
+      final messages = (response as List)
+          .map((json) => DirectMessageModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      // Find unique peer IDs and their latest message
+      final Map<String, DirectMessageModel> peerLatestMsg = {};
+      for (final m in messages) {
+        final peerId = m.senderUid == user.uid ? m.receiverUid : m.senderUid;
+        if (!peerLatestMsg.containsKey(peerId)) {
+          peerLatestMsg[peerId] = m;
+        }
+      }
+
+      final List<ChatThreadModel> loadedThreads = [];
+      
+      // Fetch profile details for each unique peer
+      for (final entry in peerLatestMsg.entries) {
+        final peerId = entry.key;
+        final latestMsg = entry.value;
+
+        final profileJson = await SupabaseService.fetchOne('profiles', 'firebase_uid', peerId);
+        if (profileJson != null) {
+          final profile = ProfileModel.fromJson(profileJson);
+          loadedThreads.add(ChatThreadModel(
+            peerUid: peerId,
+            peerName: profile.fullName,
+            peerPhoto: profile.photoUrl,
+            peerUniversity: profile.university,
+            lastMessage: latestMsg.content,
+            lastMessageTime: latestMsg.createdAt,
+          ));
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _threads = loadedThreads;
+          _isLoadingThreads = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isLoadingThreads = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final postsAsync = ref.watch(communityFeedProvider);
     final isFr = ref.watch(localeProvider).languageCode == 'fr';
-    final filters = isFr
-        ? ['Tous', 'Questions', 'Partages', 'Conseils']
-        : ['All', 'Questions', 'Shares', 'Tips'];
-
     final strings = isFr ? _FrenchStrings() : _EnglishStrings();
 
     return Scaffold(
@@ -277,114 +344,153 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(communityFeedProvider.notifier).fetchPosts(),
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
+            tooltip: 'Settings',
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: AppColors.primary,
+          labelColor: AppColors.primary,
+          unselectedLabelColor: AppColors.textSecondary,
+          tabs: [
+            Tab(text: isFr ? 'Actualités' : 'Feed'),
+            Tab(text: isFr ? 'Membres' : 'Members'),
+            Tab(text: isFr ? 'Messages' : 'Inbox'),
+          ],
+        ),
       ),
-      body: RefreshIndicator(
-        color: AppColors.primary,
-        onRefresh: () => ref.read(communityFeedProvider.notifier).fetchPosts(),
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            // ── Create Post Prompt ──────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: _buildCreatePostBar(strings),
-            ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          // ── Tab 1: Feed ──
+          RefreshIndicator(
+            color: AppColors.primary,
+            onRefresh: () => ref.read(communityFeedProvider.notifier).fetchPosts(),
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _buildCreatePostBar(strings),
+                ),
+                postsAsync.when(
+                  loading: () => const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                  ),
+                  error: (err, _) => SliverFillRemaining(
+                    child: Center(
+                      child: Text(strings.errorLoading, style: AppTextStyles.bodyMedium),
+                    ),
+                  ),
+                  data: (posts) {
+                    if (posts.isEmpty) {
+                      return SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.feed_outlined, size: 64, color: AppColors.glassBorder),
+                                const SizedBox(height: 16),
+                                Text(strings.noPosts, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }
 
-            // ── Filter Chips ────────────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: Container(
-                height: 50,
-                padding: const EdgeInsets.only(left: 24, bottom: 12),
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: filters.length,
-                  itemBuilder: (context, i) {
-                    final isSelected = _selectedFilter.toLowerCase() == filters[i].toLowerCase() ||
-                        (_selectedFilter == 'All' && filters[i] == 'Tous') ||
-                        (_selectedFilter == 'Tous' && filters[i] == 'All');
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(filters[i]),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedFilter = filters[i];
-                          });
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final post = posts[index];
+                          return _PostCard(post: post, strings: strings);
                         },
+                        childCount: posts.length,
                       ),
                     );
                   },
                 ),
-              ),
+                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              ],
             ),
+          ),
 
-            // ── Posts List ──────────────────────────────────────────────────
-            postsAsync.when(
-              loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              ),
-              error: (err, _) => SliverFillRemaining(
-                child: Center(
-                  child: Text(strings.errorLoading, style: AppTextStyles.bodyMedium),
-                ),
-              ),
-              data: (posts) {
-                // Apply filter
-                final filteredPosts = posts.where((p) {
-                  if (_selectedFilter == 'All' || _selectedFilter == 'Tous') return true;
-                  if (_selectedFilter == 'Questions' && p.content.contains('?')) return true;
-                  if (_selectedFilter == 'Conseils' || _selectedFilter == 'Tips') {
-                    return p.tags.any((t) => t.toLowerCase().contains('conseil') || t.toLowerCase().contains('tip'));
-                  }
-                  return p.tags.any((t) => t.toLowerCase() == _selectedFilter.toLowerCase());
-                }).toList();
-
-                if (filteredPosts.isEmpty) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.feed_outlined, size: 64, color: AppColors.glassBorder),
-                            const SizedBox(height: 16),
-                            Text(strings.noPosts, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
-                          ],
-                        ),
-                      ),
+          // ── Tab 2: Members ──
+          _isLoadingMembers
+              ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+              : _members.isEmpty
+                  ? Center(child: Text(isFr ? 'Aucun membre inscrit.' : 'No members registered.'))
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                      itemCount: _members.length,
+                      itemBuilder: (context, index) {
+                        return _MemberCard(
+                          profile: _members[index],
+                          isFr: isFr,
+                          onMessageTap: () {
+                            context.push('/chat/${_members[index].firebaseUid}', extra: _members[index]);
+                          },
+                        );
+                      },
                     ),
-                  );
-                }
 
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final post = filteredPosts[index];
-                      return _PostCard(post: post, strings: strings);
-                    },
-                    childCount: filteredPosts.length,
-                  ),
-                );
-              },
-            ),
+          // ── Tab 3: Inbox ──
+          _isLoadingThreads
+              ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+              : _threads.isEmpty
+                  ? Center(child: Text(isFr ? 'Aucun message.' : 'No conversations yet.'))
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                      itemCount: _threads.length,
+                      itemBuilder: (context, index) {
+                        final thread = _threads[index];
+                        final timeStr = DateFormat('HH:mm').format(thread.lastMessageTime);
 
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 100),
-            ),
-          ],
-        ),
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.card,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppColors.glassBorder),
+                          ),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: AppColors.primary.withOpacity(0.1),
+                              backgroundImage: thread.peerPhoto != null ? NetworkImage(thread.peerPhoto!) : null,
+                              child: thread.peerPhoto == null
+                                  ? Text(
+                                      thread.peerName.isNotEmpty ? thread.peerName[0].toUpperCase() : 'S',
+                                      style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                                    )
+                                  : null,
+                            ),
+                            title: Text(thread.peerName, style: AppTextStyles.titleMedium),
+                            subtitle: Text(
+                              thread.lastMessage,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                            ),
+                            trailing: Text(timeStr, style: AppTextStyles.caption),
+                            onTap: () {
+                              context.push('/chat/${thread.peerUid}');
+                            },
+                          ),
+                        );
+                      },
+                    ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
-        onPressed: () => _showCreatePostModal(context, strings),
-        child: const Icon(Icons.create_rounded, color: Colors.white),
-      ),
+      floatingActionButton: _tabController.index == 0
+          ? FloatingActionButton(
+              backgroundColor: AppColors.primary,
+              onPressed: () => _showCreatePostModal(context, strings),
+              child: const Icon(Icons.create_rounded, color: Colors.white),
+            )
+          : null,
     );
   }
 
@@ -541,7 +647,6 @@ class _PostCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Avatar + Author + Time
           Row(
             children: [
               CircleAvatar(
@@ -571,15 +676,9 @@ class _PostCard extends ConsumerWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: Icon(Icons.more_vert_rounded, color: AppColors.textSecondary),
-                onPressed: () {},
-              ),
             ],
           ),
           const SizedBox(height: 14),
-
-          // Content text
           Text(
             post.content,
             style: AppTextStyles.bodyMedium.copyWith(
@@ -588,8 +687,6 @@ class _PostCard extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 14),
-
-          // HashTags
           if (post.tags.isNotEmpty) ...[
             Wrap(
               spacing: 8,
@@ -607,12 +704,8 @@ class _PostCard extends ConsumerWidget {
             ),
             const SizedBox(height: 14),
           ],
-
-          // Footer Divider
           Divider(color: AppColors.glassBorder, height: 1),
           const SizedBox(height: 10),
-
-          // Actions Row: Like + Comment + Share
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -698,6 +791,102 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
+// ── _MemberCard ──────────────────────────────────────────────────────────────
+
+class _MemberCard extends StatelessWidget {
+  final ProfileModel profile;
+  final bool isFr;
+  final VoidCallback onMessageTap;
+
+  const _MemberCard({
+    required this.profile,
+    required this.isFr,
+    required this.onMessageTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.glassBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 26,
+                backgroundColor: AppColors.primary.withOpacity(0.1),
+                backgroundImage: profile.photoUrl != null ? NetworkImage(profile.photoUrl!) : null,
+                child: profile.photoUrl == null
+                    ? Text(
+                        profile.fullName.isNotEmpty ? profile.fullName[0].toUpperCase() : 'S',
+                        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 18),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(profile.fullName, style: AppTextStyles.titleLarge),
+                    Text(
+                      '${profile.educationLevel} · ${profile.university}',
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: onMessageTap,
+                icon: const Icon(Icons.mail_rounded, size: 14, color: Colors.white),
+                label: Text(
+                  isFr ? 'Message' : 'Message',
+                  style: const TextStyle(fontSize: 12, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          if (profile.targetFields.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: profile.targetFields.map((field) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.glassBorder),
+                  ),
+                  child: Text(
+                    field,
+                    style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary, fontSize: 10),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 // ── Localization Strings ─────────────────────────────────────────────────────
 
 abstract class _Strings {
@@ -712,7 +901,7 @@ abstract class _Strings {
 
 class _FrenchStrings implements _Strings {
   @override
-  String get title => 'Communauté 🌐';
+  String get title => 'Communauté';
   @override
   String get errorLoading => 'Erreur de chargement du flux.';
   @override
@@ -729,7 +918,7 @@ class _FrenchStrings implements _Strings {
 
 class _EnglishStrings implements _Strings {
   @override
-  String get title => 'Community Feed 🌐';
+  String get title => 'Community';
   @override
   String get errorLoading => 'Error loading community feed.';
   @override

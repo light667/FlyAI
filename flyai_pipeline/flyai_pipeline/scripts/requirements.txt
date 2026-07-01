@@ -1,0 +1,27 @@
+# Core
+pydantic>=2.0
+python-dotenv>=1.0
+
+# HTTP
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=4.9
+
+# Dates
+dateparser>=1.2
+
+# Déduplication
+rapidfuzz>=3.0
+
+# Retry
+tenacity>=8.2
+
+# Données
+pandas>=2.0
+
+# Scheduler (optionnel)
+apscheduler>=3.10
+
+# Tests
+pytest>=7.4
+pytest-asyncio>=0.21

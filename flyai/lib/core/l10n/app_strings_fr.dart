@@ -20,9 +20,9 @@ class AppStringsFr implements AppStringsBase {
   @override String get getStarted => 'Commencer';
 
   // Auth
-  @override String get welcomeBack => 'Bon retour 👋';
+  @override String get welcomeBack => 'Bon retour';
   @override String get welcomeBackSub => 'Connecte-toi pour continuer ton voyage';
-  @override String get createAccount => 'Créer un compte ✨';
+  @override String get createAccount => 'Créer un compte';
   @override String get createAccountSub => 'Commence ton parcours vers les bourses aujourd\'hui';
   @override String get signIn => 'Se connecter';
   @override String get signUp => 'S\'inscrire';
@@ -34,7 +34,7 @@ class AppStringsFr implements AppStringsBase {
   @override String get emailLabel => 'Adresse e-mail';
   @override String get emailHint => 'toi@exemple.com';
   @override String get sendMagicLink => 'Recevoir le lien de connexion';
-  @override String get emailSentTitle => 'E-mail envoyé ! ✉️';
+  @override String get emailSentTitle => 'E-mail envoyé !';
   @override String get emailSentDesc => 'Vérifie ta boîte mail et clique sur le lien pour te connecter.';
   @override String get checkSpam => 'Vérifie aussi tes spams si tu ne reçois rien.';
   @override String get resendLink => 'Renvoyer le lien';
@@ -131,14 +131,14 @@ class AppStringsFr implements AppStringsBase {
   @override String get flyAssistant => 'Fly Assistant';
   @override String get askAnything => 'Pose-moi n\'importe quelle question…';
   @override String get assistantWelcome =>
-      'Bonjour ! Je suis Fly Assistant 🚀\n\nJe peux t\'aider avec :\n• Révision de CV\n• Lettres de motivation\n• Rédaction de SOP\n• Préparation aux entretiens\n• Stratégie de bourses\n\nComment puis-je t\'aider aujourd\'hui ?';
+      'Bonjour ! Je suis Fly Assistant\n\nJe peux t\'aider avec :\n• Révision de CV\n• Lettres de motivation\n• Rédaction de SOP\n• Préparation aux entretiens\n• Stratégie de bourses\n\nComment puis-je t\'aider aujourd\'hui ?';
 
   // Application
   @override String get applicationProgress => 'Avancement de la candidature';
   @override String get checklist => 'Liste de contrôle';
 
   // Settings
-  @override String get settings => 'Paramètres ⚙️';
+  @override String get settings => 'Paramètres';
   @override String get account => 'Compte';
   @override String get editProfile => 'Modifier le profil';
   @override String get editProfileSub => 'Mettre à jour les objectifs et niveaux de langues';

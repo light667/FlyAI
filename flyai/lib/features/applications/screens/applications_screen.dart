@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../models/application_model.dart';
@@ -15,7 +16,14 @@ class ApplicationsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('My Applications 📁', style: AppTextStyles.headlineSmall),
+        title: Text('My Applications', style: AppTextStyles.headlineSmall),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
+            tooltip: 'Settings',
+          ),
+        ],
       ),
       body: appsAsync.when(
         loading: () => const Center(
@@ -288,7 +296,7 @@ class _StatusBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (label, bg, fg) = switch (status) {
       'submitted' => ('Submitted', AppColors.primary.withOpacity(0.2), AppColors.primary),
-      'accepted' => ('Accepted 🎉', AppColors.success.withOpacity(0.2), AppColors.success),
+      'accepted' => ('Accepted', AppColors.success.withOpacity(0.2), AppColors.success),
       'rejected' => ('Rejected', AppColors.error.withOpacity(0.2), AppColors.error),
       _ => ('Draft', AppColors.glassBorder, AppColors.textSecondary),
     };
