@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lottie/lottie.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/services/auth_service.dart';
@@ -8,99 +7,206 @@ import '../../../core/services/supabase_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _scale;
+  late Animation<double> _fade;
+  late Animation<double> _ring;
+
   @override
   void initState() {
     super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
+    _scale = Tween<double>(begin: 0.6, end: 1.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.6, curve: Curves.elasticOut)));
+    _fade = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.5, curve: Curves.easeOut)));
+    _ring = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(CurvedAnimation(parent: _ctrl, curve: const Interval(0.4, 1.0, curve: Curves.easeOut)));
+    _ctrl.forward();
     _navigate();
   }
 
-  Future<void> _navigate() async {
-    await Future.delayed(const Duration(milliseconds: 2800));
-    if (!mounted) return;
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
+  Future<void> _navigate() async {
+    await Future.delayed(const Duration(milliseconds: 2600));
+    if (!mounted) return;
     final user = AuthService.currentUser;
     if (user == null) {
       context.go(AppRoutes.onboarding);
       return;
     }
-
-    // Check if profile exists
-    final profile = await SupabaseService.fetchOne(
-      'profiles',
-      'firebase_uid',
-      user.uid,
-    );
-
+    final profile = await SupabaseService.fetchOne('profiles', 'firebase_uid', user.uid);
     if (!mounted) return;
-    if (profile != null) {
-      context.go(AppRoutes.home);
-    } else {
-      context.go(AppRoutes.profileSetup);
-    }
+    context.go(profile != null ? AppRoutes.home : AppRoutes.profileSetup);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 160,
-              height: 160,
+      backgroundColor: const Color(0xFF0A0F1C),
+      body: Stack(
+        children: [
+          // Ambient glow
+          Positioned(
+            top: -100,
+            left: -80,
+            child: Container(
+              width: 400,
+              height: 400,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withOpacity(0.25),
-                    blurRadius: 24,
-                    spreadRadius: 2,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  fit: BoxFit.cover,
+                gradient: RadialGradient(
+                  colors: [AppColors.primary.withOpacity(0.2), Colors.transparent],
                 ),
               ),
             ),
-            const SizedBox(height: 32),
-            ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [AppColors.primary, AppColors.secondary],
-              ).createShader(bounds),
-              child: const Text(
-                'Fly AI',
-                style: TextStyle(
-                  fontSize: 38,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  letterSpacing: -1,
+          ),
+          Positioned(
+            bottom: -100,
+            right: -80,
+            child: Container(
+              width: 350,
+              height: 350,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [const Color(0xFF7C3AED).withOpacity(0.15), Colors.transparent],
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Swipe. Match. Apply. Fly.',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-                letterSpacing: 1.5,
+          ),
+
+          // Center content
+          Center(
+            child: AnimatedBuilder(
+              animation: _ctrl,
+              builder: (_, __) => FadeTransition(
+                opacity: _fade,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo with ring
+                    ScaleTransition(
+                      scale: _scale,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Outer ring
+                          Container(
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.primary.withOpacity(_ring.value * 0.3),
+                                width: 1.5,
+                              ),
+                            ),
+                          ),
+                          // Inner glow ring
+                          Container(
+                            width: 116,
+                            height: 116,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  AppColors.primary.withOpacity(0.25),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Logo
+                          Container(
+                            width: 90,
+                            height: 90,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [AppColors.primary, Color(0xFF7C3AED)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 36),
+
+                    // App name
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [Colors.white, Color(0xFFCBD5E1)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ).createShader(bounds),
+                      child: const Text(
+                        'FLY AI',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 6,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Swipe. Match. Apply. Fly.',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.4),
+                        fontSize: 13,
+                        letterSpacing: 2.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 80),
+
+                    // Loading dots
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(3, (i) {
+                        final delay = i / 3;
+                        final anim = CurvedAnimation(
+                          parent: _ctrl,
+                          curve: Interval(delay, delay + 0.4, curve: Curves.easeInOut),
+                        );
+                        return AnimatedBuilder(
+                          animation: anim,
+                          builder: (_, __) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.primary.withOpacity(0.3 + anim.value * 0.7),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

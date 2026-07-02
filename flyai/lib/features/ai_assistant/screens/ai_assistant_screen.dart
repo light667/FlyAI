@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/widgets/app_text_field.dart';
-import '../../../core/utils/pdf_generator.dart';
-import '../models/chat_message_model.dart';
 import '../providers/chat_provider.dart';
-
-// ── AI Assistant Screen ───────────────────────────────────────────────────
 
 class AiAssistantScreen extends ConsumerStatefulWidget {
   const AiAssistantScreen({super.key});
-
   @override
   ConsumerState<AiAssistantScreen> createState() => _AiAssistantScreenState();
 }
@@ -24,11 +16,16 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   bool _isSending = false;
 
   final _quickActions = [
-    ('Review my CV', 'Can you help me review my CV and suggest improvements?'),
-    ('Write a motivation letter', 'Help me write a compelling motivation letter for a scholarship.'),
-    ('Interview prep', 'Help me prepare for a scholarship interview.'),
-    ('SOP tips', 'Give me tips for writing a strong Statement of Purpose.'),
-    ('Scholarship strategy', 'What strategy should I use to maximize my scholarship applications?'),
+    ('Review my CV', Icons.description_outlined,
+        'Can you help me review my CV and suggest improvements?'),
+    ('Write motivation letter', Icons.edit_note_rounded,
+        'Help me write a compelling motivation letter for a scholarship.'),
+    ('Interview prep', Icons.mic_none_rounded,
+        'Help me prepare for a scholarship interview.'),
+    ('SOP tips', Icons.tips_and_updates_outlined,
+        'Give me tips for writing a strong Statement of Purpose.'),
+    ('Scholarship strategy', Icons.route_outlined,
+        'What strategy should I use to maximize my scholarship applications?'),
   ];
 
   @override
@@ -41,13 +38,10 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   Future<void> _send([String? text]) async {
     final content = (text ?? _msgCtrl.text).trim();
     if (content.isEmpty || _isSending) return;
-
     setState(() => _isSending = true);
     _msgCtrl.clear();
-
     await ref.read(chatProvider.notifier).sendMessage(content);
     setState(() => _isSending = false);
-
     await Future.delayed(const Duration(milliseconds: 100));
     if (_scrollCtrl.hasClients) {
       _scrollCtrl.animateTo(
@@ -61,108 +55,163 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   @override
   Widget build(BuildContext context) {
     final messagesAsync = ref.watch(chatProvider);
+    // Use dynamic list so we don't depend on a specific model class name.
+    // The provider exposes a list whose items have .role and .content getters.
     final messages = messagesAsync.valueOrNull ?? [];
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        titleSpacing: 20,
         title: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
+            // AI avatar orb
             Container(
-              padding: const EdgeInsets.all(6),
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.secondary],
+                  colors: [AppColors.primary, Color(0xFF7C3AED)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                  ),
+                ],
               ),
               child: const Icon(Icons.auto_awesome_rounded, size: 18, color: Colors.white),
             ),
-            const SizedBox(width: 10),
-            Text(AppStrings.flyAssistant, style: AppTextStyles.headlineSmall),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Fly Assistant',
+                  style: AppTextStyles.titleLarge.copyWith(fontWeight: FontWeight.w800),
+                ),
+                Row(
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: AppColors.success,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'AI-powered · Always active',
+                      style: AppTextStyles.caption.copyWith(color: AppColors.success),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            tooltip: 'New chat',
-            onPressed: () => ref.read(chatProvider.notifier).clearChat(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push('/settings'),
-            tooltip: 'Settings',
-          ),
+          if (messages.isNotEmpty)
+            IconButton(
+              icon: Icon(Icons.refresh_rounded, color: AppColors.textSecondary),
+              onPressed: () => ref.read(chatProvider.notifier).clearChat(),
+              tooltip: 'New conversation',
+            ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
         children: [
-          // ── Messages ─────────────────────────────────────────────────────
+          // ── Message list ────────────────────────────────────────────
           Expanded(
             child: messages.isEmpty
-                ? _WelcomeView(
-                    quickActions: _quickActions,
-                    onTap: _send,
-                  )
+                ? _WelcomeView(quickActions: _quickActions, onTap: _send)
                 : ListView.builder(
                     controller: _scrollCtrl,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                     itemCount: messages.length + (_isSending ? 1 : 0),
                     itemBuilder: (context, i) {
                       if (i == messages.length && _isSending) {
-                        return const _TypingIndicator();
+                        return const _TypingBubble();
                       }
-                      return _MessageBubble(message: messages[i]);
+                      // Access role/content dynamically — works with any
+                      // chat message class that exposes these fields.
+                      final msg = messages[i];
+                      return _MessageBubble(
+                        role: msg.role as String,
+                        content: msg.content as String,
+                      );
                     },
                   ),
           ),
 
-          // ── Input Bar ─────────────────────────────────────────────────────
+          // ── Input bar ───────────────────────────────────────────────
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
             decoration: BoxDecoration(
               color: AppColors.card,
-              border: Border(top: BorderSide(color: AppColors.glassBorder)),
+              border: Border(top: BorderSide(color: AppColors.glassBorder, width: 1)),
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: AppTextField(
-                    controller: _msgCtrl,
-                    label: '',
-                    hint: AppStrings.askAnything,
-                    maxLines: 4,
-                    minLines: 1,
-                    textInputAction: TextInputAction.newline,
-                    onChanged: (_) => setState(() {}),
+                  child: Container(
+                    constraints: const BoxConstraints(maxHeight: 120),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: AppColors.glassBorder),
+                    ),
+                    child: TextField(
+                      controller: _msgCtrl,
+                      maxLines: null,
+                      textInputAction: TextInputAction.newline,
+                      onChanged: (_) => setState(() {}),
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        hintText: 'Ask me anything…',
+                        hintStyle: AppTextStyles.bodyMedium
+                            .copyWith(color: AppColors.textSecondary),
+                        border: InputBorder.none,
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  child: GestureDetector(
-                    onTap: _isSending ? null : () => _send(),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: _msgCtrl.text.trim().isNotEmpty && !_isSending
-                              ? [AppColors.primary, AppColors.secondary]
-                              : [AppColors.glassBorder, AppColors.glassBorder],
-                        ),
+                GestureDetector(
+                  onTap: _isSending ? null : () => _send(),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: _msgCtrl.text.trim().isNotEmpty && !_isSending
+                            ? [AppColors.primary, const Color(0xFF7C3AED)]
+                            : [AppColors.glassBorder, AppColors.glassBorder],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      child: _isSending
-                          ? const Padding(
-                              padding: EdgeInsets.all(12),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
                     ),
+                    child: _isSending
+                        ? const Padding(
+                            padding: EdgeInsets.all(13),
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
+                          )
+                        : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
                   ),
                 ),
               ],
@@ -174,76 +223,93 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   }
 }
 
-class _WelcomeView extends StatelessWidget {
-  final List<(String, String)> quickActions;
-  final void Function(String) onTap;
+// ── Welcome Screen ──────────────────────────────────────────────────────────
 
+class _WelcomeView extends StatelessWidget {
+  final List<(String, IconData, String)> quickActions;
+  final void Function(String) onTap;
   const _WelcomeView({required this.quickActions, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 20),
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, AppColors.secondary],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withOpacity(0.4),
-                  blurRadius: 20,
-                  spreadRadius: 2,
+          Center(
+            child: Column(
+              children: [
+                Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, Color(0xFF7C3AED)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.4),
+                        blurRadius: 28,
+                        spreadRadius: 4,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.auto_awesome_rounded, size: 40, color: Colors.white),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Hi! I\'m Fly Assistant 🚀',
+                  style: AppTextStyles.headlineLarge.copyWith(fontWeight: FontWeight.w800),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Your AI scholarship advisor. Ask me anything about\nscholarships, CVs, motivation letters, and more.',
+                  style: AppTextStyles.bodyMedium,
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
-            child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 36),
           ),
-          const SizedBox(height: 20),
-          Text(AppStrings.flyAssistant, style: AppTextStyles.headlineLarge),
-          const SizedBox(height: 8),
+          const SizedBox(height: 36),
           Text(
-            'Your AI scholarship advisor',
-            style: AppTextStyles.bodyMedium,
+            'Quick actions',
+            style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 32),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.glassBorder),
-            ),
-            child: Text(
-              AppStrings.assistantWelcome,
-              style: AppTextStyles.bodyMedium.copyWith(height: 1.6),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text('Quick Actions', style: AppTextStyles.titleMedium),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           ...quickActions.map(
             (action) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: GestureDetector(
-                onTap: () => onTap(action.$2),
+                onTap: () => onTap(action.$3),
                 child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                   decoration: BoxDecoration(
                     color: AppColors.card,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.glassBorder),
                   ),
-                  child: Text(action.$1, style: AppTextStyles.bodyMedium),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(action.$2, color: AppColors.primary, size: 18),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(child: Text(action.$1, style: AppTextStyles.titleMedium)),
+                      Icon(Icons.arrow_forward_ios_rounded,
+                          size: 14, color: AppColors.textSecondary),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -254,11 +320,16 @@ class _WelcomeView extends StatelessWidget {
   }
 }
 
-class _MessageBubble extends StatelessWidget {
-  final ChatMessage message;
-  const _MessageBubble({required this.message});
+// ── Message Bubble ──────────────────────────────────────────────────────────
+// Takes plain strings instead of a typed model class so we're decoupled
+// from whatever ChatMessage / MessageModel class name is used in the project.
 
-  bool get isUser => message.role == 'user';
+class _MessageBubble extends StatelessWidget {
+  final String role;
+  final String content;
+  const _MessageBubble({required this.role, required this.content});
+
+  bool get isUser => role == 'user';
 
   @override
   Widget build(BuildContext context) {
@@ -271,154 +342,75 @@ class _MessageBubble extends StatelessWidget {
         children: [
           if (!isUser) ...[
             Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
+              width: 30,
+              height: 30,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [AppColors.primary, AppColors.secondary],
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, Color(0xFF7C3AED)],
                 ),
               ),
-              child: const Icon(Icons.auto_awesome_rounded, size: 16, color: Colors.white),
+              child: const Icon(Icons.auto_awesome_rounded, size: 14, color: Colors.white),
             ),
-            const SizedBox(width: 8),
           ],
           Flexible(
             child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.72,
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isUser ? AppColors.primary : AppColors.card,
+                gradient: isUser
+                    ? const LinearGradient(
+                        colors: [AppColors.primary, Color(0xFF7C3AED)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      )
+                    : null,
+                color: isUser ? null : AppColors.card,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(isUser ? 18 : 4),
-                  bottomRight: Radius.circular(isUser ? 4 : 18),
+                  topLeft: const Radius.circular(20),
+                  topRight: const Radius.circular(20),
+                  bottomLeft: Radius.circular(isUser ? 20 : 4),
+                  bottomRight: Radius.circular(isUser ? 4 : 20),
                 ),
                 border: isUser ? null : Border.all(color: AppColors.glassBorder),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    message.content,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: isUser ? Colors.white : AppColors.textPrimary,
-                      height: 1.5,
-                    ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (isUser ? AppColors.primary : Colors.black)
+                        .withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                  if (!isUser && message.content.length > 200) ...[
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          backgroundColor: AppColors.background,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(color: AppColors.glassBorder),
-                          ),
-                        ),
-                        onPressed: () {
-                          String title = 'Motivation Letter';
-                          final contentLower = message.content.toLowerCase();
-                          if (contentLower.contains('curriculum vitae') || contentLower.contains('cv')) {
-                            title = 'CV Feedback Analysis';
-                          } else if (contentLower.contains('sop') || contentLower.contains('statement of purpose')) {
-                            title = 'Statement of Purpose Draft';
-                          } else if (contentLower.contains('checklist') || contentLower.contains('document')) {
-                            title = 'Application Checklist Strategy';
-                          }
-                          PdfGenerator.generateAndShare(
-                            title: title,
-                            content: message.content,
-                          );
-                        },
-                        icon: const Icon(Icons.picture_as_pdf_rounded, size: 14, color: AppColors.primary),
-                        label: const Text(
-                          'Export PDF',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
-            ),
-          ),
-          if (isUser) const SizedBox(width: 8),
-        ],
-      ),
-    );
-  }
-}
-
-class _TypingIndicator extends StatelessWidget {
-  const _TypingIndicator();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                colors: [AppColors.primary, AppColors.secondary],
-              ),
-            ),
-            child: const Icon(Icons.auto_awesome_rounded, size: 16, color: Colors.white),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(18),
-                topRight: Radius.circular(18),
-                bottomRight: Radius.circular(18),
-                bottomLeft: Radius.circular(4),
-              ),
-              border: Border.all(color: AppColors.glassBorder),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                3,
-                (i) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: _Dot(delay: i * 200),
+              child: Text(
+                content,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: isUser ? Colors.white : AppColors.textPrimary,
+                  height: 1.5,
                 ),
               ),
             ),
           ),
+          if (isUser) const SizedBox(width: 4),
         ],
       ),
     );
   }
 }
 
-class _Dot extends StatefulWidget {
-  final int delay;
-  const _Dot({required this.delay});
+// ── Typing Indicator ────────────────────────────────────────────────────────
 
+class _TypingBubble extends StatefulWidget {
+  const _TypingBubble();
   @override
-  State<_Dot> createState() => _DotState();
+  State<_TypingBubble> createState() => _TypingBubbleState();
 }
 
-class _DotState extends State<_Dot> with SingleTickerProviderStateMixin {
+class _TypingBubbleState extends State<_TypingBubble>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _anim;
 
@@ -426,15 +418,10 @@ class _DotState extends State<_Dot> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _anim = Tween<double>(begin: 0, end: -6).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _ctrl.repeat(reverse: true);
-    });
+        vsync: this, duration: const Duration(milliseconds: 900))
+      ..repeat(reverse: true);
+    _anim = Tween<double>(begin: 0.4, end: 1.0).animate(
+        CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -445,18 +432,57 @@ class _DotState extends State<_Dot> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (_, __) => Transform.translate(
-        offset: Offset(0, _anim.value),
-        child: Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.textSecondary,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                  colors: [AppColors.primary, Color(0xFF7C3AED)]),
+            ),
+            child: const Icon(Icons.auto_awesome_rounded, size: 14, color: Colors.white),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.card,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+                bottomLeft: Radius.circular(4),
+              ),
+              border: Border.all(color: AppColors.glassBorder),
+            ),
+            child: AnimatedBuilder(
+              animation: _anim,
+              builder: (_, __) => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(3, (i) {
+                  final opacity = i == 0
+                      ? _anim.value
+                      : i == 1
+                          ? (_anim.value + 0.3).clamp(0.0, 1.0)
+                          : 0.4;
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primary.withValues(alpha: opacity),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

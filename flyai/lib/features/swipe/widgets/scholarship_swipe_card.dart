@@ -17,165 +17,130 @@ class ScholarshipSwipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: AppColors.card,
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: Colors.black.withOpacity(0.35),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          // ── Image ─────────────────────────────────────────────────────
-          Expanded(
-            flex: 5,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                scholarship.imageUrl != null
-                    ? CachedNetworkImage(
-                        imageUrl: scholarship.imageUrl!,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) => _placeholderImage(),
-                        errorWidget: (_, __, ___) => _placeholderImage(),
-                      )
-                    : _placeholderImage(),
+          // ── Background image ─────────────────────────────────────────
+          _buildBackground(),
 
-                // Gradient overlay
-                Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          AppColors.card.withValues(alpha: 0.9),
-                        ],
-                        stops: const [0.5, 1.0],
-                      ),
-                    ),
-                  ),
+          // ── Gradient overlay (bottom-heavy) ──────────────────────────
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.05),
+                    Colors.black.withOpacity(0.65),
+                    Colors.black.withOpacity(0.92),
+                  ],
+                  stops: const [0.0, 0.35, 0.7, 1.0],
                 ),
-
-                // Compatibility badge — top-right
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: _CompatibilityBadge(score: scholarship.compatibilityScore),
-                ),
-
-                // Country chip — bottom-left
-                Positioned(
-                  bottom: 12,
-                  left: 12,
-                  child: _CountryChip(country: scholarship.country),
-                ),
-              ],
+              ),
             ),
           ),
 
-          // ── Info ───────────────────────────────────────────────────────
-          // Root cause of overflow:
-          //   • Column had mainAxisSize: MainAxisSize.min, which prevents
-          //     Spacer() from working — the Column tried to be as small as
-          //     its children while Spacer pushed to expand → conflict.
-          //   • Fix: remove mainAxisSize (defaults to max), so the Column
-          //     fills the Expanded parent and MainAxisAlignment.spaceBetween
-          //     pushes swipe hints to the bottom without needing Spacer.
-          Expanded(
-            flex: 4,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisSize defaults to max → fills the Expanded height
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Top section: title + university + chips
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+          // ── Content overlay ───────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.all(22),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Top row: match score + funding ───────────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _MatchBadge(score: scholarship.compatibilityScore),
+                    _FundingBadge(type: scholarship.fundingType),
+                  ],
+                ),
+
+                const Spacer(),
+
+                // ── Bottom content ────────────────────────────────────────
+                // Country
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_rounded, size: 13, color: Colors.white60),
+                    const SizedBox(width: 4),
+                    Text(
+                      scholarship.country,
+                      style: const TextStyle(color: Colors.white60, fontSize: 12, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Title
+                Text(
+                  scholarship.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    height: 1.2,
+                    letterSpacing: -0.3,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+
+                // University
+                if (scholarship.university != null)
+                  Text(
+                    scholarship.university!,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                const SizedBox(height: 14),
+
+                // Info chips row
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
                     children: [
-                      Text(
-                        scholarship.title,
-                        style: AppTextStyles.titleLarge, // 16px — fits 1 line
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        scholarship.university,
-                        style: AppTextStyles.bodySmall, // 12px
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      // Chips row — horizontal scroll prevents RunFlex issues
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            _InfoChip(
-                              icon: Icons.school_outlined,
-                              label: scholarship.degreeLevel.length > 18
-                                  ? '${scholarship.degreeLevel.substring(0, 16)}…'
-                                  : scholarship.degreeLevel,
-                              color: AppColors.primary,
-                            ),
-                            const SizedBox(width: 6),
-                            _InfoChip(
-                              icon: Icons.attach_money_rounded,
-                              label: scholarship.fundingType,
-                              color: AppColors.success,
-                            ),
-                            if (scholarship.deadline != null) ...[
-                              const SizedBox(width: 6),
-                              _InfoChip(
-                                icon: Icons.calendar_today_outlined,
-                                label: _formatDeadline(scholarship.deadline!),
-                                color: scholarship.isDeadlineSoon
-                                    ? AppColors.warning
-                                    : AppColors.textSecondary,
-                              ),
-                            ],
-                          ],
+                      _InfoChip(Icons.school_outlined, _shortenDegree(scholarship.degreeLevel), AppColors.primary),
+                      const SizedBox(width: 8),
+                      if (scholarship.deadline != null) ...[
+                        _InfoChip(
+                          Icons.schedule_rounded,
+                          _formatDeadline(scholarship.deadline!),
+                          scholarship.isDeadlineSoon ? AppColors.warning : Colors.white54,
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                      ],
                     ],
                   ),
+                ),
 
-                  // Bottom section: swipe hints (pushed down by spaceBetween)
-                  if (showSwipeHints)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _SwipeHint(
-                          icon: Icons.close_rounded,
-                          color: AppColors.error,
-                          label: 'Pass',
-                        ),
-                        _SwipeHint(
-                          icon: Icons.star_rounded,
-                          color: AppColors.secondary,
-                          label: 'Priority',
-                        ),
-                        _SwipeHint(
-                          icon: Icons.favorite_rounded,
-                          color: AppColors.success,
-                          label: 'Like',
-                        ),
-                      ],
-                    ),
+                // Swipe hints
+                if (showSwipeHints) ...[
+                  const SizedBox(height: 18),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _SwipeHint(Icons.close_rounded, AppColors.error, 'Pass'),
+                      _SwipeHint(Icons.star_rounded, AppColors.secondary, 'Priority'),
+                      _SwipeHint(Icons.favorite_rounded, AppColors.success, 'Like'),
+                    ],
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
         ],
@@ -183,20 +148,24 @@ class ScholarshipSwipeCard extends StatelessWidget {
     );
   }
 
-  Widget _placeholderImage() {
-    return Container(
-      color: AppColors.background,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.school_rounded, size: 56, color: AppColors.primary),
-            const SizedBox(height: 8),
-            Text(scholarship.country, style: AppTextStyles.bodyMedium),
-          ],
-        ),
-      ),
-    );
+  Widget _buildBackground() {
+    if (scholarship.imageUrl != null) {
+      return CachedNetworkImage(
+        imageUrl: scholarship.imageUrl!,
+        fit: BoxFit.cover,
+        placeholder: (_, __) => _PlaceholderBg(country: scholarship.country),
+        errorWidget: (_, __, ___) => _PlaceholderBg(country: scholarship.country),
+      );
+    }
+    return _PlaceholderBg(country: scholarship.country);
+  }
+
+  String _shortenDegree(String level) {
+    if (level.length <= 16) return level;
+    if (level.toLowerCase().contains('master')) return "Master's";
+    if (level.toLowerCase().contains('bachelor')) return "Bachelor's";
+    if (level.toLowerCase().contains('phd') || level.toLowerCase().contains('doctor')) return 'PhD';
+    return '${level.substring(0, 14)}…';
   }
 
   String _formatDeadline(DateTime deadline) {
@@ -204,16 +173,48 @@ class ScholarshipSwipeCard extends StatelessWidget {
     if (diff < 0) return 'Expired';
     if (diff == 0) return 'Today!';
     if (diff <= 30) return '$diff days';
-    final months = (diff / 30).floor();
-    return '$months mo.';
+    return '${(diff / 30).floor()}mo.';
   }
 }
 
-// ── _CompatibilityBadge ────────────────────────────────────────────────────
+// ── Background placeholder ─────────────────────────────────────────────────
 
-class _CompatibilityBadge extends StatelessWidget {
+class _PlaceholderBg extends StatelessWidget {
+  final String country;
+  const _PlaceholderBg({required this.country});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+        ),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.school_rounded, size: 72, color: AppColors.primary.withOpacity(0.4)),
+            const SizedBox(height: 12),
+            Text(
+              country,
+              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Sub-widgets ────────────────────────────────────────────────────────────
+
+class _MatchBadge extends StatelessWidget {
   final int score;
-  const _CompatibilityBadge({required this.score});
+  const _MatchBadge({required this.score});
 
   Color get _color {
     if (score >= 80) return AppColors.success;
@@ -225,25 +226,55 @@ class _CompatibilityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: _color.withValues(alpha: 0.15),
+        color: _color.withOpacity(0.2),
         borderRadius: BorderRadius.circular(50),
-        border: Border.all(color: _color.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(color: _color.withValues(alpha: 0.2), blurRadius: 6),
-        ],
+        border: Border.all(color: _color.withOpacity(0.5)),
+        boxShadow: [BoxShadow(color: _color.withOpacity(0.3), blurRadius: 10)],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.bolt_rounded, size: 12, color: _color),
+          Icon(Icons.bolt_rounded, size: 13, color: _color),
+          const SizedBox(width: 4),
+          Text(
+            '$score% match',
+            style: TextStyle(color: _color, fontSize: 12, fontWeight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FundingBadge extends StatelessWidget {
+  final String type;
+  const _FundingBadge({required this.type});
+
+  @override
+  Widget build(BuildContext context) {
+    final isFullyFunded = type.toLowerCase().contains('fully');
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: isFullyFunded ? AppColors.success.withOpacity(0.2) : Colors.white12,
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(
+          color: isFullyFunded ? AppColors.success.withOpacity(0.5) : Colors.white24,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.attach_money_rounded, size: 12,
+              color: isFullyFunded ? AppColors.success : Colors.white70),
           const SizedBox(width: 3),
           Text(
-            '$score%',
+            isFullyFunded ? 'Fully Funded' : type,
             style: TextStyle(
-              color: _color,
-              fontSize: 12,
+              color: isFullyFunded ? AppColors.success : Colors.white70,
+              fontSize: 11,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -253,99 +284,54 @@ class _CompatibilityBadge extends StatelessWidget {
   }
 }
 
-// ── _CountryChip ───────────────────────────────────────────────────────────
-
-class _CountryChip extends StatelessWidget {
-  final String country;
-  const _CountryChip({required this.country});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(50),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.location_on_rounded, size: 11, color: AppColors.textSecondary),
-          const SizedBox(width: 3),
-          Text(country, style: AppTextStyles.caption),
-        ],
-      ),
-    );
-  }
-}
-
-// ── _InfoChip ──────────────────────────────────────────────────────────────
-
 class _InfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  const _InfoChip({
-    required this.icon,
-    required this.label,
-    required this.color,
-  });
+  const _InfoChip(this.icon, this.label, this.color);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withOpacity(0.15),
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 11, color: color),
-          const SizedBox(width: 3),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          const SizedBox(width: 4),
+          Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
         ],
       ),
     );
   }
 }
 
-// ── _SwipeHint ─────────────────────────────────────────────────────────────
-
 class _SwipeHint extends StatelessWidget {
   final IconData icon;
   final Color color;
   final String label;
-  const _SwipeHint({
-    required this.icon,
-    required this.color,
-    required this.label,
-  });
+  const _SwipeHint(this.icon, this.color, this.label);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: color.withValues(alpha: 0.6), size: 16),
-        const SizedBox(height: 1),
-        Text(
-          label,
-          style: TextStyle(
-            color: color.withValues(alpha: 0.6),
-            fontSize: 9,
-            fontWeight: FontWeight.w600,
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.15),
+            shape: BoxShape.circle,
           ),
+          child: Icon(icon, size: 16, color: color.withOpacity(0.8)),
         ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(color: color.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.w600)),
       ],
     );
   }

@@ -11,7 +11,7 @@ import '../../../core/providers/locale_provider.dart';
 import '../../profile/models/profile_model.dart';
 import 'direct_chat_screen.dart';
 
-// ── Models ───────────────────────────────────────────────────────────────────
+// ── PostModel (unchanged) ─────────────────────────────────────────────────
 
 class PostModel {
   final String id;
@@ -23,9 +23,9 @@ class PostModel {
   final int likesCount;
   final int commentsCount;
   final DateTime createdAt;
-  final bool isLiked;
+  bool isLiked;
 
-  const PostModel({
+  PostModel({
     required this.id,
     required this.firebaseUid,
     required this.authorName,
@@ -55,6 +55,12 @@ class PostModel {
     );
   }
 
+  static List<String> _parseList(dynamic v) {
+    if (v == null) return [];
+    if (v is List) return v.map((e) => e.toString()).toList();
+    return [];
+  }
+
   Map<String, dynamic> toJson() => {
         'firebase_uid': firebaseUid,
         'author_name': authorName,
@@ -62,479 +68,353 @@ class PostModel {
         'content': content,
         'tags': tags,
       };
-
-  static List<String> _parseList(dynamic val) {
-    if (val == null) return [];
-    if (val is List) return val.map((e) => e.toString()).toList();
-    return [];
-  }
-
-  PostModel copyWith({
-    int? likesCount,
-    int? commentsCount,
-    bool? isLiked,
-  }) {
-    return PostModel(
-      id: id,
-      firebaseUid: firebaseUid,
-      authorName: authorName,
-      authorPhoto: authorPhoto,
-      content: content,
-      tags: tags,
-      likesCount: likesCount ?? this.likesCount,
-      commentsCount: commentsCount ?? this.commentsCount,
-      createdAt: createdAt,
-      isLiked: isLiked ?? this.isLiked,
-    );
-  }
 }
 
-class ChatThreadModel {
-  final String peerUid;
-  final String peerName;
-  final String? peerPhoto;
-  final String? peerUniversity;
-  final String lastMessage;
-  final DateTime lastMessageTime;
-
-  const ChatThreadModel({
-    required this.peerUid,
-    required this.peerName,
-    this.peerPhoto,
-    this.peerUniversity,
-    required this.lastMessage,
-    required this.lastMessageTime,
-  });
-}
-
-// ── Providers ────────────────────────────────────────────────────────────────
-
-final communityFeedProvider = StateNotifierProvider<CommunityFeedNotifier, AsyncValue<List<PostModel>>>((ref) {
-  return CommunityFeedNotifier();
-});
-
-class CommunityFeedNotifier extends StateNotifier<AsyncValue<List<PostModel>>> {
-  CommunityFeedNotifier() : super(const AsyncLoading()) {
-    fetchPosts();
-  }
-
-  Future<void> fetchPosts() async {
-    final user = AuthService.currentUser;
-    try {
-      final postsResponse = await SupabaseService.client
-          .from('posts')
-          .select()
-          .order('created_at', ascending: false);
-
-      final List<PostModel> posts = [];
-
-      List<String> likedPostIds = [];
-      if (user != null) {
-        final likesResponse = await SupabaseService.client
-            .from('post_likes')
-            .select('post_id')
-            .eq('firebase_uid', user.uid);
-        likedPostIds = (likesResponse as List).map((l) => l['post_id'].toString()).toList();
-      }
-
-      for (var p in (postsResponse as List)) {
-        final postId = p['id'].toString();
-        posts.add(PostModel.fromJson(p as Map<String, dynamic>, isLiked: likedPostIds.contains(postId)));
-      }
-
-      state = AsyncValue.data(posts);
-    } catch (e) {
-      state = AsyncValue.error(e, StackTrace.current);
-    }
-  }
-
-  Future<void> createPost(String content, List<String> tags) async {
-    final user = AuthService.currentUser;
-    if (user == null) return;
-
-    final newPostLocal = PostModel(
-      id: '',
-      firebaseUid: user.uid,
-      authorName: user.displayName ?? 'Scholar',
-      authorPhoto: user.photoURL,
-      content: content,
-      tags: tags,
-      createdAt: DateTime.now(),
-      likesCount: 0,
-      commentsCount: 0,
-    );
-
-    try {
-      await SupabaseService.client.from('posts').insert(newPostLocal.toJson());
-      fetchPosts();
-    } catch (_) {}
-  }
-
-  Future<void> toggleLike(String postId) async {
-    final user = AuthService.currentUser;
-    if (user == null) return;
-
-    state.whenData((posts) {
-      final updated = posts.map((p) {
-        if (p.id == postId) {
-          final newLiked = !p.isLiked;
-          final newCount = p.likesCount + (newLiked ? 1 : -1);
-          return p.copyWith(isLiked: newLiked, likesCount: newCount);
-        }
-        return p;
-      }).toList();
-      state = AsyncValue.data(updated);
-    });
-
-    try {
-      final postsList = state.value ?? [];
-      final post = postsList.firstWhere((p) => p.id == postId);
-
-      if (post.isLiked) {
-        await SupabaseService.client.from('post_likes').insert({
-          'post_id': postId,
-          'firebase_uid': user.uid,
-        });
-        await SupabaseService.client.rpc('increment_likes', params: {'post_id': postId});
-      } else {
-        await SupabaseService.client
-            .from('post_likes')
-            .delete()
-            .eq('post_id', postId)
-            .eq('firebase_uid', user.uid);
-        await SupabaseService.client.rpc('decrement_likes', params: {'post_id': postId});
-      }
-    } catch (_) {}
-  }
-}
-
-// ── Screen UI ────────────────────────────────────────────────────────────────
+// ── Community Feed Screen ─────────────────────────────────────────────────
 
 class CommunityFeedScreen extends ConsumerStatefulWidget {
   const CommunityFeedScreen({super.key});
-
   @override
   ConsumerState<CommunityFeedScreen> createState() => _CommunityFeedScreenState();
 }
 
-class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  List<ProfileModel> _members = [];
-  bool _isLoadingMembers = false;
-  List<ChatThreadModel> _threads = [];
-  bool _isLoadingThreads = false;
+class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
+  List<PostModel> _posts = [];
+  bool _isLoading = true;
+  final _postCtrl = TextEditingController();
+  final _tagCtrl = TextEditingController();
+  List<String> _selectedTags = [];
+  Set<String> _likedIds = {};
+
+  final _suggestedTags = ['Scholarship', 'Tips', 'Motivation', 'Success', 'Deadline', 'Interview', 'CV', 'SOP'];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(_handleTabChange);
+    _loadPosts();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _postCtrl.dispose();
+    _tagCtrl.dispose();
     super.dispose();
   }
 
-  void _handleTabChange() {
-    if (_tabController.indexIsChanging) return;
-    if (_tabController.index == 1) {
-      _fetchMembers();
-    } else if (_tabController.index == 2) {
-      _fetchInboxThreads();
-    }
-  }
-
-  Future<void> _fetchMembers() async {
-    final user = AuthService.currentUser;
-    if (user == null) return;
-
-    setState(() => _isLoadingMembers = true);
+  Future<void> _loadPosts() async {
+    setState(() => _isLoading = true);
     try {
-      final response = await SupabaseService.client
-          .from('profiles')
+      final user = AuthService.currentUser;
+      final rows = await SupabaseService.client
+          .from('community_posts')
           .select()
-          .neq('firebase_uid', user.uid);
+          .order('created_at', ascending: false)
+          .limit(40);
 
-      final loaded = (response as List)
-          .map((json) => ProfileModel.fromJson(json as Map<String, dynamic>))
-          .toList();
-
-      if (mounted) {
-        setState(() {
-          _members = loaded;
-          _isLoadingMembers = false;
-        });
-      }
-    } catch (_) {
-      if (mounted) setState(() => _isLoadingMembers = false);
-    }
-  }
-
-  Future<void> _fetchInboxThreads() async {
-    final user = AuthService.currentUser;
-    if (user == null) return;
-
-    setState(() => _isLoadingThreads = true);
-    try {
-      // Query messages where sender or receiver is current user
-      final response = await SupabaseService.client
-          .from('direct_messages')
-          .select()
-          .or('sender_uid.eq.${user.uid},receiver_uid.eq.${user.uid}')
-          .order('created_at', ascending: false);
-
-      final messages = (response as List)
-          .map((json) => DirectMessageModel.fromJson(json as Map<String, dynamic>))
-          .toList();
-
-      // Find unique peer IDs and their latest message
-      final Map<String, DirectMessageModel> peerLatestMsg = {};
-      for (final m in messages) {
-        final peerId = m.senderUid == user.uid ? m.receiverUid : m.senderUid;
-        if (!peerLatestMsg.containsKey(peerId)) {
-          peerLatestMsg[peerId] = m;
-        }
-      }
-
-      final List<ChatThreadModel> loadedThreads = [];
-      
-      // Fetch profile details for each unique peer
-      for (final entry in peerLatestMsg.entries) {
-        final peerId = entry.key;
-        final latestMsg = entry.value;
-
-        final profileJson = await SupabaseService.fetchOne('profiles', 'firebase_uid', peerId);
-        if (profileJson != null) {
-          final profile = ProfileModel.fromJson(profileJson);
-          loadedThreads.add(ChatThreadModel(
-            peerUid: peerId,
-            peerName: profile.fullName,
-            peerPhoto: profile.photoUrl,
-            peerUniversity: profile.university,
-            lastMessage: latestMsg.content,
-            lastMessageTime: latestMsg.createdAt,
-          ));
-        }
+      Set<String> likedIds = {};
+      if (user != null) {
+        final likes = await SupabaseService.client
+            .from('post_likes')
+            .select('post_id')
+            .eq('firebase_uid', user.uid);
+        likedIds = (likes as List).map((r) => r['post_id'] as String).toSet();
       }
 
       if (mounted) {
         setState(() {
-          _threads = loadedThreads;
-          _isLoadingThreads = false;
+          _posts = (rows as List)
+              .map((r) => PostModel.fromJson(r as Map<String, dynamic>, isLiked: likedIds.contains(r['id'])))
+              .toList();
+          _likedIds = likedIds;
+          _isLoading = false;
         });
       }
     } catch (_) {
-      if (mounted) setState(() => _isLoadingThreads = false);
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _toggleLike(PostModel post) async {
+    final user = AuthService.currentUser;
+    if (user == null) return;
+    setState(() => post.isLiked = !post.isLiked);
+    try {
+      if (post.isLiked) {
+        await SupabaseService.client.from('post_likes').insert({'firebase_uid': user.uid, 'post_id': post.id});
+      } else {
+        await SupabaseService.client.from('post_likes').delete().eq('firebase_uid', user.uid).eq('post_id', post.id);
+      }
+    } catch (_) {
+      setState(() => post.isLiked = !post.isLiked);
+    }
+  }
+
+  Future<void> _submitPost() async {
+    final content = _postCtrl.text.trim();
+    if (content.isEmpty) return;
+    final user = AuthService.currentUser;
+    if (user == null) return;
+
+    final profile = await SupabaseService.fetchOne('profiles', 'firebase_uid', user.uid);
+    final name = profile?['full_name'] as String? ?? user.displayName ?? 'Scholar';
+    final photo = profile?['photo_url'] as String? ?? user.photoURL;
+
+    try {
+      await SupabaseService.client.from('community_posts').insert({
+        'firebase_uid': user.uid,
+        'author_name': name,
+        'author_photo': photo,
+        'content': content,
+        'tags': _selectedTags,
+      });
+      _postCtrl.clear();
+      _selectedTags = [];
+      Navigator.pop(context);
+      _loadPosts();
+    } catch (_) {}
+  }
+
+  void _showPostModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _CreatePostSheet(
+        controller: _postCtrl,
+        tagCtrl: _tagCtrl,
+        selectedTags: _selectedTags,
+        suggestedTags: _suggestedTags,
+        onTagToggle: (tag) => setState(() {
+          _selectedTags.contains(tag) ? _selectedTags.remove(tag) : _selectedTags.add(tag);
+        }),
+        onSubmit: _submitPost,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final postsAsync = ref.watch(communityFeedProvider);
-    final isFr = ref.watch(localeProvider).languageCode == 'fr';
-    final strings = isFr ? _FrenchStrings() : _EnglishStrings();
-
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(strings.title, style: AppTextStyles.headlineSmall),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push('/settings'),
-            tooltip: 'Settings',
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.primary,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondary,
-          tabs: [
-            Tab(text: isFr ? 'Actualités' : 'Feed'),
-            Tab(text: isFr ? 'Membres' : 'Members'),
-            Tab(text: isFr ? 'Messages' : 'Inbox'),
+      body: RefreshIndicator(
+        onRefresh: _loadPosts,
+        color: AppColors.primary,
+        child: CustomScrollView(
+          slivers: [
+            // ── Header ────────────────────────────────────────────────────
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 60, 24, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Community',
+                        style: AppTextStyles.displayMedium.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: _showPostModal,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppColors.primary, Color(0xFF7C3AED)],
+                          ),
+                          borderRadius: BorderRadius.circular(50),
+                          boxShadow: [
+                            BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 10),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.edit_rounded, size: 14, color: Colors.white),
+                            SizedBox(width: 6),
+                            Text('Post', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── Feed ──────────────────────────────────────────────────────
+            _isLoading
+                ? const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 80),
+                      child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                    ),
+                  )
+                : _posts.isEmpty
+                    ? SliverToBoxAdapter(child: _EmptyCommunity(onPost: _showPostModal))
+                    : SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, i) {
+                            if (i < _posts.length) {
+                              return _PostCard(
+                                post: _posts[i],
+                                onLike: () => _toggleLike(_posts[i]),
+                                onMessage: () {
+                                  final user = AuthService.currentUser;
+                                  if (user == null || _posts[i].firebaseUid == user.uid) return;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => DirectChatScreen(peerId: _posts[i].firebaseUid),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                            return const SizedBox(height: 120);
+                          },
+                          childCount: _posts.length + 1,
+                        ),
+                      ),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+    );
+  }
+}
+
+// ── Post Card ─────────────────────────────────────────────────────────────
+
+class _PostCard extends StatelessWidget {
+  final PostModel post;
+  final VoidCallback onLike;
+  final VoidCallback onMessage;
+  const _PostCard({required this.post, required this.onLike, required this.onMessage});
+
+  @override
+  Widget build(BuildContext context) {
+    final timeAgo = _formatTime(post.createdAt);
+    final user = AuthService.currentUser;
+    final isOwn = post.firebaseUid == user?.uid;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.glassBorder),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 12, offset: const Offset(0, 3)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Tab 1: Feed ──
-          RefreshIndicator(
-            color: AppColors.primary,
-            onRefresh: () => ref.read(communityFeedProvider.notifier).fetchPosts(),
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: _buildCreatePostBar(strings),
-                ),
-                postsAsync.when(
-                  loading: () => const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-                  ),
-                  error: (err, _) => SliverFillRemaining(
-                    child: Center(
-                      child: Text(strings.errorLoading, style: AppTextStyles.bodyMedium),
+          // Author header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+            child: Row(
+              children: [
+                // Avatar
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [AppColors.primary, Color(0xFF7C3AED)],
                     ),
                   ),
-                  data: (posts) {
-                    if (posts.isEmpty) {
-                      return SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.feed_outlined, size: 64, color: AppColors.glassBorder),
-                                const SizedBox(height: 16),
-                                Text(strings.noPosts, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
-                              ],
-                            ),
+                  child: post.authorPhoto != null
+                      ? ClipOval(child: Image.network(post.authorPhoto!, fit: BoxFit.cover))
+                      : Center(
+                          child: Text(
+                            post.authorName.isNotEmpty ? post.authorName[0].toUpperCase() : 'S',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
                           ),
                         ),
-                      );
-                    }
-
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final post = posts[index];
-                          return _PostCard(post: post, strings: strings);
-                        },
-                        childCount: posts.length,
-                      ),
-                    );
-                  },
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(post.authorName, style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700)),
+                      Text(timeAgo, style: AppTextStyles.caption),
+                    ],
+                  ),
+                ),
+                if (!isOwn)
+                  GestureDetector(
+                    onTap: onMessage,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: AppColors.primary),
+                    ),
+                  ),
               ],
             ),
           ),
 
-          // ── Tab 2: Members ──
-          _isLoadingMembers
-              ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-              : _members.isEmpty
-                  ? Center(child: Text(isFr ? 'Aucun membre inscrit.' : 'No members registered.'))
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                      itemCount: _members.length,
-                      itemBuilder: (context, index) {
-                        return _MemberCard(
-                          profile: _members[index],
-                          isFr: isFr,
-                          onMessageTap: () {
-                            context.push('/chat/${_members[index].firebaseUid}', extra: _members[index]);
-                          },
-                        );
-                      },
-                    ),
-
-          // ── Tab 3: Inbox ──
-          _isLoadingThreads
-              ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-              : _threads.isEmpty
-                  ? Center(child: Text(isFr ? 'Aucun message.' : 'No conversations yet.'))
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                      itemCount: _threads.length,
-                      itemBuilder: (context, index) {
-                        final thread = _threads[index];
-                        final timeStr = DateFormat('HH:mm').format(thread.lastMessageTime);
-
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          decoration: BoxDecoration(
-                            color: AppColors.card,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.glassBorder),
-                          ),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: AppColors.primary.withOpacity(0.1),
-                              backgroundImage: thread.peerPhoto != null ? NetworkImage(thread.peerPhoto!) : null,
-                              child: thread.peerPhoto == null
-                                  ? Text(
-                                      thread.peerName.isNotEmpty ? thread.peerName[0].toUpperCase() : 'S',
-                                      style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                                    )
-                                  : null,
-                            ),
-                            title: Text(thread.peerName, style: AppTextStyles.titleMedium),
-                            subtitle: Text(
-                              thread.lastMessage,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                            ),
-                            trailing: Text(timeStr, style: AppTextStyles.caption),
-                            onTap: () {
-                              context.push('/chat/${thread.peerUid}');
-                            },
-                          ),
-                        );
-                      },
-                    ),
-        ],
-      ),
-      floatingActionButton: _tabController.index == 0
-          ? FloatingActionButton(
-              backgroundColor: AppColors.primary,
-              onPressed: () => _showCreatePostModal(context, strings),
-              child: const Icon(Icons.create_rounded, color: Colors.white),
-            )
-          : null,
-    );
-  }
-
-  Widget _buildCreatePostBar(_Strings strings) {
-    final user = AuthService.currentUser;
-    return Container(
-      margin: const EdgeInsets.all(24),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: AppColors.primary.withOpacity(0.1),
-            backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
-            child: user?.photoURL == null
-                ? Text(
-                    user?.displayName != null && user!.displayName!.isNotEmpty
-                        ? user.displayName![0].toUpperCase()
-                        : 'S',
-                    style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                  )
-                : null,
+          // Content
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            child: Text(
+              post.content,
+              style: AppTextStyles.bodyMedium.copyWith(height: 1.55),
+            ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => _showCreatePostModal(context, strings),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: AppColors.glassBorder),
-                ),
-                child: Text(
-                  strings.whatsOnYourMind,
-                  style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                ),
+
+          // Tags
+          if (post.tags.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: post.tags
+                    .map((t) => Text(
+                          '#$t',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ))
+                    .toList(),
               ),
+            ),
+
+          // Actions bar
+          Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: AppColors.glassBorder)),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Row(
+              children: [
+                _ActionBtn(
+                  icon: post.isLiked ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+                  label: '${post.likesCount + (post.isLiked ? 1 : 0)}',
+                  color: post.isLiked ? AppColors.error : AppColors.textSecondary,
+                  onTap: onLike,
+                ),
+                _ActionBtn(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  label: '${post.commentsCount}',
+                  color: AppColors.textSecondary,
+                  onTap: () {},
+                ),
+                _ActionBtn(
+                  icon: Icons.share_outlined,
+                  label: 'Share',
+                  color: AppColors.textSecondary,
+                  onTap: () {},
+                ),
+              ],
             ),
           ),
         ],
@@ -542,248 +422,175 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen>
     );
   }
 
-  void _showCreatePostModal(BuildContext context, _Strings strings) {
-    final contentCtrl = TextEditingController();
-    final tagsCtrl = TextEditingController();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.card,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            top: 24,
-            left: 24,
-            right: 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(strings.createPost, style: AppTextStyles.headlineSmall),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: contentCtrl,
-                maxLines: 5,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: strings.whatsOnYourMind,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: AppColors.glassBorder),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: tagsCtrl,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: strings.tagsHint,
-                  prefixIcon: const Icon(Icons.local_offer_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: AppColors.glassBorder),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  final content = contentCtrl.text.trim();
-                  if (content.isNotEmpty) {
-                    final tags = tagsCtrl.text
-                        .split(',')
-                        .map((t) => t.trim().replaceAll('#', ''))
-                        .where((t) => t.isNotEmpty)
-                        .toList();
-                    ref.read(communityFeedProvider.notifier).createPost(content, tags);
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(strings.publish),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        );
-      },
-    );
+  String _formatTime(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 1) return 'Just now';
+    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
+    if (diff.inDays < 1) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return DateFormat('MMM d').format(dt);
   }
 }
 
-class _PostCard extends ConsumerWidget {
-  final PostModel post;
-  final _Strings strings;
-
-  const _PostCard({required this.post, required this.strings});
+class _ActionBtn extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  const _ActionBtn({required this.icon, required this.label, required this.color, required this.onTap});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final String timeAgo = _formatTimeAgo(post.createdAt, ref.watch(localeProvider).languageCode);
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: AppColors.primary.withOpacity(0.1),
-                backgroundImage: post.authorPhoto != null ? NetworkImage(post.authorPhoto!) : null,
-                child: post.authorPhoto == null
-                    ? Text(
-                        post.authorName.isNotEmpty ? post.authorName[0].toUpperCase() : 'S',
-                        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-                      )
-                    : null,
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      post.authorName,
-                      style: AppTextStyles.titleLarge,
-                    ),
-                    Text(
-                      timeAgo,
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Text(
-            post.content,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textPrimary,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 14),
-          if (post.tags.isNotEmpty) ...[
-            Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              children: post.tags.map((tag) {
-                return Text(
-                  '#$tag',
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 14),
-          ],
-          Divider(color: AppColors.glassBorder, height: 1),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _ActionButton(
-                icon: post.isLiked ? Icons.favorite : Icons.favorite_border_rounded,
-                color: post.isLiked ? AppColors.error : AppColors.textSecondary,
-                label: '${post.likesCount}',
-                onTap: () {
-                  ref.read(communityFeedProvider.notifier).toggleLike(post.id);
-                },
-              ),
-              _ActionButton(
-                icon: Icons.chat_bubble_outline_rounded,
-                color: AppColors.textSecondary,
-                label: '${post.commentsCount}',
-                onTap: () {},
-              ),
-              _ActionButton(
-                icon: Icons.send_outlined,
-                color: AppColors.textSecondary,
-                label: '',
-                onTap: () {},
-              ),
-            ],
-          ),
-        ],
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: TextButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, size: 18, color: color),
+        label: Text(label, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600)),
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       ),
     );
   }
-
-  String _formatTimeAgo(DateTime dateTime, String lang) {
-    final diff = DateTime.now().difference(dateTime);
-    if (lang == 'fr') {
-      if (diff.inMinutes < 60) return 'Il y a ${diff.inMinutes} min';
-      if (diff.inHours < 24) return 'Il y a ${diff.inHours} h';
-      return DateFormat('dd MMM yyyy').format(dateTime);
-    } else {
-      if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-      if (diff.inHours < 24) return '${diff.inHours}h ago';
-      return DateFormat('MMM dd, yyyy').format(dateTime);
-    }
-  }
 }
 
-class _ActionButton extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-  final VoidCallback onTap;
+// ── Create Post Sheet ──────────────────────────────────────────────────────
 
-  const _ActionButton({
-    required this.icon,
-    required this.color,
-    required this.label,
-    required this.onTap,
+class _CreatePostSheet extends StatelessWidget {
+  final TextEditingController controller;
+  final TextEditingController tagCtrl;
+  final List<String> selectedTags;
+  final List<String> suggestedTags;
+  final void Function(String) onTagToggle;
+  final VoidCallback onSubmit;
+
+  const _CreatePostSheet({
+    required this.controller,
+    required this.tagCtrl,
+    required this.selectedTags,
+    required this.suggestedTags,
+    required this.onTagToggle,
+    required this.onSubmit,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (_, sc) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
           children: [
-            Icon(icon, color: color, size: 20),
-            if (label.isNotEmpty) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
+            const SizedBox(height: 12),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.glassBorder, borderRadius: BorderRadius.circular(2))),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              child: Row(
+                children: [
+                  Text('Share with the community', style: AppTextStyles.headlineSmall.copyWith(fontWeight: FontWeight.w800)),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(Icons.close_rounded, color: AppColors.textSecondary),
+                  ),
+                ],
               ),
-            ],
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView(
+                controller: sc,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  TextField(
+                    controller: controller,
+                    maxLines: 6,
+                    autofocus: true,
+                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
+                    decoration: InputDecoration(
+                      hintText: 'Share your scholarship journey, tips, or success story…',
+                      hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: AppColors.glassBorder),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: AppColors.glassBorder),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      filled: true,
+                      fillColor: AppColors.background,
+                      contentPadding: const EdgeInsets.all(16),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Add tags', style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w700, color: AppColors.textSecondary)),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: suggestedTags.map((tag) {
+                      final isSelected = selectedTags.contains(tag);
+                      return GestureDetector(
+                        onTap: () => onTagToggle(tag),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.primary : AppColors.background,
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(color: isSelected ? AppColors.primary : AppColors.glassBorder),
+                          ),
+                          child: Text(
+                            '#$tag',
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : AppColors.textSecondary,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 24),
+                  GestureDetector(
+                    onTap: onSubmit,
+                    child: Container(
+                      height: 54,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppColors.primary, Color(0xFF7C3AED)],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 6))],
+                      ),
+                      child: const Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                            SizedBox(width: 8),
+                            Text('Publish', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -791,144 +598,47 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-// ── _MemberCard ──────────────────────────────────────────────────────────────
-
-class _MemberCard extends StatelessWidget {
-  final ProfileModel profile;
-  final bool isFr;
-  final VoidCallback onMessageTap;
-
-  const _MemberCard({
-    required this.profile,
-    required this.isFr,
-    required this.onMessageTap,
-  });
+class _EmptyCommunity extends StatelessWidget {
+  final VoidCallback onPost;
+  const _EmptyCommunity({required this.onPost});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
+    return Padding(
+      padding: const EdgeInsets.all(40),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 26,
-                backgroundColor: AppColors.primary.withOpacity(0.1),
-                backgroundImage: profile.photoUrl != null ? NetworkImage(profile.photoUrl!) : null,
-                child: profile.photoUrl == null
-                    ? Text(
-                        profile.fullName.isNotEmpty ? profile.fullName[0].toUpperCase() : 'S',
-                        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 18),
-                      )
-                    : null,
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(profile.fullName, style: AppTextStyles.titleLarge),
-                    Text(
-                      '${profile.educationLevel} · ${profile.university}',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: onMessageTap,
-                icon: const Icon(Icons.mail_rounded, size: 14, color: Colors.white),
-                label: Text(
-                  isFr ? 'Message' : 'Message',
-                  style: const TextStyle(fontSize: 12, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-          if (profile.targetFields.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: profile.targetFields.map((field) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.glassBorder),
-                  ),
-                  child: Text(
-                    field,
-                    style: AppTextStyles.caption.copyWith(color: AppColors.textPrimary, fontSize: 10),
-                  ),
-                );
-              }).toList(),
+          Container(
+            width: 88,
+            height: 88,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primary.withOpacity(0.1),
             ),
-          ],
+            child: const Icon(Icons.forum_rounded, size: 44, color: AppColors.primary),
+          ),
+          const SizedBox(height: 20),
+          Text('Be the first to post!', style: AppTextStyles.headlineSmall),
+          const SizedBox(height: 8),
+          Text(
+            'Share tips, success stories, or questions with other scholars.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium,
+          ),
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: onPost,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [AppColors.primary, Color(0xFF7C3AED)]),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: const Text('Create a post', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            ),
+          ),
         ],
       ),
     );
   }
-}
-
-// ── Localization Strings ─────────────────────────────────────────────────────
-
-abstract class _Strings {
-  String get title;
-  String get errorLoading;
-  String get noPosts;
-  String get whatsOnYourMind;
-  String get createPost;
-  String get tagsHint;
-  String get publish;
-}
-
-class _FrenchStrings implements _Strings {
-  @override
-  String get title => 'Communauté';
-  @override
-  String get errorLoading => 'Erreur de chargement du flux.';
-  @override
-  String get noPosts => 'Aucune publication pour le moment.\nSoyez le premier à partager !';
-  @override
-  String get whatsOnYourMind => 'Partagez quelque chose avec les boursiers...';
-  @override
-  String get createPost => 'Créer une publication';
-  @override
-  String get tagsHint => 'Tags (séparés par des virgules, ex: Eiffel, DAAD)';
-  @override
-  String get publish => 'Publier';
-}
-
-class _EnglishStrings implements _Strings {
-  @override
-  String get title => 'Community';
-  @override
-  String get errorLoading => 'Error loading community feed.';
-  @override
-  String get noPosts => 'No posts in this feed yet.\nBe the first to share something!';
-  @override
-  String get whatsOnYourMind => 'Share something with other scholars...';
-  @override
-  String get createPost => 'Create Post';
-  @override
-  String get tagsHint => 'Tags (comma separated, e.g. Eiffel, DAAD)';
-  @override
-  String get publish => 'Publish';
 }

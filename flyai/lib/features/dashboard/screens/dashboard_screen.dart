@@ -16,331 +16,449 @@ class DashboardScreen extends ConsumerWidget {
     final statsAsync = ref.watch(dashboardStatsProvider);
     final likedAsync = ref.watch(likedScholarshipsProvider);
     final user = AuthService.currentUser;
-    final displayName = user?.displayName ?? 'Scholar';
+    final firstName = (user?.displayName ?? 'Scholar').split(' ').first;
 
     return Scaffold(
-      body: RefreshIndicator(
-        color: AppColors.primary,
-        onRefresh: () async {
-          ref.invalidate(dashboardStatsProvider);
-          ref.invalidate(likedScholarshipsProvider);
-        },
-        child: CustomScrollView(
-          slivers: [
-            // ── Header ────────────────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(24, 60, 24, 28),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primary.withValues(alpha: 0.15),
-                      Colors.transparent,
-                    ],
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Welcome back,', style: AppTextStyles.bodyMedium),
-                              Text(
-                                displayName.split(' ').first,
-                                style: AppTextStyles.displayMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                        CircleAvatar(
-                          radius: 26,
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-                          backgroundImage: user?.photoURL != null
-                              ? CachedNetworkImageProvider(user!.photoURL!)
-                              : null,
-                          child: user?.photoURL == null
-                              ? Text(
-                                  displayName.isNotEmpty
-                                      ? displayName[0].toUpperCase()
-                                      : 'S',
-                                  style: const TextStyle(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 18,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      ],
-                    ),
+      backgroundColor: AppColors.background,
+      body: CustomScrollView(
+        slivers: [
+          // ── Header ────────────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.primary.withOpacity(0.12),
+                    AppColors.background,
                   ],
                 ),
               ),
-            ),
-
-            // ── Stats Grid ────────────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: statsAsync.when(
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-                ),
-                error: (_, __) => const SizedBox.shrink(),
-                data: (stats) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 1.4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      _StatCard(
-                        label: 'Total Matches',
-                        value: '${stats.totalMatches}',
-                        icon: Icons.favorite_rounded,
-                        color: AppColors.success,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Good morning,',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textSecondary,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              firstName,
+                              style: AppTextStyles.displayLarge.copyWith(letterSpacing: -0.5),
+                            ),
+                          ],
+                        ),
                       ),
-                      _StatCard(
-                        label: 'Saved',
-                        value: '${stats.savedScholarships}',
-                        icon: Icons.bookmark_rounded,
-                        color: AppColors.primary,
-                      ),
-                      _StatCard(
-                        label: 'Active',
-                        value: '${stats.activeApplications}',
-                        icon: Icons.assignment_rounded,
-                        color: AppColors.secondary,
-                      ),
-                      _StatCard(
-                        label: 'Avg. Match',
-                        value: '${stats.avgCompatibility.round()}%',
-                        icon: Icons.bolt_rounded,
-                        color: AppColors.warning,
+                      GestureDetector(
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: const LinearGradient(
+                                  colors: [AppColors.primary, Color(0xFF7C3AED)],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primary.withOpacity(0.3),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: user?.photoURL != null
+                                  ? ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: user!.photoURL!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Text(
+                                        firstName.isNotEmpty ? firstName[0].toUpperCase() : 'S',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                            Positioned(
+                              right: 1,
+                              bottom: 1,
+                              child: Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: AppColors.success,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.background, width: 2),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
+          ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 32)),
-
-            // ── Liked Scholarships ────────────────────────────────────────
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+          // ── Stats Row ─────────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: statsAsync.when(
+              loading: () => const _StatsShimmer(),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (stats) => Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                 child: Row(
                   children: [
-                    Text('My Scholarships', style: AppTextStyles.headlineSmall),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('See all'),
+                    _MiniStat(
+                      value: '${stats.totalMatches}',
+                      label: 'Matches',
+                      color: AppColors.success,
+                      icon: Icons.favorite_rounded,
+                    ),
+                    const SizedBox(width: 10),
+                    _MiniStat(
+                      value: '${stats.savedScholarships}',
+                      label: 'Saved',
+                      color: AppColors.primary,
+                      icon: Icons.bookmark_rounded,
+                    ),
+                    const SizedBox(width: 10),
+                    _MiniStat(
+                      value: '${stats.activeApplications}',
+                      label: 'Active',
+                      color: AppColors.secondary,
+                      icon: Icons.assignment_rounded,
+                    ),
+                    const SizedBox(width: 10),
+                    _MiniStat(
+                      value: '${stats.avgCompatibility.round()}%',
+                      label: 'Avg Match',
+                      color: const Color(0xFFEC4899),
+                      icon: Icons.bolt_rounded,
                     ),
                   ],
                 ),
               ),
             ),
+          ),
 
-            likedAsync.when(
-              loading: () => const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-                ),
-              ),
-              error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
-              data: (scholarships) {
-                if (scholarships.isEmpty) {
-                  return SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: _EmptySection(
-                        icon: Icons.school_rounded,
-                        message: 'No liked scholarships yet.\nStart swiping to find matches!',
+          // ── Section Title ──────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+              child: Row(
+                children: [
+                  Text(
+                    'Your Scholarships',
+                    style: AppTextStyles.headlineSmall.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'See all',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  );
-                }
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) => _ScholarshipListTile(scholarship: scholarships[i]),
-                    childCount: scholarships.length,
                   ),
-                );
-              },
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 100)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  const _StatCard({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.glassBorder),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            color.withValues(alpha: 0.08),
-            Colors.transparent,
-          ],
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 18),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(value,
-                  style: AppTextStyles.headlineLarge.copyWith(color: color)),
-              Text(label, style: AppTextStyles.caption),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ScholarshipListTile extends StatelessWidget {
-  final ScholarshipModel scholarship;
-  const _ScholarshipListTile({required this.scholarship});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: AppColors.primary.withOpacity(0.1),
-            ),
-            child: scholarship.imageUrl != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: CachedNetworkImage(
-                      imageUrl: scholarship.imageUrl!,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) => const Icon(
-                          Icons.school_rounded, color: AppColors.primary),
-                    ),
-                  )
-                : const Icon(Icons.school_rounded, color: AppColors.primary),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(scholarship.title,
-                    style: AppTextStyles.titleMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
-                Text(
-                  '${scholarship.country} · ${scholarship.fundingType}',
-                  style: AppTextStyles.bodySmall,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(50),
-            ),
-            child: Text(
-              '${scholarship.compatibilityScore}%',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
+                ],
               ),
             ),
           ),
+
+          // ── Scholarship List ────────────────────────────────────────────────
+          likedAsync.when(
+            loading: () => const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+              ),
+            ),
+            error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+            data: (scholarships) {
+              if (scholarships.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: _EmptyFeed(),
+                );
+              }
+              return SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, i) => Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                    child: _ScholarshipFeedCard(scholarship: scholarships[i]),
+                  ),
+                  childCount: scholarships.length,
+                ),
+              );
+            },
+          ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 120)),
         ],
       ),
     );
   }
 }
 
-class _EmptySection extends StatelessWidget {
+// ── Mini Stat Card ─────────────────────────────────────────────────────────
+
+class _MiniStat extends StatelessWidget {
+  final String value;
+  final String label;
+  final Color color;
   final IconData icon;
-  final String message;
-  const _EmptySection({required this.icon, required this.message});
+  const _MiniStat({required this.value, required this.label, required this.color, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: color.withOpacity(0.2)),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color.withOpacity(0.08), Colors.transparent],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: color, size: 16),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                color: color,
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
+            ),
+            Text(
+              label,
+              style: AppTextStyles.caption,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Scholarship Feed Card ──────────────────────────────────────────────────
+
+class _ScholarshipFeedCard extends StatelessWidget {
+  final ScholarshipModel scholarship;
+  const _ScholarshipFeedCard({required this.scholarship});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.glassBorder),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 48, color: AppColors.glassBorder),
-          const SizedBox(height: 12),
-          Text(
-            message,
-            style: AppTextStyles.bodyMedium,
-            textAlign: TextAlign.center,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // Thumbnail
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: AppColors.primary.withOpacity(0.1),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: scholarship.imageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: scholarship.imageUrl!,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => const Icon(Icons.school_rounded, color: AppColors.primary),
+                    )
+                  : const Icon(Icons.school_rounded, color: AppColors.primary, size: 28),
+            ),
+            const SizedBox(width: 14),
+
+            // Info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    scholarship.title,
+                    style: AppTextStyles.titleMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${scholarship.university ?? ''} · ${scholarship.country}',
+                    style: AppTextStyles.bodySmall,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      _DeadlineChip(scholarship: scholarship),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+
+            // Score badge
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: scholarship.compatibilityScore >= 70
+                      ? [AppColors.success, const Color(0xFF15803D)]
+                      : [AppColors.primary, const Color(0xFF1D4ED8)],
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${scholarship.compatibilityScore}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const Text(
+                    '%',
+                    style: TextStyle(color: Colors.white70, fontSize: 8),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeadlineChip extends StatelessWidget {
+  final ScholarshipModel scholarship;
+  const _DeadlineChip({required this.scholarship});
+
+  @override
+  Widget build(BuildContext context) {
+    if (scholarship.deadline == null) return const SizedBox.shrink();
+    final diff = scholarship.deadline!.difference(DateTime.now()).inDays;
+    final color = diff <= 7 ? AppColors.error : diff <= 30 ? AppColors.warning : AppColors.textSecondary;
+    final label = diff < 0 ? 'Expired' : diff == 0 ? 'Today!' : '$diff days left';
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.schedule_rounded, size: 11, color: color),
+        const SizedBox(width: 3),
+        Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+}
+
+class _EmptyFeed extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primary.withOpacity(0.1),
+            ),
+            child: const Icon(Icons.explore_rounded, size: 40, color: AppColors.primary),
+          ),
+          const SizedBox(height: 16),
+          Text('Start exploring', style: AppTextStyles.headlineSmall),
+          const SizedBox(height: 8),
+          Text(
+            'Swipe on scholarships to build your collection here.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatsShimmer extends StatelessWidget {
+  const _StatsShimmer();
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+      child: Row(
+        children: List.generate(
+          4,
+          (_) => Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(right: 10),
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.glassBorder,
+                borderRadius: BorderRadius.circular(18),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

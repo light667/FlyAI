@@ -15,7 +15,6 @@ import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
-
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
@@ -24,7 +23,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  bool _obscurePassword = true;
+  bool _obscure = true;
   bool _isLoading = false;
 
   @override
@@ -33,26 +32,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _checkRedirectResult();
   }
 
-  Future<void> _checkRedirectResult() async {
-    if (!kIsWeb) return;
-    setState(() => _isLoading = true);
-    try {
-      final credential = await AuthService.getRedirectResult();
-      if (credential != null && mounted) {
-        await _navigateAfterAuth();
-      }
-    } catch (e) {
-      _showError(ref.read(stringsProvider).genericError);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
   @override
   void dispose() {
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkRedirectResult() async {
+    if (!kIsWeb) return;
+    setState(() => _isLoading = true);
+    try {
+      final cred = await AuthService.getRedirectResult();
+      if (cred != null && mounted) await _navigate();
+    } catch (_) {} finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _signIn() async {
@@ -63,13 +58,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             email: _emailCtrl.text,
             password: _passwordCtrl.text,
           );
-      if (mounted) await _navigateAfterAuth();
+      if (mounted) await _navigate();
     } on FirebaseAuthException catch (e) {
-      _showError(AuthService.mapFirebaseError(
-        e,
-        fr: ref.read(localeProvider).languageCode == 'fr',
-      ));
-    } catch (e) {
+      _showError(AuthService.mapFirebaseError(e, fr: ref.read(localeProvider).languageCode == 'fr'));
+    } catch (_) {
       _showError(ref.read(stringsProvider).genericError);
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -80,204 +72,245 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       await ref.read(authNotifierProvider.notifier).signInWithGoogle();
-      if (mounted && FirebaseAuth.instance.currentUser != null) {
-        await _navigateAfterAuth();
-      }
-    } catch (e) {
+      if (mounted && FirebaseAuth.instance.currentUser != null) await _navigate();
+    } catch (_) {
       _showError(ref.read(stringsProvider).genericError);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _appleSignIn() async {
-    setState(() => _isLoading = true);
-    try {
-      await ref.read(authNotifierProvider.notifier).signInWithApple();
-      if (mounted) await _navigateAfterAuth();
-    } catch (e) {
-      _showError(ref.read(stringsProvider).genericError);
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _navigateAfterAuth() async {
+  Future<void> _navigate() async {
     final exists = await ref.read(profileExistsProvider.future);
     if (!mounted) return;
     context.go(exists ? AppRoutes.home : AppRoutes.profileSetup);
   }
 
-  void _showError(String message) {
+  void _showError(String msg) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-      ),
+      SnackBar(content: Text(msg), backgroundColor: AppColors.error, behavior: SnackBarBehavior.floating),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final strings = ref.watch(stringsProvider);
-    final currentLocale = ref.watch(localeProvider);
+    final locale = ref.watch(localeProvider);
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Form(
-            key: _formKey,
+      backgroundColor: AppColors.background,
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Language Selector
-                Align(
-                  alignment: Alignment.topRight,
-                  child: PopupMenuButton<Locale>(
-                    initialValue: currentLocale,
-                    icon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.language_rounded, size: 18, color: AppColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Text(
-                          currentLocale.languageCode.toUpperCase(),
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                        ),
-                        Icon(Icons.arrow_drop_down_rounded, color: AppColors.textSecondary),
-                      ],
-                    ),
-                    onSelected: (locale) => ref.read(localeProvider.notifier).setLocale(locale),
-                    itemBuilder: (context) => [
-                      PopupMenuItem(value: const Locale('fr'), child: Text(strings.french)),
-                      PopupMenuItem(value: const Locale('en'), child: Text(strings.english)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Logo
-                Center(child: Image.asset('assets/images/symbol.png', height: 56)),
-                const SizedBox(height: 32),
-
-                Text(strings.welcomeBack, style: AppTextStyles.displayMedium),
-                const SizedBox(height: 8),
-                Text(strings.welcomeBackSub, style: AppTextStyles.bodyMedium),
-                const SizedBox(height: 40),
-
-                // Email
-                AppTextField(
-                  controller: _emailCtrl,
-                  label: strings.emailLabel,
-                  hint: strings.emailHint,
-                  keyboardType: TextInputType.emailAddress,
-                  prefixIcon: Icons.email_outlined,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return strings.fieldRequired;
-                    if (!v.contains('@')) return strings.invalidEmail;
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Password
-                AppTextField(
-                  controller: _passwordCtrl,
-                  label: strings.passwordLabel,
-                  hint: '••••••••',
-                  obscureText: _obscurePassword,
-                  prefixIcon: Icons.lock_outline,
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                      color: AppColors.textSecondary,
-                    ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                  ),
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return strings.fieldRequired;
-                    if (v.length < 6) return strings.passwordTooShort;
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 8),
-
-                // Forgot Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () => context.push(AppRoutes.forgotPassword),
-                    child: Text(
-                      strings.forgotPassword,
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary),
+                // ── Gradient header ──────────────────────────────────────
+                Container(
+                  height: 260,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF0A0F1C), Color(0xFF1E1B4B), Color(0xFF0A0F1C)],
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-
-                // Sign In Button
-                PrimaryButton(
-                  label: strings.signIn,
-                  isLoading: _isLoading,
-                  onPressed: _signIn,
-                ),
-                const SizedBox(height: 32),
-
-                // Divider
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: AppColors.glassBorder)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(strings.orContinueWith, style: AppTextStyles.bodySmall),
-                    ),
-                    Expanded(child: Divider(color: AppColors.glassBorder)),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                // Social Buttons
-                SocialButton(
-                  label: strings.continueWithGoogle,
-                  iconPath: 'assets/images/google.jpg',
-                  onPressed: _isLoading ? null : _googleSignIn,
-                ),
-                const SizedBox(height: 12),
-                SocialButton(
-                  label: strings.continueWithApple,
-                  iconPath: 'assets/images/apple.png',
-                  onPressed: _isLoading ? null : _appleSignIn,
-                ),
-                const SizedBox(height: 40),
-
-                // Sign Up Link
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Stack(
                     children: [
-                      Text(strings.dontHaveAccount, style: AppTextStyles.bodyMedium),
-                      TextButton(
-                        onPressed: () => context.push(AppRoutes.signup),
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      // Glow
+                      Positioned(
+                        top: -40,
+                        right: -40,
+                        child: Container(
+                          width: 200,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [AppColors.primary.withOpacity(0.3), Colors.transparent],
+                            ),
+                          ),
                         ),
-                        child: Text(
-                          strings.signUp,
-                          style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary),
+                      ),
+                      // Logo + title
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 60),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 52,
+                                height: 52,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [AppColors.primary, Color(0xFF7C3AED)],
+                                  ),
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'FLY AI',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 3,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 28),
+                          Text(
+                            strings.welcomeBack,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            strings.welcomeBackSub,
+                            style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                          ),
+                        ],
+                      ),
+                      // Language pill
+                      Positioned(
+                        top: 52,
+                        right: 20,
+                        child: PopupMenuButton<Locale>(
+                          initialValue: locale,
+                          onSelected: (l) => ref.read(localeProvider.notifier).setLocale(l),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(color: Colors.white.withOpacity(0.2)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.language_rounded, size: 14, color: Colors.white70),
+                                const SizedBox(width: 4),
+                                Text(locale.languageCode.toUpperCase(),
+                                    style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          ),
+                          itemBuilder: (_) => [
+                            PopupMenuItem(value: const Locale('fr'), child: Text(strings.french)),
+                            PopupMenuItem(value: const Locale('en'), child: Text(strings.english)),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
+
+                // ── Form ────────────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextField(
+                          controller: _emailCtrl,
+                          label: strings.emailLabel,
+                          hint: strings.emailHint,
+                          keyboardType: TextInputType.emailAddress,
+                          prefixIcon: Icons.email_outlined,
+                          validator: (v) {
+                            if (v == null || v.isEmpty) return strings.fieldRequired;
+                            if (!v.contains('@')) return strings.invalidEmail;
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 14),
+                        AppTextField(
+                          controller: _passwordCtrl,
+                          label: strings.passwordLabel,
+                          hint: '••••••••',
+                          obscureText: _obscure,
+                          prefixIcon: Icons.lock_outline,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                              color: AppColors.textSecondary,
+                            ),
+                            onPressed: () => setState(() => _obscure = !_obscure),
+                          ),
+                          validator: (v) {
+                            if (v == null || v.isEmpty) return strings.fieldRequired;
+                            if (v.length < 6) return strings.passwordTooShort;
+                            return null;
+                          },
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () => context.push(AppRoutes.forgotPassword),
+                            child: Text(strings.forgotPassword,
+                                style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary)),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        PrimaryButton(label: strings.signIn, isLoading: _isLoading, onPressed: _signIn),
+                        const SizedBox(height: 28),
+                        Row(children: [
+                          Expanded(child: Divider(color: AppColors.glassBorder)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(strings.orContinueWith, style: AppTextStyles.bodySmall),
+                          ),
+                          Expanded(child: Divider(color: AppColors.glassBorder)),
+                        ]),
+                        const SizedBox(height: 20),
+                        SocialButton(
+                          label: strings.continueWithGoogle,
+                          iconPath: 'assets/images/google.jpg',
+                          onPressed: _isLoading ? null : _googleSignIn,
+                        ),
+                        const SizedBox(height: 36),
+                        Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(strings.dontHaveAccount, style: AppTextStyles.bodyMedium),
+                              TextButton(
+                                onPressed: () => context.push(AppRoutes.signup),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(strings.signUp,
+                                    style: AppTextStyles.labelLarge.copyWith(color: AppColors.primary)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
