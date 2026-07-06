@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../providers/chat_provider.dart';
+import '../providers/scholarship_coaching_provider.dart';
 
 class AiAssistantScreen extends ConsumerStatefulWidget {
   const AiAssistantScreen({super.key});
@@ -11,28 +12,43 @@ class AiAssistantScreen extends ConsumerStatefulWidget {
 }
 
 class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
-  final _msgCtrl = TextEditingController();
+  final _msgCtrl  = TextEditingController();
   final _scrollCtrl = ScrollController();
   bool _isSending = false;
+  bool _taskPanelExpanded = true;
 
   final _quickActions = [
-    ('Review my CV', Icons.description_outlined,
-        'Can you help me review my CV and suggest improvements?'),
-    ('Write motivation letter', Icons.edit_note_rounded,
-        'Help me write a compelling motivation letter for a scholarship.'),
-    ('Interview prep', Icons.mic_none_rounded,
-        'Help me prepare for a scholarship interview.'),
-    ('SOP tips', Icons.tips_and_updates_outlined,
-        'Give me tips for writing a strong Statement of Purpose.'),
-    ('Scholarship strategy', Icons.route_outlined,
-        'What strategy should I use to maximize my scholarship applications?'),
+    ('Évalue mon CV', Icons.description_outlined,
+        'Peux-tu analyser mon CV et me suggérer des améliorations ?'),
+    ('Rédige ma lettre de motivation', Icons.edit_note_rounded,
+        'Rédige une lettre de motivation complète pour cette bourse.'),
+    ('Préparation entretien', Icons.mic_none_rounded,
+        'Aide-moi à préparer mon entretien de sélection.'),
+    ('Stratégie de candidature', Icons.route_outlined,
+        'Quelle stratégie adopter pour maximiser mes chances ?'),
+    ('SOP complet', Icons.article_outlined,
+        'Rédige mon Statement of Purpose complet pour cette bourse.'),
   ];
 
   @override
-  void dispose() {
-    _msgCtrl.dispose();
-    _scrollCtrl.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    // Watch for incoming coaching scholarship from DiscoverScreen
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkPendingCoaching());
+  }
+
+  void _checkPendingCoaching() {
+    final pending = ref.read(pendingCoachingScholarshipProvider);
+    if (pending != null) {
+      ref.read(pendingCoachingScholarshipProvider.notifier).state = null;
+      ref.read(chatProvider.notifier).startScholarshipCoaching(pending);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant AiAssistantScreen old) {
+    super.didUpdateWidget(old);
+    _checkPendingCoaching();
   }
 
   Future<void> _send([String? text]) async {
@@ -42,35 +58,149 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
     _msgCtrl.clear();
     await ref.read(chatProvider.notifier).sendMessage(content);
     setState(() => _isSending = false);
-    await Future.delayed(const Duration(milliseconds: 100));
-    if (_scrollCtrl.hasClients) {
-      _scrollCtrl.animateTo(
-        _scrollCtrl.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    }
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (_scrollCtrl.hasClients) {
+        _scrollCtrl.animateTo(
+          _scrollCtrl.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _msgCtrl.dispose();
+    _scrollCtrl.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final messagesAsync = ref.watch(chatProvider);
-    // Use dynamic list so we don't depend on a specific model class name.
-    // The provider exposes a list whose items have .role and .content getters.
-    final messages = messagesAsync.valueOrNull ?? [];
+    final messagesAsync    = ref.watch(chatProvider);
+    final messages         = messagesAsync.valueOrNull ?? [];
+    final tasks            = ref.watch(coachingTasksProvider);
+    final phase            = ref.watch(coachingPhaseProvider);
+    final activeScholarship = ref.watch(activeCoachingScholarshipProvider);
+    final isCoaching       = activeScholarship != null;
+    final isLoading        = messagesAsync is AsyncLoading;
+
+    // Listen for new messages to trigger scroll
+    ref.listen(chatProvider, (_, next) {
+      if (next.valueOrNull?.isNotEmpty == true) _scrollToBottom();
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        titleSpacing: 20,
-        title: Row(
+      body: Column(
+        children: [
+          // ── Header ────────────────────────────────────────────────────────
+          _AgentHeader(
+            isCoaching: isCoaching,
+            scholarship: activeScholarship,
+            phase: phase,
+            onClear: () {
+              ref.read(chatProvider.notifier).clearChat();
+              setState(() => _taskPanelExpanded = true);
+            },
+          ),
+
+          // ── Task Panel (only in coaching mode with tasks) ─────────────────
+          if (isCoaching && tasks.isNotEmpty)
+            _TaskPanel(
+              tasks: tasks,
+              isExpanded: _taskPanelExpanded,
+              onToggleExpand: () =>
+                  setState(() => _taskPanelExpanded = !_taskPanelExpanded),
+              onToggleTask: (id) =>
+                  ref.read(coachingTasksProvider.notifier).toggle(id),
+              onHelpTask: (task) => _send(
+                  'Aide-moi avec la tâche : "${task.title}". ${task.description}'),
+            ),
+
+          // ── Messages ──────────────────────────────────────────────────────
+          Expanded(
+            child: isLoading && messages.isEmpty
+                ? _LoadingBriefing(scholarshipTitle: activeScholarship?.title)
+                : messages.isEmpty
+                    ? _WelcomeView(
+                        quickActions: _quickActions,
+                        onTap: _send,
+                      )
+                    : ListView.builder(
+                        controller: _scrollCtrl,
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        itemCount: messages.length + (_isSending ? 1 : 0),
+                        itemBuilder: (context, i) {
+                          if (i == messages.length && _isSending) {
+                            return const _TypingBubble();
+                          }
+                          final msg = messages[i];
+                          return _MessageBubble(
+                            role: msg.role,
+                            content: msg.content,
+                          );
+                        },
+                      ),
+          ),
+
+          // ── Quick replies (confirmation phase) ────────────────────────────
+          if (phase == CoachingPhase.awaitingConfirmation)
+            _ConfirmationBar(onConfirm: () => _send('Oui, je suis prêt(e) à commencer !'), onDecline: () => ref.read(chatProvider.notifier).clearChat()),
+
+          // ── Input bar ─────────────────────────────────────────────────────
+          _InputBar(
+            controller: _msgCtrl,
+            isSending: _isSending,
+            onSend: () => _send(),
+            onChanged: () => setState(() {}),
+            hint: isCoaching
+                ? 'Pose une question ou demande de l\'aide…'
+                : 'Pose-moi n\'importe quelle question…',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Agent Header ────────────────────────────────────────────────────────────
+
+class _AgentHeader extends StatelessWidget {
+  final bool isCoaching;
+  final dynamic scholarship;
+  final CoachingPhase phase;
+  final VoidCallback onClear;
+
+  const _AgentHeader({
+    required this.isCoaching,
+    required this.scholarship,
+    required this.phase,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          border: Border(
+              bottom: BorderSide(color: AppColors.glassBorder, width: 1)),
+        ),
+        child: Row(
           children: [
-            // AI avatar orb
+            // Avatar orb
             Container(
-              width: 40,
-              height: 40,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: const LinearGradient(
@@ -86,135 +216,412 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
                   ),
                 ],
               ),
-              child: const Icon(Icons.auto_awesome_rounded, size: 18, color: Colors.white),
+              child: const Icon(Icons.auto_awesome_rounded,
+                  size: 20, color: Colors.white),
             ),
             const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Fly Assistant',
-                  style: AppTextStyles.titleLarge.copyWith(fontWeight: FontWeight.w800),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: AppColors.success,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isCoaching ? 'Fly Agent 🎯' : 'Fly Assistant',
+                    style: AppTextStyles.titleLarge
+                        .copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  if (isCoaching && scholarship != null) ...[
                     Text(
-                      'AI-powered · Always active',
-                      style: AppTextStyles.caption.copyWith(color: AppColors.success),
+                      scholarship.title ?? '',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ],
+                  ] else
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: AppColors.success,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'IA spécialisée bourses · Actif',
+                          style: AppTextStyles.caption
+                              .copyWith(color: AppColors.success),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+
+            // Phase badge
+            if (isCoaching)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _phaseColor(phase).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(50),
+                  border: Border.all(
+                      color: _phaseColor(phase).withValues(alpha: 0.4)),
                 ),
-              ],
+                child: Text(
+                  _phaseLabel(phase),
+                  style: TextStyle(
+                    color: _phaseColor(phase),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+
+            const SizedBox(width: 8),
+            IconButton(
+              icon: Icon(Icons.add_circle_outline_rounded,
+                  color: AppColors.textSecondary, size: 22),
+              onPressed: onClear,
+              tooltip: 'Nouvelle conversation',
+              padding: EdgeInsets.zero,
             ),
           ],
         ),
-        actions: [
-          if (messages.isNotEmpty)
-            IconButton(
-              icon: Icon(Icons.refresh_rounded, color: AppColors.textSecondary),
-              onPressed: () => ref.read(chatProvider.notifier).clearChat(),
-              tooltip: 'New conversation',
-            ),
-          const SizedBox(width: 8),
-        ],
       ),
-      body: Column(
+    );
+  }
+
+  Color _phaseColor(CoachingPhase p) {
+    switch (p) {
+      case CoachingPhase.briefing:
+        return AppColors.primary;
+      case CoachingPhase.awaitingConfirmation:
+        return AppColors.secondary;
+      case CoachingPhase.coaching:
+        return AppColors.success;
+      default:
+        return AppColors.textSecondary;
+    }
+  }
+
+  String _phaseLabel(CoachingPhase p) {
+    switch (p) {
+      case CoachingPhase.briefing:
+        return 'Analyse';
+      case CoachingPhase.awaitingConfirmation:
+        return 'En attente';
+      case CoachingPhase.coaching:
+        return 'Coaching actif';
+      default:
+        return 'Prêt';
+    }
+  }
+}
+
+// ── Task Panel ──────────────────────────────────────────────────────────────
+
+class _TaskPanel extends StatelessWidget {
+  final List<CoachingTask> tasks;
+  final bool isExpanded;
+  final VoidCallback onToggleExpand;
+  final void Function(String id) onToggleTask;
+  final void Function(CoachingTask task) onHelpTask;
+
+  const _TaskPanel({
+    required this.tasks,
+    required this.isExpanded,
+    required this.onToggleExpand,
+    required this.onToggleTask,
+    required this.onHelpTask,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final done   = tasks.where((t) => t.isCompleted).length;
+    final total  = tasks.length;
+    final progress = total > 0 ? done / total : 0.0;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        border: Border(
+          bottom: BorderSide(color: AppColors.glassBorder),
+        ),
+      ),
+      child: Column(
         children: [
-          // ── Message list ────────────────────────────────────────────
-          Expanded(
-            child: messages.isEmpty
-                ? _WelcomeView(quickActions: _quickActions, onTap: _send)
-                : ListView.builder(
-                    controller: _scrollCtrl,
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                    itemCount: messages.length + (_isSending ? 1 : 0),
-                    itemBuilder: (context, i) {
-                      if (i == messages.length && _isSending) {
-                        return const _TypingBubble();
-                      }
-                      // Access role/content dynamically — works with any
-                      // chat message class that exposes these fields.
-                      final msg = messages[i];
-                      return _MessageBubble(
-                        role: msg.role as String,
-                        content: msg.content as String,
-                      );
-                    },
+          // Header row
+          GestureDetector(
+            onTap: onToggleExpand,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.success.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.task_alt_rounded,
+                        color: AppColors.success, size: 16),
                   ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Plan d\'action · $done/$total',
+                          style: AppTextStyles.titleMedium
+                              .copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 4),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 4,
+                            backgroundColor: AppColors.glassBorder,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                AppColors.success),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${(progress * 100).round()}%',
+                    style: const TextStyle(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(
+                    isExpanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
+                    color: AppColors.textSecondary,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
           ),
 
-          // ── Input bar ───────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              border: Border(top: BorderSide(color: AppColors.glassBorder, width: 1)),
+          // Task list
+          AnimatedSize(
+            duration: const Duration(milliseconds: 250),
+            child: isExpanded
+                ? ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 260),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                      itemCount: tasks.length,
+                      separatorBuilder: (_, __) => Divider(
+                        height: 1,
+                        color: AppColors.glassBorder,
+                      ),
+                      itemBuilder: (_, i) {
+                        final task = tasks[i];
+                        return _TaskRow(
+                          task: task,
+                          onToggle: () => onToggleTask(task.id),
+                          onHelp: () => onHelpTask(task),
+                        );
+                      },
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TaskRow extends StatelessWidget {
+  final CoachingTask task;
+  final VoidCallback onToggle;
+  final VoidCallback onHelp;
+
+  const _TaskRow({
+    required this.task,
+    required this.onToggle,
+    required this.onHelp,
+  });
+
+  IconData get _categoryIcon {
+    switch (task.category) {
+      case 'document':
+        return Icons.description_outlined;
+      case 'test':
+        return Icons.assignment_outlined;
+      case 'online':
+        return Icons.language_rounded;
+      default:
+        return Icons.task_outlined;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          // Checkbox
+          GestureDetector(
+            onTap: onToggle,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: task.isCompleted
+                    ? AppColors.success
+                    : Colors.transparent,
+                border: Border.all(
+                  color: task.isCompleted
+                      ? AppColors.success
+                      : AppColors.glassBorder,
+                  width: 2,
+                ),
+              ),
+              child: task.isCompleted
+                  ? const Icon(Icons.check_rounded,
+                      color: Colors.white, size: 14)
+                  : null,
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Container(
-                    constraints: const BoxConstraints(maxHeight: 120),
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.glassBorder),
-                    ),
-                    child: TextField(
-                      controller: _msgCtrl,
-                      maxLines: null,
-                      textInputAction: TextInputAction.newline,
-                      onChanged: (_) => setState(() {}),
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
-                      decoration: InputDecoration(
-                        hintText: 'Ask me anything…',
-                        hintStyle: AppTextStyles.bodyMedium
-                            .copyWith(color: AppColors.textSecondary),
-                        border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          ),
+          const SizedBox(width: 10),
+
+          // Category icon
+          Icon(_categoryIcon,
+              size: 14,
+              color: task.isCompleted
+                  ? AppColors.textSecondary
+                  : AppColors.primary),
+          const SizedBox(width: 6),
+
+          // Title
+          Expanded(
+            child: Text(
+              task.title,
+              style: AppTextStyles.bodySmall.copyWith(
+                fontWeight: FontWeight.w600,
+                color: task.isCompleted
+                    ? AppColors.textSecondary
+                    : AppColors.textPrimary,
+                decoration:
+                    task.isCompleted ? TextDecoration.lineThrough : null,
+              ),
+            ),
+          ),
+
+          // Help button
+          if (!task.isCompleted)
+            GestureDetector(
+              onTap: onHelp,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.auto_awesome_rounded,
+                        size: 11, color: AppColors.primary),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Aide',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: _isSending ? null : () => _send(),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: _msgCtrl.text.trim().isNotEmpty && !_isSending
-                            ? [AppColors.primary, const Color(0xFF7C3AED)]
-                            : [AppColors.glassBorder, AppColors.glassBorder],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: _isSending
-                        ? const Padding(
-                            padding: EdgeInsets.all(13),
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
-                          )
-                        : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
-                  ),
-                ),
-              ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Confirmation Bar ────────────────────────────────────────────────────────
+
+class _ConfirmationBar extends StatelessWidget {
+  final VoidCallback onConfirm;
+  final VoidCallback onDecline;
+  const _ConfirmationBar({required this.onConfirm, required this.onDecline});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        border: Border(top: BorderSide(color: AppColors.glassBorder)),
+      ),
+      child: Row(
+        children: [
+          Text('Prêt(e) à commencer ?',
+              style: AppTextStyles.bodySmall
+                  .copyWith(fontWeight: FontWeight.w600)),
+          const Spacer(),
+          GestureDetector(
+            onTap: onDecline,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: AppColors.error.withValues(alpha: 0.5)),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Text('Non',
+                  style: TextStyle(
+                      color: AppColors.error, fontWeight: FontWeight.w700)),
+            ),
+          ),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: onConfirm,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                    colors: [AppColors.primary, Color(0xFF7C3AED)]),
+                borderRadius: BorderRadius.circular(50),
+                boxShadow: [
+                  BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 10)
+                ],
+              ),
+              child: const Text('Oui, commençons !',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w700)),
             ),
           ),
         ],
@@ -223,7 +630,61 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   }
 }
 
-// ── Welcome Screen ──────────────────────────────────────────────────────────
+// ── Loading Briefing ────────────────────────────────────────────────────────
+
+class _LoadingBriefing extends StatelessWidget {
+  final String? scholarshipTitle;
+  const _LoadingBriefing({this.scholarshipTitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 56,
+              height: 56,
+              child: CircularProgressIndicator(
+                color: AppColors.primary,
+                strokeWidth: 3,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Fly Agent analyse la bourse…',
+              style: AppTextStyles.headlineSmall,
+              textAlign: TextAlign.center,
+            ),
+            if (scholarshipTitle != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                scholarshipTitle!,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+            const SizedBox(height: 16),
+            Text(
+              'Recherche d\'informations en ligne\net préparation de ton plan personnalisé…',
+              style: AppTextStyles.bodySmall,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Welcome View ────────────────────────────────────────────────────────────
 
 class _WelcomeView extends StatelessWidget {
   final List<(String, IconData, String)> quickActions;
@@ -247,8 +708,6 @@ class _WelcomeView extends StatelessWidget {
                     shape: BoxShape.circle,
                     gradient: const LinearGradient(
                       colors: [AppColors.primary, Color(0xFF7C3AED)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -258,28 +717,29 @@ class _WelcomeView extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.auto_awesome_rounded, size: 40, color: Colors.white),
+                  child: const Icon(Icons.auto_awesome_rounded,
+                      size: 40, color: Colors.white),
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Hi! I\'m Fly Assistant 🚀',
-                  style: AppTextStyles.headlineLarge.copyWith(fontWeight: FontWeight.w800),
+                  'Fly Agent 🚀',
+                  style: AppTextStyles.headlineLarge
+                      .copyWith(fontWeight: FontWeight.w800),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Your AI scholarship advisor. Ask me anything about\nscholarships, CVs, motivation letters, and more.',
+                  'Ton coach IA spécialisé en bourses.\nAccepte une bourse dans Découvrir pour\nque je t\'accompagne pas à pas.',
                   style: AppTextStyles.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 36),
-          Text(
-            'Quick actions',
-            style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
-          ),
+          const SizedBox(height: 32),
+          Text('Actions rapides',
+              style: AppTextStyles.titleMedium
+                  .copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 14),
           ...quickActions.map(
             (action) => Padding(
@@ -287,7 +747,8 @@ class _WelcomeView extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => onTap(action.$3),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 18, vertical: 14),
                   decoration: BoxDecoration(
                     color: AppColors.card,
                     borderRadius: BorderRadius.circular(16),
@@ -302,7 +763,8 @@ class _WelcomeView extends StatelessWidget {
                           color: AppColors.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Icon(action.$2, color: AppColors.primary, size: 18),
+                        child: Icon(action.$2,
+                            color: AppColors.primary, size: 18),
                       ),
                       const SizedBox(width: 14),
                       Expanded(child: Text(action.$1, style: AppTextStyles.titleMedium)),
@@ -321,8 +783,6 @@ class _WelcomeView extends StatelessWidget {
 }
 
 // ── Message Bubble ──────────────────────────────────────────────────────────
-// Takes plain strings instead of a typed model class so we're decoupled
-// from whatever ChatMessage / MessageModel class name is used in the project.
 
 class _MessageBubble extends StatelessWidget {
   final String role;
@@ -348,18 +808,18 @@ class _MessageBubble extends StatelessWidget {
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [AppColors.primary, Color(0xFF7C3AED)],
-                ),
+                    colors: [AppColors.primary, Color(0xFF7C3AED)]),
               ),
-              child: const Icon(Icons.auto_awesome_rounded, size: 14, color: Colors.white),
+              child: const Icon(Icons.auto_awesome_rounded,
+                  size: 14, color: Colors.white),
             ),
           ],
           Flexible(
             child: Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.72,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  maxWidth: MediaQuery.of(context).size.width * 0.75),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 gradient: isUser
                     ? const LinearGradient(
@@ -375,7 +835,9 @@ class _MessageBubble extends StatelessWidget {
                   bottomLeft: Radius.circular(isUser ? 20 : 4),
                   bottomRight: Radius.circular(isUser ? 4 : 20),
                 ),
-                border: isUser ? null : Border.all(color: AppColors.glassBorder),
+                border: isUser
+                    ? null
+                    : Border.all(color: AppColors.glassBorder),
                 boxShadow: [
                   BoxShadow(
                     color: (isUser ? AppColors.primary : Colors.black)
@@ -389,7 +851,7 @@ class _MessageBubble extends StatelessWidget {
                 content,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: isUser ? Colors.white : AppColors.textPrimary,
-                  height: 1.5,
+                  height: 1.55,
                 ),
               ),
             ),
@@ -401,7 +863,92 @@ class _MessageBubble extends StatelessWidget {
   }
 }
 
-// ── Typing Indicator ────────────────────────────────────────────────────────
+// ── Input Bar ───────────────────────────────────────────────────────────────
+
+class _InputBar extends StatelessWidget {
+  final TextEditingController controller;
+  final bool isSending;
+  final VoidCallback onSend;
+  final VoidCallback onChanged;
+  final String hint;
+
+  const _InputBar({
+    required this.controller,
+    required this.isSending,
+    required this.onSend,
+    required this.onChanged,
+    required this.hint,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 32),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        border: Border(
+            top: BorderSide(color: AppColors.glassBorder, width: 1)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 120),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.glassBorder),
+              ),
+              child: TextField(
+                controller: controller,
+                maxLines: null,
+                textInputAction: TextInputAction.newline,
+                onChanged: (_) => onChanged(),
+                style: AppTextStyles.bodyMedium
+                    .copyWith(color: AppColors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: hint,
+                  hintStyle: AppTextStyles.bodyMedium
+                      .copyWith(color: AppColors.textSecondary),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 18, vertical: 12),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: isSending ? null : onSend,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: controller.text.trim().isNotEmpty && !isSending
+                      ? [AppColors.primary, const Color(0xFF7C3AED)]
+                      : [AppColors.glassBorder, AppColors.glassBorder],
+                ),
+              ),
+              child: isSending
+                  ? const Padding(
+                      padding: EdgeInsets.all(13),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.send_rounded,
+                      color: Colors.white, size: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Typing Bubble ───────────────────────────────────────────────────────────
 
 class _TypingBubble extends StatefulWidget {
   const _TypingBubble();
@@ -420,7 +967,7 @@ class _TypingBubbleState extends State<_TypingBubble>
     _ctrl = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 900))
       ..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0.4, end: 1.0).animate(
+    _anim = Tween<double>(begin: 0.3, end: 1.0).animate(
         CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
@@ -445,7 +992,8 @@ class _TypingBubbleState extends State<_TypingBubble>
               gradient: LinearGradient(
                   colors: [AppColors.primary, Color(0xFF7C3AED)]),
             ),
-            child: const Icon(Icons.auto_awesome_rounded, size: 14, color: Colors.white),
+            child: const Icon(Icons.auto_awesome_rounded,
+                size: 14, color: Colors.white),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),

@@ -17,17 +17,49 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _scale;
   late Animation<double> _fade;
   late Animation<double> _ring;
+  // Pre-compute dot animations with valid Interval ranges (all end <= 1.0)
+  late List<Animation<double>> _dotAnims;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
-    _scale = Tween<double>(begin: 0.6, end: 1.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.6, curve: Curves.elasticOut)));
-    _fade = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: const Interval(0.0, 0.5, curve: Curves.easeOut)));
-    _ring = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(parent: _ctrl, curve: const Interval(0.4, 1.0, curve: Curves.easeOut)));
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    );
+
+    _scale = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _ctrl,
+        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
+      ),
+    );
+    _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _ctrl,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+      ),
+    );
+    _ring = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _ctrl,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeOut),
+      ),
+    );
+
+    // Dot animations — staggered but all end values ≤ 1.0
+    // i=0: 0.50 → 0.75   i=1: 0.65 → 0.90   i=2: 0.75 → 1.00
+    _dotAnims = List.generate(3, (i) {
+      final begin = 0.50 + i * 0.10;    // 0.50, 0.60, 0.70
+      final end   = (begin + 0.30).clamp(0.0, 1.0);  // 0.80, 0.90, 1.00
+      return Tween<double>(begin: 0.2, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _ctrl,
+          curve: Interval(begin, end, curve: Curves.easeInOut),
+        ),
+      );
+    });
+
     _ctrl.forward();
     _navigate();
   }
@@ -46,7 +78,8 @@ class _SplashScreenState extends State<SplashScreen>
       context.go(AppRoutes.onboarding);
       return;
     }
-    final profile = await SupabaseService.fetchOne('profiles', 'firebase_uid', user.uid);
+    final profile =
+        await SupabaseService.fetchOne('profiles', 'firebase_uid', user.uid);
     if (!mounted) return;
     context.go(profile != null ? AppRoutes.home : AppRoutes.profileSetup);
   }
@@ -57,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: const Color(0xFF0A0F1C),
       body: Stack(
         children: [
-          // Ambient glow
+          // Ambient glows
           Positioned(
             top: -100,
             left: -80,
@@ -67,7 +100,10 @@ class _SplashScreenState extends State<SplashScreen>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [AppColors.primary.withOpacity(0.2), Colors.transparent],
+                  colors: [
+                    AppColors.primary.withValues(alpha: 0.2),
+                    Colors.transparent
+                  ],
                 ),
               ),
             ),
@@ -81,7 +117,10 @@ class _SplashScreenState extends State<SplashScreen>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [const Color(0xFF7C3AED).withOpacity(0.15), Colors.transparent],
+                  colors: [
+                    const Color(0xFF7C3AED).withValues(alpha: 0.15),
+                    Colors.transparent
+                  ],
                 ),
               ),
             ),
@@ -96,25 +135,24 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Logo with ring
+                    // Logo with animated rings
                     ScaleTransition(
                       scale: _scale,
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Outer ring
                           Container(
-                            width: 140,
-                            height: 140,
+                            width: 144,
+                            height: 144,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: AppColors.primary.withOpacity(_ring.value * 0.3),
+                                color: AppColors.primary
+                                    .withValues(alpha: _ring.value * 0.25),
                                 width: 1.5,
                               ),
                             ),
                           ),
-                          // Inner glow ring
                           Container(
                             width: 116,
                             height: 116,
@@ -122,13 +160,13 @@ class _SplashScreenState extends State<SplashScreen>
                               shape: BoxShape.circle,
                               gradient: RadialGradient(
                                 colors: [
-                                  AppColors.primary.withOpacity(0.25),
+                                  AppColors.primary
+                                      .withValues(alpha: 0.2 * _ring.value),
                                   Colors.transparent,
                                 ],
                               ),
                             ),
                           ),
-                          // Logo
                           Container(
                             width: 90,
                             height: 90,
@@ -141,7 +179,10 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                             child: ClipOval(
-                              child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ],
@@ -149,7 +190,6 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 36),
 
-                    // App name
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
                         colors: [Colors.white, Color(0xFFCBD5E1)],
@@ -170,7 +210,7 @@ class _SplashScreenState extends State<SplashScreen>
                     Text(
                       'Swipe. Match. Apply. Fly.',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Colors.white.withValues(alpha: 0.4),
                         fontSize: 13,
                         letterSpacing: 2.5,
                         fontWeight: FontWeight.w500,
@@ -178,24 +218,20 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 80),
 
-                    // Loading dots
+                    // Staggered loading dots — safe Interval values
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: List.generate(3, (i) {
-                        final delay = i / 3;
-                        final anim = CurvedAnimation(
-                          parent: _ctrl,
-                          curve: Interval(delay, delay + 0.4, curve: Curves.easeInOut),
-                        );
                         return AnimatedBuilder(
-                          animation: anim,
+                          animation: _dotAnims[i],
                           builder: (_, __) => Container(
                             margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: 6,
-                            height: 6,
+                            width: 7,
+                            height: 7,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.primary.withOpacity(0.3 + anim.value * 0.7),
+                              color: AppColors.primary
+                                  .withValues(alpha: _dotAnims[i].value),
                             ),
                           ),
                         );

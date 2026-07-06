@@ -2,7 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../swipe/screens/swipe_screen.dart';
+import '../../ai_assistant/providers/scholarship_coaching_provider.dart';
+import '../../swipe/screens/discover_screen.dart';
 import 'community_feed_screen.dart';
 import '../../ai_assistant/screens/ai_assistant_screen.dart';
 import '../../applications/screens/applications_screen.dart';
@@ -18,7 +19,7 @@ class _MainShellState extends ConsumerState<MainShell> {
   int _currentIndex = 0;
 
   static const _screens = [
-    SwipeScreen(),
+    DiscoverScreen(),
     CommunityFeedScreen(),
     AiAssistantScreen(),
     ApplicationsScreen(),
@@ -27,6 +28,18 @@ class _MainShellState extends ConsumerState<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    // ── Listen for scholarship accepted in DiscoverScreen ─────────────────
+    // When the user taps "Accepter", DiscoverScreen sets pendingCoachingScholarshipProvider.
+    // We switch to the AI tab (index 2) here, then AiAssistantScreen detects
+    // the pending scholarship and auto-starts the coaching session.
+    ref.listen<dynamic>(pendingCoachingScholarshipProvider, (_, next) {
+      if (next != null && mounted) {
+        setState(() => _currentIndex = 2);
+        // AiAssistantScreen.initState / didUpdateWidget will detect and clear
+        // pendingCoachingScholarshipProvider, then call startScholarshipCoaching.
+      }
+    });
+
     return Scaffold(
       extendBody: true,
       body: IndexedStack(index: _currentIndex, children: _screens),
@@ -38,6 +51,8 @@ class _MainShellState extends ConsumerState<MainShell> {
   }
 }
 
+// ── Floating Glass Navigation Bar ─────────────────────────────────────────
+
 class _FlyNavBar extends StatelessWidget {
   final int currentIndex;
   final void Function(int) onTap;
@@ -45,9 +60,9 @@ class _FlyNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.of(context).padding.bottom;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, bottom + 14),
+      padding: EdgeInsets.fromLTRB(20, 0, 20, bottomPadding + 14),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(36),
         child: BackdropFilter(
@@ -55,12 +70,12 @@ class _FlyNavBar extends StatelessWidget {
           child: Container(
             height: 66,
             decoration: BoxDecoration(
-              color: AppColors.card.withOpacity(0.88),
+              color: AppColors.card.withValues(alpha: 0.88),
               borderRadius: BorderRadius.circular(36),
               border: Border.all(color: AppColors.glassBorder, width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.18),
+                  color: Colors.black.withValues(alpha: 0.18),
                   blurRadius: 32,
                   offset: const Offset(0, 12),
                 ),
@@ -69,11 +84,15 @@ class _FlyNavBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _NavIcon(Icons.explore_outlined, Icons.explore_rounded, 0, currentIndex, onTap),
-                _NavIcon(Icons.forum_outlined, Icons.forum_rounded, 1, currentIndex, onTap),
+                _NavIcon(Icons.explore_outlined, Icons.explore_rounded,
+                    0, currentIndex, onTap),
+                _NavIcon(Icons.forum_outlined, Icons.forum_rounded,
+                    1, currentIndex, onTap),
                 _AiOrb(isActive: currentIndex == 2, onTap: () => onTap(2)),
-                _NavIcon(Icons.assignment_outlined, Icons.assignment_rounded, 3, currentIndex, onTap),
-                _NavIcon(Icons.person_outline_rounded, Icons.person_rounded, 4, currentIndex, onTap),
+                _NavIcon(Icons.assignment_outlined, Icons.assignment_rounded,
+                    3, currentIndex, onTap),
+                _NavIcon(Icons.person_outline_rounded, Icons.person_rounded,
+                    4, currentIndex, onTap),
               ],
             ),
           ),
@@ -101,19 +120,24 @@ class _AiOrb extends StatelessWidget {
           gradient: LinearGradient(
             colors: isActive
                 ? [AppColors.primary, const Color(0xFF7C3AED)]
-                : [AppColors.primary.withOpacity(0.85), AppColors.primary],
+                : [
+                    AppColors.primary.withValues(alpha: 0.85),
+                    AppColors.primary
+                  ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withOpacity(isActive ? 0.55 : 0.25),
+              color:
+                  AppColors.primary.withValues(alpha: isActive ? 0.55 : 0.25),
               blurRadius: isActive ? 24 : 10,
               spreadRadius: isActive ? 3 : 0,
             ),
           ],
         ),
-        child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 22),
+        child: const Icon(Icons.auto_awesome_rounded,
+            color: Colors.white, size: 22),
       ),
     );
   }
@@ -125,7 +149,9 @@ class _NavIcon extends StatelessWidget {
   final int index;
   final int current;
   final void Function(int) onTap;
-  const _NavIcon(this.icon, this.activeIcon, this.index, this.current, this.onTap);
+
+  const _NavIcon(
+      this.icon, this.activeIcon, this.index, this.current, this.onTap);
 
   bool get isActive => index == current;
 
@@ -153,7 +179,12 @@ class _NavIcon extends StatelessWidget {
                 color: AppColors.primary,
                 borderRadius: BorderRadius.circular(2),
                 boxShadow: isActive
-                    ? [BoxShadow(color: AppColors.primary.withOpacity(0.6), blurRadius: 6)]
+                    ? [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.6),
+                          blurRadius: 6,
+                        )
+                      ]
                     : [],
               ),
             ),
