@@ -16,22 +16,20 @@ class DiscoverScreen extends ConsumerStatefulWidget {
 }
 
 class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
-  final _pageController = PageController(viewportFraction: 0.88);
-  int _currentIndex = 0;
+  final _scrollCtrl = ScrollController();
 
   void _onAccept(ScholarshipModel scholarship) {
-    // Bridge: set pending coaching scholarship → main_shell will switch to AI tab
     ref.read(pendingCoachingScholarshipProvider.notifier).state = scholarship;
-    // Small visual delay so the user sees the accept animation
   }
 
-  void _onRefuse(int total) {
-    if (_currentIndex < total - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeInOut,
-      );
-    }
+  void _onRefuse(ScholarshipModel scholarship) {
+    // Nothing persistent — just visual, user can scroll past it
+  }
+
+  @override
+  void dispose() {
+    _scrollCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -42,7 +40,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       backgroundColor: AppColors.background,
       body: Column(
         children: [
-          // ── Header ───────────────────────────────────────────────────────
+          // ── Header ─────────────────────────────────────────────────────────
           SafeArea(
             bottom: false,
             child: Padding(
@@ -53,12 +51,12 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Discover',
+                        'Découvrir',
                         style: AppTextStyles.headlineLarge
                             .copyWith(fontWeight: FontWeight.w900),
                       ),
                       Text(
-                        'Find your next opportunity',
+                        'Trouve ta prochaine opportunité',
                         style: AppTextStyles.bodySmall,
                       ),
                     ],
@@ -82,7 +80,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             ),
           ),
 
-          // ── Scholarship Cards ──────────────────────────────────────────────
+          // ── Scholarship Cards Horizontal Scroll ───────────────────────────
           Expanded(
             child: scholarshipsAsync.when(
               loading: () =>
@@ -91,158 +89,75 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                   onRetry: () => ref.refresh(scholarshipProvider)),
               data: (scholarships) {
                 if (scholarships.isEmpty) return const _EmptyView();
+
                 return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Counter + progress
+                    // Sub-header: count + top match score
                     Padding(
                       padding:
-                          const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          const EdgeInsets.fromLTRB(24, 14, 24, 8),
                       child: Row(
                         children: [
                           Text(
-                            '${_currentIndex + 1} / ${scholarships.length}',
+                            '${scholarships.length} bourses disponibles',
                             style: AppTextStyles.bodySmall,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: ((_currentIndex + 1) / scholarships.length),
-                                minHeight: 3,
-                                backgroundColor: AppColors.glassBorder,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                    AppColors.primary),
+                          const Spacer(),
+                          if (scholarships.first.compatibilityScore > 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                    colors: [AppColors.primary, Color(0xFF7C3AED)]),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: Text(
+                                'Meilleur match : ${scholarships.first.compatibilityScore}%',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                  colors: [AppColors.primary, Color(0xFF7C3AED)]),
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: Text(
-                              '${scholarships[_currentIndex].compatibilityScore}% match',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
 
-                    // Cards PageView
+                    // Horizontal scrollable list of scholarship cards
                     Expanded(
-                      child: PageView.builder(
-                        controller: _pageController,
-                        onPageChanged: (i) =>
-                            setState(() => _currentIndex = i),
-                        itemCount: scholarships.length,
-                        itemBuilder: (context, i) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: _ScholarshipCard(
-                              scholarship: scholarships[i],
-                              isActive: i == _currentIndex,
-                            ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // On wide screens (>700px): show 2 cards; on narrow: 1 card
+                          final isWide = constraints.maxWidth > 700;
+                          final cardWidth = isWide
+                              ? (constraints.maxWidth / 2) - 24
+                              : constraints.maxWidth - 40;
+
+                          return ListView.separated(
+                            controller: _scrollCtrl,
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            itemCount: scholarships.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 16),
+                            itemBuilder: (context, i) {
+                              return SizedBox(
+                                width: cardWidth,
+                                child: _ScholarshipCard(
+                                  scholarship: scholarships[i],
+                                  onAccept: () => _onAccept(scholarships[i]),
+                                  onRefuse: () => _onRefuse(scholarships[i]),
+                                ),
+                              );
+                            },
                           );
                         },
                       ),
                     ),
-
-                    // Accept / Refuse buttons
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(32, 16, 32, 24),
-                      child: Row(
-                        children: [
-                          // Refuse
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () =>
-                                  _onRefuse(scholarships.length),
-                              child: Container(
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  color: AppColors.card,
-                                  borderRadius: BorderRadius.circular(18),
-                                  border: Border.all(
-                                      color: AppColors.error.withValues(alpha: 0.4),
-                                      width: 1.5),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.close_rounded,
-                                        color: AppColors.error, size: 22),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Refuser',
-                                      style: TextStyle(
-                                        color: AppColors.error,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          // Accept
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => _onAccept(scholarships[_currentIndex]),
-                              child: Container(
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      AppColors.success,
-                                      Color(0xFF15803D)
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(18),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.success
-                                          .withValues(alpha: 0.35),
-                                      blurRadius: 16,
-                                      offset: const Offset(0, 6),
-                                    ),
-                                  ],
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.rocket_launch_rounded,
-                                        color: Colors.white, size: 20),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Accepter',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    SizedBox(height: MediaQuery.of(context).padding.bottom + 90),
                   ],
                 );
               },
@@ -254,213 +169,273 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   }
 }
 
-// ── Scholarship Card ───────────────────────────────────────────────────────
+// ── Scholarship Card ────────────────────────────────────────────────────────
 
-class _ScholarshipCard extends StatelessWidget {
+class _ScholarshipCard extends StatefulWidget {
   final ScholarshipModel scholarship;
-  final bool isActive;
-  const _ScholarshipCard({required this.scholarship, required this.isActive});
+  final VoidCallback onAccept;
+  final VoidCallback onRefuse;
+
+  const _ScholarshipCard({
+    required this.scholarship,
+    required this.onAccept,
+    required this.onRefuse,
+  });
+
+  @override
+  State<_ScholarshipCard> createState() => _ScholarshipCardState();
+}
+
+class _ScholarshipCardState extends State<_ScholarshipCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseCtrl;
+  late Animation<double> _pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+    _pulseAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedScale(
-      scale: isActive ? 1.0 : 0.95,
-      duration: const Duration(milliseconds: 300),
+    final s = widget.scholarship;
+
+    return GestureDetector(
+      onTap: () => context.push('/home/scholarship/${s.id}', extra: s),
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: [
-            if (isActive)
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.15),
-                blurRadius: 30,
-                spreadRadius: 2,
-                offset: const Offset(0, 12),
-              ),
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.25),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            // Background image
-            Positioned.fill(
-              child: scholarship.imageUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: scholarship.imageUrl!,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) =>
-                          _PlaceholderBg(country: scholarship.country),
-                    )
-                  : _PlaceholderBg(country: scholarship.country),
-            ),
-
-            // Gradient overlay
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.1),
-                      Colors.black.withValues(alpha: 0.75),
-                      Colors.black.withValues(alpha: 0.95),
-                    ],
-                    stops: const [0.0, 0.35, 0.65, 1.0],
-                  ),
-                ),
-              ),
-            ),
-
-            // Content
-            Positioned(
-              left: 20,
-              right: 20,
-              bottom: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Funding badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                          color: AppColors.success.withValues(alpha: 0.5)),
-                    ),
-                    child: Text(
-                      scholarship.fundingType,
-                      style: const TextStyle(
-                          color: AppColors.success,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Title
-                  Text(
-                    scholarship.title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      height: 1.2,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-
-                  // University
-                  if (scholarship.university.isNotEmpty)
-                    Text(
-                      scholarship.university,
-                      style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  const SizedBox(height: 14),
-
-                  // Stats row
-                  Row(
-                    children: [
-                      _InfoPill(Icons.location_on_rounded,
-                          scholarship.country),
-                      const SizedBox(width: 8),
-                      if (scholarship.deadline != null)
-                        _InfoPill(
-                          Icons.schedule_rounded,
-                          _deadlineLabel(scholarship.deadline!),
-                          urgent: scholarship.isDeadlineSoon,
-                        ),
-                      const SizedBox(width: 8),
-                      _InfoPill(Icons.school_outlined,
-                          _shortDegree(scholarship.degreeLevel)),
-                    ],
-                  ),
-
-                  // Fields
-                  if (scholarship.fields.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 4,
-                      children: scholarship.fields.take(3).map((f) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            f,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-
-            // Match score top-right
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(50),
-                  border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.bolt_rounded,
-                        size: 13, color: Colors.white70),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${scholarship.compatibilityScore}%',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.12),
+            blurRadius: 30,
+            spreadRadius: 2,
+            offset: const Offset(0, 12),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.22),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-    );
-  }
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          // Background image
+          Positioned.fill(
+            child: s.imageUrl != null
+                ? CachedNetworkImage(
+                    imageUrl: s.imageUrl!,
+                    fit: BoxFit.cover,
+                    errorWidget: (_, __, ___) =>
+                        _PlaceholderBg(country: s.country),
+                  )
+                : _PlaceholderBg(country: s.country),
+          ),
+
+          // Gradient overlay
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.1),
+                    Colors.black.withValues(alpha: 0.7),
+                    Colors.black.withValues(alpha: 0.96),
+                  ],
+                  stops: const [0.0, 0.3, 0.58, 1.0],
+                ),
+              ),
+            ),
+          ),
+
+          // Card content
+          Positioned.fill(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top: match score badge
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Row(
+                    children: [
+                      // Funding badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.success.withValues(alpha: 0.22),
+                          borderRadius: BorderRadius.circular(50),
+                          border: Border.all(
+                              color: AppColors.success.withValues(alpha: 0.5)),
+                        ),
+                        child: Text(
+                          s.fundingType,
+                          style: const TextStyle(
+                              color: AppColors.success,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      const Spacer(),
+                      // Match score
+                      AnimatedBuilder(
+                        animation: _pulseAnim,
+                        builder: (_, child) => Transform.scale(
+                          scale: s.compatibilityScore > 70
+                              ? _pulseAnim.value
+                              : 1.0,
+                          child: child,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            gradient: s.compatibilityScore > 0
+                                ? const LinearGradient(
+                                    colors: [AppColors.primary, Color(0xFF7C3AED)])
+                                : null,
+                            color: s.compatibilityScore == 0
+                                ? Colors.black.withValues(alpha: 0.5)
+                                : null,
+                            borderRadius: BorderRadius.circular(50),
+                            border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.2)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.bolt_rounded,
+                                  size: 13, color: Colors.white70),
+                              const SizedBox(width: 3),
+                              Text(
+                                '${s.compatibilityScore}% match',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Spacer(),
+
+                // Bottom info
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Title
+                      Text(
+                        s.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 19,
+                          fontWeight: FontWeight.w800,
+                          height: 1.2,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (s.university.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          s.university,
+                          style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                      const SizedBox(height: 10),
+
+                      // Stats row
+                      Row(
+                        children: [
+                          _InfoPill(Icons.location_on_rounded, s.country),
+                          const SizedBox(width: 8),
+                          if (s.deadline != null)
+                            _InfoPill(
+                              Icons.schedule_rounded,
+                              _deadlineLabel(s.deadline!),
+                              urgent: s.isDeadlineSoon,
+                            ),
+                          const SizedBox(width: 8),
+                          _InfoPill(Icons.school_outlined,
+                              _shortDegree(s.degreeLevel)),
+                        ],
+                      ),
+
+                      // Fields
+                      if (s.fields.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: s.fields.take(3).map((f) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary
+                                    .withValues(alpha: 0.25),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                f,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   String _deadlineLabel(DateTime d) {
     final diff = d.difference(DateTime.now()).inDays;
     if (diff < 0) return 'Expiré';
-    if (diff == 0) return 'Aujourd\'hui!';
+    if (diff == 0) return "Aujourd'hui!";
     if (diff <= 30) return '$diff jours';
     return '${(diff / 30).floor()} mois';
   }
@@ -574,8 +549,7 @@ class _ErrorView extends StatelessWidget {
           GestureDetector(
             onTap: onRetry,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(50),

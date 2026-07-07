@@ -92,6 +92,19 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
     } catch (_) {}
   }
 
+  Future<void> _markMessagesAsRead() async {
+    final user = AuthService.currentUser;
+    if (user == null) return;
+    try {
+      await SupabaseService.client
+          .from('direct_messages')
+          .update({'is_read': true})
+          .eq('sender_uid', widget.peerId)
+          .eq('receiver_uid', user.uid)
+          .eq('is_read', false);
+    } catch (_) {}
+  }
+
   Future<void> _fetchMessages({bool silent = false}) async {
     final user = AuthService.currentUser;
     if (user == null) return;
@@ -121,6 +134,8 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
         if (!silent) {
           Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
         }
+
+        _markMessagesAsRead();
       }
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
@@ -135,6 +150,18 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
         curve: Curves.easeOut,
       );
     }
+  }
+
+  Future<void> _deleteMessage(DirectMessageModel msg) async {
+    final user = AuthService.currentUser;
+    if (user == null || msg.senderUid != user.uid) return;
+    try {
+      await SupabaseService.client
+          .from('direct_messages')
+          .delete()
+          .eq('id', msg.id);
+      await _fetchMessages(silent: true);
+    } catch (_) {}
   }
 
   Future<void> _sendMessage() async {
@@ -225,14 +252,19 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         itemCount: _messages.length,
                         itemBuilder: (context, index) {
-                          return _MessageBubble(message: _messages[index]);
+                          final msg = _messages[index];
+                          return _MessageBubble(
+                            message: msg,
+                            onDelete: () => _deleteMessage(msg),
+                          );
                         },
                       ),
           ),
 
           // Message Input Bar
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            padding: EdgeInsets.fromLTRB(16, 12, 16,
+                MediaQuery.of(context).padding.bottom + 12),
             decoration: BoxDecoration(
               color: AppColors.card,
               border: Border(top: BorderSide(color: AppColors.glassBorder)),
@@ -240,26 +272,40 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _msgCtrl,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: 'Type your message...',
-                      hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.6)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: AppColors.glassBorder),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: AppColors.glassBorder),
                     ),
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: (_) => _sendMessage(),
+                    child: TextField(
+                      controller: _msgCtrl,
+                      // Fixed: was Colors.white which blended into the white background
+                      style: TextStyle(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        hintText: 'Écris un message...',
+                        hintStyle: TextStyle(color: AppColors.textSecondary.withValues(alpha: 0.6)),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _sendMessage(),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.send_rounded, color: AppColors.primary),
-                  onPressed: _sendMessage,
+                GestureDetector(
+                  onTap: _sendMessage,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                          colors: [AppColors.primary, Color(0xFF7C3AED)]),
+                    ),
+                    child: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                  ),
                 ),
               ],
             ),
@@ -272,8 +318,9 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
 
 class _MessageBubble extends StatelessWidget {
   final DirectMessageModel message;
+  final VoidCallback? onDelete;
 
-  const _MessageBubble({required this.message});
+  const _MessageBubble({required this.message, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -288,42 +335,67 @@ class _MessageBubble extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: isMe ? AppColors.primary : AppColors.card,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(isMe ? 16 : 4),
-                  bottomRight: Radius.circular(isMe ? 4 : 16),
-                ),
-                border: isMe ? null : Border.all(color: AppColors.glassBorder),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    message.content,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: isMe ? Colors.white : AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        timeStr,
-                        style: AppTextStyles.caption.copyWith(
-                          fontSize: 9,
-                          color: isMe ? Colors.white60 : AppColors.textSecondary,
-                        ),
+            child: GestureDetector(
+              onLongPress: isMe ? () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: AppColors.card,
+                    title: Text('Supprimer ce message?',
+                        style: TextStyle(color: AppColors.textPrimary)),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: Text('Annuler',
+                            style: TextStyle(color: AppColors.textSecondary)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Supprimer',
+                            style: TextStyle(color: Colors.red)),
                       ),
                     ],
                   ),
-                ],
+                );
+                if (confirm == true) onDelete?.call();
+              } : null,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isMe ? AppColors.primary : AppColors.card,
+                  borderRadius: BorderRadius.only(
+                    topLeft: const Radius.circular(16),
+                    topRight: const Radius.circular(16),
+                    bottomLeft: Radius.circular(isMe ? 16 : 4),
+                    bottomRight: Radius.circular(isMe ? 4 : 16),
+                  ),
+                  border: isMe ? null : Border.all(color: AppColors.glassBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      message.content,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: isMe ? Colors.white : AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          timeStr,
+                          style: AppTextStyles.caption.copyWith(
+                            fontSize: 9,
+                            color: isMe ? Colors.white60 : AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -195,13 +195,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     String? subtitle,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: AppColors.textSecondary),
-      title: Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-      subtitle: subtitle != null ? Text(subtitle, style: AppTextStyles.bodySmall) : null,
-      trailing: Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
-      onTap: onTap,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        leading: Icon(icon, color: AppColors.textSecondary),
+        title: Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        subtitle: subtitle != null ? Text(subtitle, style: AppTextStyles.bodySmall) : null,
+        trailing: Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+        onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
     );
   }
 
@@ -211,13 +214,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return SwitchListTile(
-      secondary: Icon(icon, color: AppColors.textSecondary),
-      title: Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-      value: value,
-      activeThumbColor: AppColors.primary,
-      onChanged: onChanged,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    return Material(
+      color: Colors.transparent,
+      child: SwitchListTile(
+        secondary: Icon(icon, color: AppColors.textSecondary),
+        title: Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        value: value,
+        activeThumbColor: AppColors.primary,
+        onChanged: onChanged,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
     );
   }
 

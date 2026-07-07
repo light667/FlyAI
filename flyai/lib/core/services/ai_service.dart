@@ -126,6 +126,42 @@ class AIService {
     String? scholarshipsContext,
     String? systemPrompt,
   }) async {
+    // Try Gemini first
+    try {
+      return await _chatWithRAGGemini(
+        messages: messages,
+        cvBase64: cvBase64,
+        scholarshipsContext: scholarshipsContext,
+        systemPrompt: systemPrompt,
+      );
+    } catch (_) {}
+
+    // Fallback 1: Mistral
+    try {
+      final contextPreamble = _buildContextPreamble(scholarshipsContext, systemPrompt);
+      return await _callMistral(messages, contextPreamble);
+    } catch (_) {}
+
+    // Fallback 2: Groq
+    final contextPreamble = _buildContextPreamble(scholarshipsContext, systemPrompt);
+    return await _callGroq(messages, contextPreamble);
+  }
+
+  static String _buildContextPreamble(String? scholarshipsContext, String? systemPrompt) {
+    final parts = <String>[];
+    if (systemPrompt != null) parts.add(systemPrompt);
+    if (scholarshipsContext != null) {
+      parts.add('Available scholarships:\n$scholarshipsContext');
+    }
+    return parts.join('\n\n');
+  }
+
+  static Future<String> _chatWithRAGGemini({
+    required List<Map<String, String>> messages,
+    String? cvBase64,
+    String? scholarshipsContext,
+    String? systemPrompt,
+  }) async {
     final apiKey = AppConfig.geminiApiKey;
     final url =
         'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey';

@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/services/auth_service.dart';
+import '../../../core/services/supabase_service.dart';
 import '../providers/chat_provider.dart';
 import '../providers/scholarship_coaching_provider.dart';
+
+// ── Chat session model for history panel ────────────────────────────────────
+class ChatSessionItem {
+  final String id;
+  final String title;
+  final DateTime createdAt;
+  ChatSessionItem({required this.id, required this.title, required this.createdAt});
+}
 
 class AiAssistantScreen extends ConsumerStatefulWidget {
   const AiAssistantScreen({super.key});
@@ -16,6 +27,9 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   final _scrollCtrl = ScrollController();
   bool _isSending = false;
   bool _taskPanelExpanded = true;
+  bool _showHistory = false;
+  List<ChatSessionItem> _sessions = [];
+  bool _sessionsLoading = false;
 
   final _quickActions = [
     ('Évalue mon CV', Icons.description_outlined,
@@ -33,22 +47,14 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
   @override
   void initState() {
     super.initState();
-    // Watch for incoming coaching scholarship from DiscoverScreen
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkPendingCoaching());
-  }
-
-  void _checkPendingCoaching() {
-    final pending = ref.read(pendingCoachingScholarshipProvider);
-    if (pending != null) {
-      ref.read(pendingCoachingScholarshipProvider.notifier).state = null;
-      ref.read(chatProvider.notifier).startScholarshipCoaching(pending);
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant AiAssistantScreen old) {
-    super.didUpdateWidget(old);
-    _checkPendingCoaching();
+    // Delay check so providers are ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final pending = ref.read(pendingCoachingScholarshipProvider);
+      if (pending != null) {
+        ref.read(pendingCoachingScholarshipProvider.notifier).state = null;
+        ref.read(chatProvider.notifier).startScholarshipCoaching(pending);
+      }
+    });
   }
 
   Future<void> _send([String? text]) async {
@@ -73,6 +79,38 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
     });
   }
 
+  Future<void> _loadSessions() async {
+    final user = AuthService.currentUser;
+    if (user == null) return;
+    setState(() => _sessionsLoading = true);
+    try {
+      final rows = await SupabaseService.client
+          .from('chat_sessions')
+          .select('id, created_at')
+          .eq('firebase_uid', user.uid)
+          .order('created_at', ascending: false)
+          .limit(20);
+
+      final items = (rows as List).map((r) {
+        final dt = DateTime.tryParse(r['created_at'] as String? ?? '') ?? DateTime.now();
+        // Format date as session title
+        final months = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+        final label = '${dt.day} ${months[dt.month - 1]} ${dt.year} — ${dt.hour.toString().padLeft(2,'0')}:${dt.minute.toString().padLeft(2,'0')}';
+        return ChatSessionItem(id: r['id'] as String, title: label, createdAt: dt);
+      }).toList();
+
+      if (mounted) setState(() { _sessions = items; _sessionsLoading = false; });
+    } catch (_) {
+      if (mounted) setState(() => _sessionsLoading = false);
+    }
+  }
+
+  Future<void> _loadSession(String sessionId) async {
+    await ref.read(chatProvider.notifier).loadSession(sessionId);
+    if (mounted) setState(() => _showHistory = false);
+    _scrollToBottom();
+  }
+
   @override
   void dispose() {
     _msgCtrl.dispose();
@@ -82,24 +120,39 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final messagesAsync    = ref.watch(chatProvider);
-    final messages         = messagesAsync.valueOrNull ?? [];
-    final tasks            = ref.watch(coachingTasksProvider);
-    final phase            = ref.watch(coachingPhaseProvider);
+    final messagesAsync     = ref.watch(chatProvider);
+    final messages          = messagesAsync.valueOrNull ?? [];
+    final tasks             = ref.watch(coachingTasksProvider);
+    final phase             = ref.watch(coachingPhaseProvider);
     final activeScholarship = ref.watch(activeCoachingScholarshipProvider);
-    final isCoaching       = activeScholarship != null;
-    final isLoading        = messagesAsync is AsyncLoading;
+    final isCoaching        = activeScholarship != null;
+    final isLoading         = messagesAsync is AsyncLoading;
 
-    // Listen for new messages to trigger scroll
+    // Dynamic bottom padding: navbar is ~66px + safe area bottom
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    final navbarHeight = 66.0;
+    final inputPadding = keyboardOpen
+        ? 12.0
+        : bottomInset + navbarHeight + 12;
+
     ref.listen(chatProvider, (_, next) {
       if (next.valueOrNull?.isNotEmpty == true) _scrollToBottom();
+    });
+
+    // React to scholarship set from detail screen even when tab is already open
+    ref.listen(pendingCoachingScholarshipProvider, (_, scholarship) {
+      if (scholarship != null) {
+        ref.read(pendingCoachingScholarshipProvider.notifier).state = null;
+        ref.read(chatProvider.notifier).startScholarshipCoaching(scholarship);
+      }
     });
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Column(
         children: [
-          // ── Header ────────────────────────────────────────────────────────
+          // ── Header ──────────────────────────────────────────────────────
           _AgentHeader(
             isCoaching: isCoaching,
             scholarship: activeScholarship,
@@ -108,10 +161,28 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
               ref.read(chatProvider.notifier).clearChat();
               setState(() => _taskPanelExpanded = true);
             },
+            onHistory: () {
+              setState(() => _showHistory = !_showHistory);
+              if (!_showHistory) return;
+              _loadSessions();
+            },
           ),
 
-          // ── Task Panel (only in coaching mode with tasks) ─────────────────
-          if (isCoaching && tasks.isNotEmpty)
+          // ── History Panel ────────────────────────────────────────────────
+          if (_showHistory)
+            _HistoryPanel(
+              sessions: _sessions,
+              isLoading: _sessionsLoading,
+              onSelect: _loadSession,
+              onClose: () => setState(() => _showHistory = false),
+              onNewChat: () {
+                ref.read(chatProvider.notifier).clearChat();
+                setState(() { _showHistory = false; _taskPanelExpanded = true; });
+              },
+            ),
+
+          // ── Task Panel ───────────────────────────────────────────────────
+          if (!_showHistory && isCoaching && tasks.isNotEmpty)
             _TaskPanel(
               tasks: tasks,
               isExpanded: _taskPanelExpanded,
@@ -123,65 +194,183 @@ class _AiAssistantScreenState extends ConsumerState<AiAssistantScreen> {
                   'Aide-moi avec la tâche : "${task.title}". ${task.description}'),
             ),
 
-          // ── Messages ──────────────────────────────────────────────────────
-          Expanded(
-            child: isLoading && messages.isEmpty
-                ? _LoadingBriefing(scholarshipTitle: activeScholarship?.title)
-                : messages.isEmpty
-                    ? _WelcomeView(
-                        quickActions: _quickActions,
-                        onTap: _send,
-                      )
-                    : ListView.builder(
-                        controller: _scrollCtrl,
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                        itemCount: messages.length + (_isSending ? 1 : 0),
-                        itemBuilder: (context, i) {
-                          if (i == messages.length && _isSending) {
-                            return const _TypingBubble();
-                          }
-                          final msg = messages[i];
-                          return _MessageBubble(
-                            role: msg.role,
-                            content: msg.content,
-                          );
-                        },
-                      ),
-          ),
+          // ── Messages ─────────────────────────────────────────────────────
+          if (!_showHistory)
+            Expanded(
+              child: isLoading && messages.isEmpty
+                  ? _LoadingBriefing(scholarshipTitle: activeScholarship?.title)
+                  : messages.isEmpty
+                      ? _WelcomeView(
+                          quickActions: _quickActions,
+                          onTap: _send,
+                        )
+                      : ListView.builder(
+                          controller: _scrollCtrl,
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                          itemCount: messages.length + (_isSending ? 1 : 0),
+                          itemBuilder: (context, i) {
+                            if (i == messages.length && _isSending) {
+                              return const _TypingBubble();
+                            }
+                            final msg = messages[i];
+                            return _MessageBubble(
+                              role: msg.role,
+                              content: msg.content,
+                            );
+                          },
+                        ),
+            ),
 
-          // ── Quick replies (confirmation phase) ────────────────────────────
-          if (phase == CoachingPhase.awaitingConfirmation)
-            _ConfirmationBar(onConfirm: () => _send('Oui, je suis prêt(e) à commencer !'), onDecline: () => ref.read(chatProvider.notifier).clearChat()),
+          // ── Quick replies (confirmation phase) ───────────────────────────
+          if (!_showHistory && phase == CoachingPhase.awaitingConfirmation)
+            _ConfirmationBar(
+              onConfirm: () => _send('Oui, je suis prêt(e) à commencer !'),
+              onDecline: () => ref.read(chatProvider.notifier).clearChat(),
+            ),
 
-          // ── Input bar ─────────────────────────────────────────────────────
-          _InputBar(
-            controller: _msgCtrl,
-            isSending: _isSending,
-            onSend: () => _send(),
-            onChanged: () => setState(() {}),
-            hint: isCoaching
-                ? 'Pose une question ou demande de l\'aide…'
-                : 'Pose-moi n\'importe quelle question…',
-          ),
+          // ── Input bar ────────────────────────────────────────────────────
+          if (!_showHistory)
+            _InputBar(
+              controller: _msgCtrl,
+              isSending: _isSending,
+              onSend: () => _send(),
+              onChanged: () => setState(() {}),
+              hint: isCoaching
+                  ? "Pose une question ou demande de l'aide…"
+                  : "Pose-moi n'importe quelle question…",
+              extraBottomPadding: inputPadding,
+            ),
         ],
       ),
     );
   }
 }
 
-// ── Agent Header ────────────────────────────────────────────────────────────
+// ── History Panel ────────────────────────────────────────────────────────────
+
+class _HistoryPanel extends StatelessWidget {
+  final List<ChatSessionItem> sessions;
+  final bool isLoading;
+  final void Function(String sessionId) onSelect;
+  final VoidCallback onClose;
+  final VoidCallback onNewChat;
+
+  const _HistoryPanel({
+    required this.sessions,
+    required this.isLoading,
+    required this.onSelect,
+    required this.onClose,
+    required this.onNewChat,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        color: AppColors.background,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  Text('Historique des conversations',
+                      style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: onNewChat,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                            colors: [AppColors.primary, Color(0xFF7C3AED)]),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add_rounded, size: 14, color: Colors.white),
+                          SizedBox(width: 4),
+                          Text('Nouveau', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: AppColors.glassBorder),
+            if (isLoading)
+              const Expanded(child: Center(child: CircularProgressIndicator(color: AppColors.primary)))
+            else if (sessions.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.chat_bubble_outline_rounded, size: 48, color: AppColors.glassBorder),
+                      const SizedBox(height: 12),
+                      Text("Aucune conversation enregistrée",
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: sessions.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (_, i) {
+                    final s = sessions[i];
+                    return GestureDetector(
+                      onTap: () => onSelect(s.id),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.card,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: AppColors.glassBorder),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.history_rounded, color: AppColors.primary, size: 18),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(s.title,
+                                  style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+                            ),
+                            Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: 16),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Agent Header ─────────────────────────────────────────────────────────────
 
 class _AgentHeader extends StatelessWidget {
   final bool isCoaching;
   final dynamic scholarship;
   final CoachingPhase phase;
   final VoidCallback onClear;
+  final VoidCallback onHistory;
 
   const _AgentHeader({
     required this.isCoaching,
     required this.scholarship,
     required this.phase,
     required this.onClear,
+    required this.onHistory,
   });
 
   @override
@@ -197,7 +386,6 @@ class _AgentHeader extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Avatar orb
             Container(
               width: 42,
               height: 42,
@@ -263,7 +451,6 @@ class _AgentHeader extends StatelessWidget {
               ),
             ),
 
-            // Phase badge
             if (isCoaching)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -283,7 +470,15 @@ class _AgentHeader extends StatelessWidget {
                 ),
               ),
 
-            const SizedBox(width: 8),
+            const SizedBox(width: 4),
+            // History button
+            IconButton(
+              icon: Icon(Icons.history_rounded,
+                  color: AppColors.textSecondary, size: 22),
+              onPressed: onHistory,
+              tooltip: 'Historique',
+              padding: EdgeInsets.zero,
+            ),
             IconButton(
               icon: Icon(Icons.add_circle_outline_rounded,
                   color: AppColors.textSecondary, size: 22),
@@ -324,7 +519,7 @@ class _AgentHeader extends StatelessWidget {
   }
 }
 
-// ── Task Panel ──────────────────────────────────────────────────────────────
+// ── Task Panel ───────────────────────────────────────────────────────────────
 
 class _TaskPanel extends StatelessWidget {
   final List<CoachingTask> tasks;
@@ -350,19 +545,15 @@ class _TaskPanel extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.card,
-        border: Border(
-          bottom: BorderSide(color: AppColors.glassBorder),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.glassBorder)),
       ),
       child: Column(
         children: [
-          // Header row
           GestureDetector(
             onTap: onToggleExpand,
             behavior: HitTestBehavior.opaque,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
                   Container(
@@ -380,7 +571,7 @@ class _TaskPanel extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Plan d\'action · $done/$total',
+                          "Plan d'action · $done/$total",
                           style: AppTextStyles.titleMedium
                               .copyWith(fontWeight: FontWeight.w700),
                         ),
@@ -419,8 +610,6 @@ class _TaskPanel extends StatelessWidget {
               ),
             ),
           ),
-
-          // Task list
           AnimatedSize(
             duration: const Duration(milliseconds: 250),
             child: isExpanded
@@ -430,10 +619,8 @@ class _TaskPanel extends StatelessWidget {
                       shrinkWrap: true,
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                       itemCount: tasks.length,
-                      separatorBuilder: (_, __) => Divider(
-                        height: 1,
-                        color: AppColors.glassBorder,
-                      ),
+                      separatorBuilder: (_, __) =>
+                          Divider(height: 1, color: AppColors.glassBorder),
                       itemBuilder: (_, i) {
                         final task = tasks[i];
                         return _TaskRow(
@@ -457,22 +644,14 @@ class _TaskRow extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onHelp;
 
-  const _TaskRow({
-    required this.task,
-    required this.onToggle,
-    required this.onHelp,
-  });
+  const _TaskRow({required this.task, required this.onToggle, required this.onHelp});
 
   IconData get _categoryIcon {
     switch (task.category) {
-      case 'document':
-        return Icons.description_outlined;
-      case 'test':
-        return Icons.assignment_outlined;
-      case 'online':
-        return Icons.language_rounded;
-      default:
-        return Icons.task_outlined;
+      case 'document': return Icons.description_outlined;
+      case 'test':     return Icons.assignment_outlined;
+      case 'online':   return Icons.language_rounded;
+      default:         return Icons.task_outlined;
     }
   }
 
@@ -482,7 +661,6 @@ class _TaskRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          // Checkbox
           GestureDetector(
             onTap: onToggle,
             child: AnimatedContainer(
@@ -491,72 +669,47 @@ class _TaskRow extends StatelessWidget {
               height: 24,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: task.isCompleted
-                    ? AppColors.success
-                    : Colors.transparent,
+                color: task.isCompleted ? AppColors.success : Colors.transparent,
                 border: Border.all(
-                  color: task.isCompleted
-                      ? AppColors.success
-                      : AppColors.glassBorder,
+                  color: task.isCompleted ? AppColors.success : AppColors.glassBorder,
                   width: 2,
                 ),
               ),
               child: task.isCompleted
-                  ? const Icon(Icons.check_rounded,
-                      color: Colors.white, size: 14)
+                  ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
                   : null,
             ),
           ),
           const SizedBox(width: 10),
-
-          // Category icon
           Icon(_categoryIcon,
               size: 14,
-              color: task.isCompleted
-                  ? AppColors.textSecondary
-                  : AppColors.primary),
+              color: task.isCompleted ? AppColors.textSecondary : AppColors.primary),
           const SizedBox(width: 6),
-
-          // Title
           Expanded(
             child: Text(
               task.title,
               style: AppTextStyles.bodySmall.copyWith(
                 fontWeight: FontWeight.w600,
-                color: task.isCompleted
-                    ? AppColors.textSecondary
-                    : AppColors.textPrimary,
-                decoration:
-                    task.isCompleted ? TextDecoration.lineThrough : null,
+                color: task.isCompleted ? AppColors.textSecondary : AppColors.textPrimary,
+                decoration: task.isCompleted ? TextDecoration.lineThrough : null,
               ),
             ),
           ),
-
-          // Help button
           if (!task.isCompleted)
             GestureDetector(
               onTap: onHelp,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.auto_awesome_rounded,
-                        size: 11, color: AppColors.primary),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Aide',
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    Icon(Icons.auto_awesome_rounded, size: 11, color: AppColors.primary),
+                    SizedBox(width: 4),
+                    Text('Aide', style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -567,7 +720,7 @@ class _TaskRow extends StatelessWidget {
   }
 }
 
-// ── Confirmation Bar ────────────────────────────────────────────────────────
+// ── Confirmation Bar ─────────────────────────────────────────────────────────
 
 class _ConfirmationBar extends StatelessWidget {
   final VoidCallback onConfirm;
@@ -584,31 +737,26 @@ class _ConfirmationBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text('Prêt(e) à commencer ?',
-              style: AppTextStyles.bodySmall
-                  .copyWith(fontWeight: FontWeight.w600)),
+          Text("Prêt(e) à commencer ?",
+              style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w600)),
           const Spacer(),
           GestureDetector(
             onTap: onDecline,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                border: Border.all(
-                    color: AppColors.error.withValues(alpha: 0.5)),
+                border: Border.all(color: AppColors.error.withValues(alpha: 0.5)),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Text('Non',
-                  style: TextStyle(
-                      color: AppColors.error, fontWeight: FontWeight.w700)),
+                  style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)),
             ),
           ),
           const SizedBox(width: 10),
           GestureDetector(
             onTap: onConfirm,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                     colors: [AppColors.primary, Color(0xFF7C3AED)]),
@@ -620,8 +768,7 @@ class _ConfirmationBar extends StatelessWidget {
                 ],
               ),
               child: const Text('Oui, commençons !',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w700)),
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             ),
           ),
         ],
@@ -630,7 +777,7 @@ class _ConfirmationBar extends StatelessWidget {
   }
 }
 
-// ── Loading Briefing ────────────────────────────────────────────────────────
+// ── Loading Briefing ─────────────────────────────────────────────────────────
 
 class _LoadingBriefing extends StatelessWidget {
   final String? scholarshipTitle;
@@ -647,33 +794,23 @@ class _LoadingBriefing extends StatelessWidget {
             const SizedBox(
               width: 56,
               height: 56,
-              child: CircularProgressIndicator(
-                color: AppColors.primary,
-                strokeWidth: 3,
-              ),
+              child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 3),
             ),
             const SizedBox(height: 24),
-            Text(
-              'Fly Agent analyse la bourse…',
-              style: AppTextStyles.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
+            Text('Fly Agent analyse la bourse…',
+                style: AppTextStyles.headlineSmall, textAlign: TextAlign.center),
             if (scholarshipTitle != null) ...[
               const SizedBox(height: 8),
-              Text(
-                scholarshipTitle!,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+              Text(scholarshipTitle!,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.primary, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis),
             ],
             const SizedBox(height: 16),
             Text(
-              'Recherche d\'informations en ligne\net préparation de ton plan personnalisé…',
+              "Recherche d'informations en ligne\net préparation de ton plan personnalisé…",
               style: AppTextStyles.bodySmall,
               textAlign: TextAlign.center,
             ),
@@ -684,7 +821,7 @@ class _LoadingBriefing extends StatelessWidget {
   }
 }
 
-// ── Welcome View ────────────────────────────────────────────────────────────
+// ── Welcome View ─────────────────────────────────────────────────────────────
 
 class _WelcomeView extends StatelessWidget {
   final List<(String, IconData, String)> quickActions;
@@ -707,8 +844,7 @@ class _WelcomeView extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: const LinearGradient(
-                      colors: [AppColors.primary, Color(0xFF7C3AED)],
-                    ),
+                        colors: [AppColors.primary, Color(0xFF7C3AED)]),
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.primary.withValues(alpha: 0.4),
@@ -721,15 +857,13 @@ class _WelcomeView extends StatelessWidget {
                       size: 40, color: Colors.white),
                 ),
                 const SizedBox(height: 20),
-                Text(
-                  'Fly Agent 🚀',
-                  style: AppTextStyles.headlineLarge
-                      .copyWith(fontWeight: FontWeight.w800),
-                  textAlign: TextAlign.center,
-                ),
+                Text('Fly Agent 🚀',
+                    style: AppTextStyles.headlineLarge
+                        .copyWith(fontWeight: FontWeight.w800),
+                    textAlign: TextAlign.center),
                 const SizedBox(height: 8),
                 Text(
-                  'Ton coach IA spécialisé en bourses.\nAccepte une bourse dans Découvrir pour\nque je t\'accompagne pas à pas.',
+                  "Ton coach IA spécialisé en bourses.\nAccepte une bourse dans Découvrir pour\nque je t'accompagne pas à pas.",
                   style: AppTextStyles.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -738,8 +872,8 @@ class _WelcomeView extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           Text('Actions rapides',
-              style: AppTextStyles.titleMedium
-                  .copyWith(fontWeight: FontWeight.w700)),
+              style:
+                  AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 14),
           ...quickActions.map(
             (action) => Padding(
@@ -747,8 +881,7 @@ class _WelcomeView extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => onTap(action.$3),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 18, vertical: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                   decoration: BoxDecoration(
                     color: AppColors.card,
                     borderRadius: BorderRadius.circular(16),
@@ -763,8 +896,7 @@ class _WelcomeView extends StatelessWidget {
                           color: AppColors.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Icon(action.$2,
-                            color: AppColors.primary, size: 18),
+                        child: Icon(action.$2, color: AppColors.primary, size: 18),
                       ),
                       const SizedBox(width: 14),
                       Expanded(child: Text(action.$1, style: AppTextStyles.titleMedium)),
@@ -782,7 +914,7 @@ class _WelcomeView extends StatelessWidget {
   }
 }
 
-// ── Message Bubble ──────────────────────────────────────────────────────────
+// ── Message Bubble (with Markdown rendering) ─────────────────────────────────
 
 class _MessageBubble extends StatelessWidget {
   final String role;
@@ -817,9 +949,8 @@ class _MessageBubble extends StatelessWidget {
           Flexible(
             child: Container(
               constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.75),
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 12),
+                  maxWidth: MediaQuery.of(context).size.width * 0.78),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 gradient: isUser
                     ? const LinearGradient(
@@ -835,9 +966,7 @@ class _MessageBubble extends StatelessWidget {
                   bottomLeft: Radius.circular(isUser ? 20 : 4),
                   bottomRight: Radius.circular(isUser ? 4 : 20),
                 ),
-                border: isUser
-                    ? null
-                    : Border.all(color: AppColors.glassBorder),
+                border: isUser ? null : Border.all(color: AppColors.glassBorder),
                 boxShadow: [
                   BoxShadow(
                     color: (isUser ? AppColors.primary : Colors.black)
@@ -847,13 +976,44 @@ class _MessageBubble extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Text(
-                content,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: isUser ? Colors.white : AppColors.textPrimary,
-                  height: 1.55,
-                ),
-              ),
+              child: isUser
+                  ? Text(
+                      content,
+                      style: AppTextStyles.bodyMedium.copyWith(
+                          color: Colors.white, height: 1.55),
+                    )
+                  : MarkdownBody(
+                      data: content,
+                      styleSheet: MarkdownStyleSheet(
+                        p: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textPrimary, height: 1.55),
+                        h1: AppTextStyles.headlineSmall.copyWith(
+                            color: AppColors.textPrimary, fontWeight: FontWeight.w800),
+                        h2: AppTextStyles.titleLarge.copyWith(
+                            color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+                        h3: AppTextStyles.titleMedium.copyWith(
+                            color: AppColors.primary, fontWeight: FontWeight.w700),
+                        strong: TextStyle(
+                            color: AppColors.textPrimary, fontWeight: FontWeight.w700),
+                        em: TextStyle(
+                            color: AppColors.textPrimary, fontStyle: FontStyle.italic),
+                        code: TextStyle(
+                          color: AppColors.primary,
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                          fontFamily: 'monospace',
+                          fontSize: 13,
+                        ),
+                        blockquote: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary),
+                        listBullet: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.primary),
+                        horizontalRuleDecoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(color: AppColors.glassBorder, width: 1),
+                          ),
+                        ),
+                      ),
+                    ),
             ),
           ),
           if (isUser) const SizedBox(width: 4),
@@ -863,7 +1023,7 @@ class _MessageBubble extends StatelessWidget {
   }
 }
 
-// ── Input Bar ───────────────────────────────────────────────────────────────
+// ── Input Bar ────────────────────────────────────────────────────────────────
 
 class _InputBar extends StatelessWidget {
   final TextEditingController controller;
@@ -871,6 +1031,7 @@ class _InputBar extends StatelessWidget {
   final VoidCallback onSend;
   final VoidCallback onChanged;
   final String hint;
+  final double extraBottomPadding;
 
   const _InputBar({
     required this.controller,
@@ -878,16 +1039,17 @@ class _InputBar extends StatelessWidget {
     required this.onSend,
     required this.onChanged,
     required this.hint,
+    this.extraBottomPadding = 32,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 32),
+      padding: EdgeInsets.fromLTRB(16, 10, 16, extraBottomPadding),
       decoration: BoxDecoration(
         color: AppColors.card,
-        border: Border(
-            top: BorderSide(color: AppColors.glassBorder, width: 1)),
+        border:
+            Border(top: BorderSide(color: AppColors.glassBorder, width: 1)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -948,7 +1110,7 @@ class _InputBar extends StatelessWidget {
   }
 }
 
-// ── Typing Bubble ───────────────────────────────────────────────────────────
+// ── Typing Bubble ────────────────────────────────────────────────────────────
 
 class _TypingBubble extends StatefulWidget {
   const _TypingBubble();
@@ -996,7 +1158,8 @@ class _TypingBubbleState extends State<_TypingBubble>
                 size: 14, color: Colors.white),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: const BorderRadius.only(

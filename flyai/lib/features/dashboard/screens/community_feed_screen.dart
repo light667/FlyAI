@@ -8,6 +8,7 @@ import '../../../core/services/auth_service.dart';
 import '../../../core/services/supabase_service.dart';
 import '../../profile/models/profile_model.dart';
 import 'direct_chat_screen.dart';
+import 'member_profile_screen.dart';
 
 // ── Post Model ─────────────────────────────────────────────────────────────
 
@@ -94,19 +95,23 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
     try {
       final user = AuthService.currentUser;
       final rows = await SupabaseService.client
-          .from('community_posts')
+          .from('posts')
           .select()
           .order('created_at', ascending: false)
           .limit(40);
 
       Set<String> likedIds = {};
       if (user != null) {
-        final likes = await SupabaseService.client
-            .from('post_likes')
-            .select('post_id')
-            .eq('firebase_uid', user.uid);
-        likedIds =
-            (likes as List).map((r) => r['post_id'] as String).toSet();
+        try {
+          final likes = await SupabaseService.client
+              .from('post_likes')
+              .select('post_id')
+              .eq('firebase_uid', user.uid);
+          likedIds =
+              (likes as List).map((r) => r['post_id'] as String).toSet();
+        } catch (_) {
+          // If post_likes table is missing, fail silently and keep empty likedIds
+        }
       }
 
       if (!mounted) return;
@@ -181,34 +186,41 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
   }
 
   void _openCreatePost() {
-    // Use simple showModalBottomSheet without DraggableScrollableSheet.
-    // DraggableScrollableSheet disposes hover-tracked widgets while the
-    // mouse cursor is still over them → mouse_tracker.dart:199 assertion.
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      // barrierColor ensures proper disposal of mouse tracking
       barrierColor: Colors.black54,
       builder: (ctx) => _CreatePostModal(
         suggestedTags: _suggestedTags,
         onSubmit: (content, tags) async {
           final user = AuthService.currentUser;
           if (user == null || content.isEmpty) return;
-          final profile = await SupabaseService.fetchOne(
-              'profiles', 'firebase_uid', user.uid);
-          final name =
-              profile?['full_name'] as String? ?? user.displayName ?? 'Scholar';
-          final photo = profile?['photo_url'] as String? ?? user.photoURL;
-          await SupabaseService.client.from('community_posts').insert({
-            'firebase_uid': user.uid,
-            'author_name': name,
-            'author_photo': photo,
-            'content': content,
-            'tags': tags,
-          });
-          if (ctx.mounted) Navigator.pop(ctx);
-          _loadPosts();
+          try {
+            final profile = await SupabaseService.fetchOne(
+                'profiles', 'firebase_uid', user.uid);
+            final name =
+                profile?['full_name'] as String? ?? user.displayName ?? 'Scholar';
+            final photo = profile?['photo_url'] as String? ?? user.photoURL;
+            await SupabaseService.client.from('posts').insert({
+              'firebase_uid': user.uid,
+              'author_name': name,
+              'author_photo': photo,
+              'content': content,
+              'tags': tags,
+            });
+            if (ctx.mounted) Navigator.pop(ctx);
+            _loadPosts();
+          } catch (e) {
+            if (ctx.mounted) {
+              ScaffoldMessenger.of(ctx).showSnackBar(
+                SnackBar(
+                  content: Text('Erreur lors de la publication : $e'),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            }
+          }
         },
       ),
     );
@@ -303,11 +315,13 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
                     onLike: _toggleLike,
                     onMessage: _openDM,
                     onPost: _openCreatePost,
+                    onDelete: _deletePost,
                   )
                 : _MembersTab(
                     members: _members,
                     isLoading: _membersLoading,
                     onMessage: _openDM,
+                    onProfile: _openMemberProfile,
                   ),
           ),
         ],
@@ -325,6 +339,48 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
         ),
       ),
     );
+  }
+
+  void _openMemberProfile(ProfileModel profile) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MemberProfileScreen(profile: profile),
+      ),
+    );
+  }
+
+  Future<void> _deletePost(PostModel post) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.card,
+        title: Text('Supprimer ce post?',
+            style: TextStyle(color: AppColors.textPrimary)),
+        content: Text('Cette action est irréversible.',
+            style: TextStyle(color: AppColors.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Annuler',
+                style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Supprimer',
+                style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    try {
+      await SupabaseService.client
+          .from('posts')
+          .delete()
+          .eq('id', post.id);
+      await _loadPosts();
+    } catch (_) {}
   }
 }
 
@@ -375,11 +431,13 @@ class _PostsTab extends StatelessWidget {
   final void Function(PostModel) onLike;
   final void Function(String peerId, [ProfileModel?]) onMessage;
   final VoidCallback onPost;
+  final void Function(PostModel) onDelete;
 
   const _PostsTab({
     required this.posts, required this.isLoading,
     required this.onRefresh, required this.onLike,
     required this.onMessage, required this.onPost,
+    required this.onDelete,
   });
 
   @override
@@ -401,6 +459,7 @@ class _PostsTab extends StatelessWidget {
           post: posts[i],
           onLike: () => onLike(posts[i]),
           onMessage: () => onMessage(posts[i].firebaseUid),
+          onDelete: () => onDelete(posts[i]),
         ),
       ),
     );
@@ -413,10 +472,11 @@ class _MembersTab extends StatelessWidget {
   final List<ProfileModel> members;
   final bool isLoading;
   final void Function(String peerId, [ProfileModel?]) onMessage;
+  final void Function(ProfileModel)? onProfile;
 
   const _MembersTab({
     required this.members, required this.isLoading,
-    required this.onMessage,
+    required this.onMessage, this.onProfile,
   });
 
   @override
@@ -445,6 +505,7 @@ class _MembersTab extends StatelessWidget {
       itemBuilder: (_, i) => _MemberCard(
         profile: members[i],
         onMessage: () => onMessage(members[i].firebaseUid, members[i]),
+        onProfile: onProfile != null ? () => onProfile!(members[i]) : null,
       ),
     );
   }
@@ -455,8 +516,9 @@ class _MembersTab extends StatelessWidget {
 class _MemberCard extends StatelessWidget {
   final ProfileModel profile;
   final VoidCallback onMessage;
+  final VoidCallback? onProfile;
 
-  const _MemberCard({required this.profile, required this.onMessage});
+  const _MemberCard({required this.profile, required this.onMessage, this.onProfile});
 
   @override
   Widget build(BuildContext context) {
@@ -476,60 +538,70 @@ class _MemberCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Avatar
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                  colors: [AppColors.primary, Color(0xFF7C3AED)]),
-            ),
-            child: profile.photoUrl != null && profile.photoUrl!.isNotEmpty
-                ? ClipOval(
-                    child: Image.network(profile.photoUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            _InitialAvatar(initial: initial)))
-                : _InitialAvatar(initial: initial),
-          ),
-          const SizedBox(width: 12),
-
-          // Info
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name,
-                    style: AppTextStyles.titleMedium
-                        .copyWith(fontWeight: FontWeight.w700)),
-                const SizedBox(height: 2),
-                if (profile.fieldOfStudy.isNotEmpty ||
-                    profile.university.isNotEmpty)
-                  Text(
-                    [
-                      if (profile.fieldOfStudy.isNotEmpty)
-                        profile.fieldOfStudy,
-                      if (profile.university.isNotEmpty) profile.university,
-                    ].join(' · '),
-                    style: AppTextStyles.bodySmall,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onProfile,
+              child: Row(
+                children: [
+                  // Avatar
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                          colors: [AppColors.primary, Color(0xFF7C3AED)]),
+                    ),
+                    child: profile.photoUrl != null && profile.photoUrl!.isNotEmpty
+                        ? ClipOval(
+                            child: Image.network(profile.photoUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    _InitialAvatar(initial: initial)))
+                        : _InitialAvatar(initial: initial),
                   ),
-                if (profile.country.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on_rounded,
-                          size: 11,
-                          color: AppColors.textSecondary),
-                      const SizedBox(width: 3),
-                      Text(profile.country,
-                          style: AppTextStyles.caption),
-                    ],
+                  const SizedBox(width: 12),
+
+                  // Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(name,
+                            style: AppTextStyles.titleMedium
+                                .copyWith(fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 2),
+                        if (profile.fieldOfStudy.isNotEmpty ||
+                            profile.university.isNotEmpty)
+                          Text(
+                            [
+                              if (profile.fieldOfStudy.isNotEmpty)
+                                profile.fieldOfStudy,
+                              if (profile.university.isNotEmpty) profile.university,
+                            ].join(' · '),
+                            style: AppTextStyles.bodySmall,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        if (profile.country.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Icon(Icons.location_on_rounded,
+                                  size: 11,
+                                  color: AppColors.textSecondary),
+                              const SizedBox(width: 3),
+                              Text(profile.country,
+                                  style: AppTextStyles.caption),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ],
-              ],
+              ),
             ),
           ),
 
@@ -585,9 +657,14 @@ class _PostCard extends StatelessWidget {
   final PostModel post;
   final VoidCallback onLike;
   final VoidCallback onMessage;
+  final VoidCallback onDelete;
 
-  const _PostCard(
-      {required this.post, required this.onLike, required this.onMessage});
+  const _PostCard({
+    required this.post,
+    required this.onLike,
+    required this.onMessage,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -655,8 +732,7 @@ class _PostCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color:
-                            AppColors.primary.withValues(alpha: 0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -664,6 +740,31 @@ class _PostCard extends StatelessWidget {
                           size: 16,
                           color: AppColors.primary),
                     ),
+                  ),
+                if (isOwn)
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert_rounded,
+                        color: AppColors.textSecondary, size: 20),
+                    color: AppColors.card,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    onSelected: (v) {
+                      if (v == 'delete') onDelete();
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.delete_outline_rounded,
+                                color: Colors.red, size: 18),
+                            const SizedBox(width: 8),
+                            Text('Supprimer',
+                                style: TextStyle(color: Colors.red)),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
               ],
             ),

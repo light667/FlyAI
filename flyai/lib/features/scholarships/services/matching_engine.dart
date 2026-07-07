@@ -4,75 +4,77 @@ import 'package:flyai/features/scholarships/models/scholarship_model.dart';
 class MatchingEngine {
   MatchingEngine._();
 
-  /// Calculate compatibility score 0–100 between student profile and scholarship
+  /// Calculate compatibility score 0–100 between student profile and scholarship.
+  /// Profiles with empty fields get partial credit (not hard-disqualified to 0).
   static int calculate(ProfileModel profile, ScholarshipModel scholarship) {
     int score = 0;
     int maxScore = 0;
 
-    // ── Education Level (25 pts) ───────────────────────────────────────
+    // ── Education Level (25 pts) ───────────────────────────────────────────
     maxScore += 25;
-    if (!_educationMatches(profile.educationLevel, scholarship.degreeLevel)) {
-      return 0; // Hard disqualification on education level mismatch
+    if (profile.educationLevel.isEmpty) {
+      // Unknown level → give half credit (can't disqualify)
+      score += 12;
+    } else if (_educationMatches(profile.educationLevel, scholarship.degreeLevel)) {
+      score += 25;
     }
-    score += 25;
+    // else: mismatch → 0 pts for this criterion (soft disqualification)
 
-    // ── Field of Study (20 pts) ────────────────────────────────────────
+    // ── Field of Study (20 pts) ────────────────────────────────────────────
     maxScore += 20;
     if (scholarship.fields.isEmpty) {
       score += 20; // Open to all fields
+    } else if (profile.fieldOfStudy.isEmpty && profile.targetFields.isEmpty) {
+      // Unknown field → give half credit
+      score += 10;
     } else {
       final profileField = profile.fieldOfStudy.toLowerCase();
-      final targetFields =
-          profile.targetFields.map((f) => f.toLowerCase()).toList();
+      final targetFields = profile.targetFields.map((f) => f.toLowerCase()).toList();
       bool fieldMatch = false;
       for (final field in scholarship.fields) {
         final f = field.toLowerCase();
-        if (profileField.contains(f) ||
-            f.contains(profileField) ||
+        if ((profileField.isNotEmpty && (profileField.contains(f) || f.contains(profileField))) ||
             targetFields.any((t) => t.contains(f) || f.contains(t))) {
           fieldMatch = true;
           break;
         }
       }
-      if (!fieldMatch) {
-        return 0; // Hard disqualification on field of study mismatch
-      }
-      score += 20;
+      if (fieldMatch) score += 20;
+      // else: mismatch → 0 pts for this criterion
     }
 
-    // ── Target Country (20 pts) ────────────────────────────────────────
+    // ── Target Country (20 pts) ────────────────────────────────────────────
     maxScore += 20;
     final scholarshipCountry = scholarship.country.toLowerCase();
-    final targetCountries =
-        profile.targetCountries.map((c) => c.toLowerCase()).toList();
-    if (targetCountries.isEmpty ||
-        targetCountries.any((c) => c.contains(scholarshipCountry) ||
-            scholarshipCountry.contains(c))) {
+    final targetCountries = profile.targetCountries.map((c) => c.toLowerCase()).toList();
+    if (targetCountries.isEmpty) {
+      score += 20; // No preference → all countries ok
+    } else if (targetCountries.any((c) =>
+        c.contains(scholarshipCountry) || scholarshipCountry.contains(c))) {
       score += 20;
     }
 
-    // ── Nationality Eligibility (15 pts) ──────────────────────────────
+    // ── Nationality Eligibility (15 pts) ──────────────────────────────────
     maxScore += 15;
     final eligibility = scholarship.eligibility;
     if (eligibility.isEmpty) {
       score += 15; // Open to all
     } else {
-      final nationalities =
-          (eligibility['nationalities'] as List<dynamic>?)
+      final nationalities = (eligibility['nationalities'] as List<dynamic>?)
               ?.map((e) => e.toString().toLowerCase())
               .toList() ??
-              [];
-      final continent =
-          (eligibility['continent'] as String?)?.toLowerCase() ?? '';
+          [];
+      final continent = (eligibility['continent'] as String?)?.toLowerCase() ?? '';
       final profileNat = profile.nationality.toLowerCase();
-      if (nationalities.isEmpty ||
+      if (profileNat.isEmpty ||
+          nationalities.isEmpty ||
           nationalities.any((n) => n.contains(profileNat) || profileNat.contains(n)) ||
           (continent.isNotEmpty && _isAfrican(profileNat) && continent.contains('africa'))) {
         score += 15;
       }
     }
 
-    // ── Language Requirements (10 pts) ────────────────────────────────
+    // ── Language Requirements (10 pts) ────────────────────────────────────
     maxScore += 10;
     final langReqs = scholarship.languageRequirements;
     if (langReqs.isEmpty) {
@@ -82,20 +84,28 @@ class MatchingEngine {
       if (langReqs.containsKey('english')) {
         final required = (langReqs['english'] as String?)?.toLowerCase() ?? '';
         final userLevel = profile.englishLevel.toLowerCase();
-        if (!_languageLevelSufficient(userLevel, required)) langOk = false;
+        if (userLevel.isEmpty) {
+          // Unknown → assume ok (benefit of the doubt)
+        } else if (!_languageLevelSufficient(userLevel, required)) {
+          langOk = false;
+        }
       }
       if (langReqs.containsKey('french')) {
         final required = (langReqs['french'] as String?)?.toLowerCase() ?? '';
         final userLevel = profile.frenchLevel.toLowerCase();
-        if (!_languageLevelSufficient(userLevel, required)) langOk = false;
+        if (userLevel.isEmpty) {
+          // Unknown → assume ok
+        } else if (!_languageLevelSufficient(userLevel, required)) {
+          langOk = false;
+        }
       }
       if (langOk) score += 10;
     }
 
-    // ── GPA Bonus (10 pts) ────────────────────────────────────────────
+    // ── GPA Bonus (10 pts) ────────────────────────────────────────────────
     maxScore += 10;
     final minGpa = (eligibility['min_gpa'] as num?)?.toDouble();
-    if (minGpa == null || profile.gpa >= minGpa) {
+    if (minGpa == null || profile.gpa <= 0 || profile.gpa >= minGpa) {
       score += 10;
     }
 
@@ -107,8 +117,10 @@ class MatchingEngine {
     final p = profileLevel.toLowerCase();
     final s = scholarshipLevel.toLowerCase();
     if (s.isEmpty || s == 'all') return true;
-    if (p.contains('bachelor') && (s.contains('bachelor') || s.contains('undergraduate'))) return true;
-    if (p.contains('master') && (s.contains('master') || s.contains('postgraduate'))) return true;
+    if (p.contains('bachelor') &&
+        (s.contains('bachelor') || s.contains('undergraduate'))) return true;
+    if (p.contains('master') &&
+        (s.contains('master') || s.contains('postgraduate'))) return true;
     if (p.contains('phd') || p.contains('doctorate')) {
       if (s.contains('phd') || s.contains('doctoral')) return true;
     }
@@ -116,11 +128,14 @@ class MatchingEngine {
   }
 
   static bool _languageLevelSufficient(String userLevel, String requiredLevel) {
-    const levels = ['beginner', 'elementary', 'intermediate', 'upper-intermediate', 'advanced', 'proficient', 'native'];
+    const levels = [
+      'beginner', 'elementary', 'intermediate', 'upper-intermediate',
+      'advanced', 'proficient', 'native'
+    ];
     final userIdx = levels.indexWhere((l) => userLevel.contains(l));
     final reqIdx = levels.indexWhere((l) => requiredLevel.contains(l));
-    if (reqIdx < 0) return true; // Unknown requirement
-    if (userIdx < 0) return false; // Unknown user level
+    if (reqIdx < 0) return true;  // Unknown requirement → ok
+    if (userIdx < 0) return true; // Unknown user level → benefit of the doubt
     return userIdx >= reqIdx;
   }
 

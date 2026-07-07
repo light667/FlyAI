@@ -11,6 +11,7 @@ import '../../scholarships/models/scholarship_model.dart';
 import '../../swipe/providers/swipe_provider.dart';
 import '../../applications/providers/application_provider.dart';
 import '../../dashboard/providers/dashboard_provider.dart';
+import '../../ai_assistant/providers/scholarship_coaching_provider.dart';
 
 class ScholarshipDetailScreen extends ConsumerWidget {
   final ScholarshipModel scholarship;
@@ -169,9 +170,20 @@ class ScholarshipDetailScreen extends ConsumerWidget {
                     ref.invalidate(dashboardStatsProvider);
                   } catch (_) {}
 
-                  if (scholarship.applicationUrl != null) {
-                    final uri = Uri.parse(scholarship.applicationUrl!);
-                    if (await canLaunchUrl(uri)) launchUrl(uri);
+                  // Trigger AI coaching session
+                  ref.read(pendingCoachingScholarshipProvider.notifier).state = scholarship;
+
+                  if (context.mounted) {
+                    context.pop();
+                  }
+
+                  if (scholarship.applicationUrl != null && scholarship.applicationUrl!.isNotEmpty) {
+                    try {
+                      final uri = Uri.parse(scholarship.applicationUrl!);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    } catch (_) {}
                   }
                 },
               ),
