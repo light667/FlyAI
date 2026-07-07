@@ -14,10 +14,7 @@ class ChatRepository {
       return sessions[0]['id'] as String;
     }
 
-    return createNewSession(firebaseUid);
-  }
-
-  Future<String> createNewSession(String firebaseUid) async {
+    // Create a new session
     final res = await SupabaseService.client
         .from('chat_sessions')
         .insert({'firebase_uid': firebaseUid})
