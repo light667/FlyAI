@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/auth_service.dart';
 import '../../../core/services/supabase_service.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../profile/models/profile_model.dart';
+import '../../profile/providers/profile_provider.dart';
 import '../models/scholarship_model.dart';
 import '../repositories/scholarship_repository.dart';
 import '../services/matching_engine.dart';
@@ -10,11 +10,13 @@ import '../services/matching_engine.dart';
 // ── Swipe history ─────────────────────────────────────────────────────────
 
 final swipedIdsProvider = FutureProvider<Set<String>>((ref) async {
-  // Watch auth state so this re-runs when user signs in
-  final authState = ref.watch(authStateProvider);
-  final user = authState.value;
-  if (user == null) return {};
+  // profileNotifierProvider rebuilds when auth state changes, so watching it
+  // here ensures swipedIds also re-fetches after login.
+  final profileAsync = ref.watch(profileNotifierProvider);
+  final _ = profileAsync; // just to register the dependency
 
+  final user = AuthService.currentUser;
+  if (user == null) return {};
   try {
     final res = await SupabaseService.client
         .from('swipes')
@@ -31,59 +33,45 @@ final swipedIdsProvider = FutureProvider<Set<String>>((ref) async {
 
 // ── Scholarships + matching ───────────────────────────────────────────────
 //
-// Root cause of 0% scores:
-//   The old code used AuthService.currentUser (synchronous getter) which
-//   returns null during the ~200ms Firebase Auth restore-from-storage phase.
-//   When null, the scoring block is skipped → all scholarships keep their
-//   default compatibilityScore = 0.
+// Root cause of 0% scores (race condition):
+//   Firebase Auth restores the session ~200ms after app launch.
+//   During that window AuthService.currentUser == null → profile not loaded
+//   → scoring skipped → all scholarships keep compatibilityScore = 0.
 //
-// Fix:
-//   Watch authStateProvider (a StreamProvider) instead. Riverpod will
-//   automatically re-run this FutureProvider once the user is authenticated,
-//   ensuring the profile is always loaded before scoring runs.
+// Fix: watch profileNotifierProvider instead of reading AuthService directly.
+//   profileNotifierProvider already watches authStateProvider internally.
+//   When the user authenticates, profileNotifierProvider re-runs, which
+//   makes scholarshipProvider re-run too → profile is available → scores
+//   are calculated correctly.
 
 final scholarshipProvider =
     FutureProvider<List<ScholarshipModel>>((ref) async {
-  // 1. Wait for a confirmed authenticated user
-  final authState = ref.watch(authStateProvider);
-  final user = authState.value;
-
-  final repo = ScholarshipRepository();
-  final swipedIds = await ref.watch(swipedIdsProvider.future);
-
-  // 2. Fetch scholarships (no scoring yet)
-  final scholarships = await repo.fetchScholarships(excludeIds: swipedIds);
-
-  if (user == null) {
-    // Auth not yet restored — return unscored list; provider will rebuild
-    // automatically once authStateProvider emits the authenticated user.
-    return scholarships;
-  }
-
-  // 3. Load profile from Supabase
+  // 1. Watch the profile provider — this creates a reactive dependency.
+  //    The future completes once the profile has loaded (or null if absent).
   ProfileModel? profile;
   try {
-    final profileJson = await SupabaseService.fetchOne(
-        'profiles', 'firebase_uid', user.uid);
-    if (profileJson != null) {
-      profile = ProfileModel.fromJson(profileJson);
-    }
-  } catch (e) {
-    // Profile not yet created (new user still in onboarding)
+    profile = await ref.watch(profileNotifierProvider.future);
+  } catch (_) {
+    // Profile not yet created (new user in onboarding) — score-less list.
   }
 
-  if (profile == null) {
-    // No profile yet → return in quality-score order without matching
-    return scholarships;
-  }
+  // 2. Fetch swiped IDs so already-seen scholarships are excluded.
+  final swipedIds = await ref.watch(swipedIdsProvider.future);
 
-  // 4. Score every scholarship against the profile
+  // 3. Fetch scholarships from Supabase.
+  final repo = ScholarshipRepository();
+  final scholarships = await repo.fetchScholarships(excludeIds: swipedIds);
+
+  // 4. No profile → return in DB order (quality_score desc from repository).
+  if (profile == null) return scholarships;
+
+  // 5. Score every scholarship against the student profile.
   final scored = scholarships.map((s) {
     final score = MatchingEngine.calculate(profile!, s);
     return s.copyWith(compatibilityScore: score);
   }).toList();
 
-  // 5. Sort descending (highest match first)
+  // 6. Sort descending — highest match first.
   scored.sort((a, b) => b.compatibilityScore.compareTo(a.compatibilityScore));
   return scored;
 });
@@ -92,8 +80,10 @@ final scholarshipProvider =
 
 final likedScholarshipsProvider =
     FutureProvider<List<ScholarshipModel>>((ref) async {
-  final authState = ref.watch(authStateProvider);
-  final user = authState.value;
+  // Re-run when profile (and thus auth) changes.
+  final _ = ref.watch(profileNotifierProvider);
+
+  final user = AuthService.currentUser;
   if (user == null) return [];
 
   try {
@@ -110,43 +100,29 @@ final likedScholarshipsProvider =
 
     if (ids.isEmpty) return [];
 
-    // Try 'scholarships' table first, fall back to 'bourses'
-    List<dynamic> rows = [];
-    try {
-      rows = await SupabaseService.client
-          .from('scholarships')
-          .select()
-          .inFilter('id', ids);
-    } catch (_) {
+    // Try the scholarships table first, then fall back to bourses.
+    for (final table in ['scholarships', 'bourses']) {
       try {
-        rows = await SupabaseService.client
-            .from('bourses')
+        final rows = await SupabaseService.client
+            .from(table)
             .select()
             .inFilter('id', ids);
+        if ((rows as List).isNotEmpty) {
+          return rows
+              .map((j) =>
+                  ScholarshipModel.fromJson(j as Map<String, dynamic>))
+              .toList();
+        }
       } catch (_) {}
     }
-
-    return rows
-        .map((json) => ScholarshipModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return [];
   } catch (_) {
     return [];
   }
 });
 
-// ── Current profile (for matching engine in other providers) ──────────────
+// ── Current profile convenience provider ──────────────────────────────────
 
 final currentProfileProvider = FutureProvider<ProfileModel?>((ref) async {
-  final authState = ref.watch(authStateProvider);
-  final user = authState.value;
-  if (user == null) return null;
-
-  try {
-    final json = await SupabaseService.fetchOne(
-        'profiles', 'firebase_uid', user.uid);
-    if (json == null) return null;
-    return ProfileModel.fromJson(json);
-  } catch (_) {
-    return null;
-  }
+  return ref.watch(profileNotifierProvider.future);
 });
