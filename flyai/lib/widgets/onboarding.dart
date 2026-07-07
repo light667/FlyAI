@@ -18,7 +18,7 @@ class Onboarding extends StatelessWidget {
       children: [
         Positioned.fill(
           child: Container(
-            color: Colors.black.withOpacity(0.8),
+            color: Colors.black.withValues(alpha: 0.8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,

@@ -251,7 +251,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.glassBorder)),
                     ),
                     dropdownColor: AppColors.card,
-                    value: selectedLang,
+                    initialValue: selectedLang,
                     items: commonLanguages.map((l) {
                       return DropdownMenuItem(
                         value: l,
@@ -270,7 +270,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.glassBorder)),
                     ),
                     dropdownColor: AppColors.card,
-                    value: selectedLvl,
+                    initialValue: selectedLvl,
                     items: _languageLevels.map((l) {
                       return DropdownMenuItem(
                         value: l,
@@ -818,7 +818,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 });
               },
               backgroundColor: AppColors.card,
-              selectedColor: AppColors.primary.withOpacity(0.25),
+              selectedColor: AppColors.primary.withValues(alpha: 0.25),
               checkmarkColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -852,7 +852,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 });
               },
               backgroundColor: AppColors.card,
-              selectedColor: AppColors.primary.withOpacity(0.25),
+              selectedColor: AppColors.primary.withValues(alpha: 0.25),
               checkmarkColor: AppColors.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),

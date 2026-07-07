@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_text_styles.dart';
+//import '../../../core/constants/app_text_styles.dart';
 import '../../scholarships/models/scholarship_model.dart';
 
 class ScholarshipSwipeCard extends StatelessWidget {
@@ -197,11 +197,11 @@ class _PlaceholderBg extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.school_rounded, size: 72, color: AppColors.primary.withOpacity(0.4)),
+            Icon(Icons.school_rounded, size: 72, color: AppColors.primary.withValues(alpha: 0.4)),
             const SizedBox(height: 12),
             Text(
               country,
-              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 18, fontWeight: FontWeight.w700),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 18, fontWeight: FontWeight.w700),
             ),
           ],
         ),
@@ -230,8 +230,8 @@ class _MatchBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: _color.withOpacity(0.2),
         borderRadius: BorderRadius.circular(50),
-        border: Border.all(color: _color.withOpacity(0.5)),
-        boxShadow: [BoxShadow(color: _color.withOpacity(0.3), blurRadius: 10)],
+        border: Border.all(color: _color.withValues(alpha: 0.5)),
+        boxShadow: [BoxShadow(color: _color.withValues(alpha: 0.3), blurRadius: 10)],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -258,10 +258,10 @@ class _FundingBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: isFullyFunded ? AppColors.success.withOpacity(0.2) : Colors.white12,
+        color: isFullyFunded ? AppColors.success.withValues(alpha: 0.2) : Colors.white12,
         borderRadius: BorderRadius.circular(50),
         border: Border.all(
-          color: isFullyFunded ? AppColors.success.withOpacity(0.5) : Colors.white24,
+          color: isFullyFunded ? AppColors.success.withValues(alpha: 0.5) : Colors.white24,
         ),
       ),
       child: Row(
@@ -295,9 +295,9 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

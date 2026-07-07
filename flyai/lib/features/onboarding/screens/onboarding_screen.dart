@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/constants/app_colors.dart';
+//import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/app_router.dart';
-import '../../../core/widgets/primary_button.dart';
+//import '../../../core/widgets/primary_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -85,7 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 center: const Alignment(-0.4, -0.6),
                 radius: 1.4,
                 colors: [
-                  slide.gradient[0].withOpacity(0.35),
+                  slide.gradient[0].withValues(alpha: 0.35),
                   const Color(0xFF0A0F1C),
                 ],
               ),
@@ -105,7 +105,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   center: Alignment.center,
                   radius: 1.0,
                   colors: [
-                    slide.gradient[0].withOpacity(0.2),
+                    slide.gradient[0].withValues(alpha: 0.2),
                     Colors.transparent,
                   ],
                 ),
@@ -183,7 +183,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: slide.gradient[0].withOpacity(0.4),
+                                color: slide.gradient[0].withValues(alpha: 0.4),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
@@ -267,7 +267,7 @@ class _OnboardSlide extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: slide.gradient[0].withOpacity(0.5),
+                    color: slide.gradient[0].withValues(alpha: 0.5),
                     blurRadius: 50,
                     spreadRadius: 8,
                   ),

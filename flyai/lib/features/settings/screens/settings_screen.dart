@@ -215,7 +215,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       secondary: Icon(icon, color: AppColors.textSecondary),
       title: Text(title, style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
       value: value,
-      activeColor: AppColors.primary,
+      activeThumbColor: AppColors.primary,
       onChanged: onChanged,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
