@@ -2,12 +2,11 @@ services:
   - type: web
     name: flyai-backend
     runtime: docker
-    # Path to Dockerfile relative to the ROOT of the repo
-    dockerfilePath: ./backend/Dockerfile
-    # Build context relative to the ROOT of the repo
-    dockerContext: ./backend
+    # Path to Dockerfile relative to the repository root
+    dockerfilePath: flyai-web/backend/Dockerfile
+    # Build context relative to the repository root
+    dockerContext: flyai-web/backend
     plan: free
-    # Render injects $PORT automatically — no need for a ports block
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
@@ -31,4 +30,4 @@ services:
       - key: API_V1_STR
         value: "/api/v1"
       - key: BACKEND_CORS_ORIGINS
-        sync: false          # Set to your Vercel URL e.g. https://flyai.vercel.app
+        sync: false          # Set to your Vercel URL e.g. ["https://flyai.vercel.app"]
