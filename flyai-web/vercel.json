@@ -8,13 +8,7 @@
       "outputDirectory": ".next"
     },
     "backend": {
-      "root": "backend",
-      "builds": [
-        {
-          "src": "api/index.py",
-          "use": "@vercel/python"
-        }
-      ]
+      "root": "backend"
     }
   },
   "rewrites": [
