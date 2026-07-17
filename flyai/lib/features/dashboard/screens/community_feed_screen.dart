@@ -19,17 +19,26 @@ class PostModel {
   final String? authorPhoto;
   final String content;
   final List<String> tags;
+  // likesCount is the DB value at load time; localLikes tracks the
+  // optimistic delta so the displayed count never double-counts.
   final int likesCount;
+  int localLikesOffset; // +1 when we like, -1 when we unlike
   final int commentsCount;
   final DateTime createdAt;
   bool isLiked;
+  // Whether the post was already liked when it was loaded from the DB.
+  final bool initiallyLiked;
 
   PostModel({
     required this.id, required this.firebaseUid, required this.authorName,
     this.authorPhoto, required this.content, required this.tags,
     this.likesCount = 0, this.commentsCount = 0, required this.createdAt,
-    this.isLiked = false,
+    this.isLiked = false, this.initiallyLiked = false,
+    this.localLikesOffset = 0,
   });
+
+  /// The count to display in the UI, accounting for optimistic toggle.
+  int get displayLikesCount => likesCount + localLikesOffset;
 
   factory PostModel.fromJson(Map<String, dynamic> json,
       {bool isLiked = false}) {
@@ -46,6 +55,8 @@ class PostModel {
           ? DateTime.tryParse(json['created_at'] as String) ?? DateTime.now()
           : DateTime.now(),
       isLiked: isLiked,
+      initiallyLiked: isLiked,
+      localLikesOffset: 0,
     );
   }
 
@@ -166,22 +177,37 @@ class _CommunityFeedScreenState extends ConsumerState<CommunityFeedScreen> {
   Future<void> _toggleLike(PostModel post) async {
     final user = AuthService.currentUser;
     if (user == null) return;
-    // Optimistic update
     if (!mounted) return;
-    setState(() => post.isLiked = !post.isLiked);
+
+    // Optimistic update: toggle state and adjust local offset
+    final wasLiked = post.isLiked;
+    setState(() {
+      post.isLiked = !wasLiked;
+      post.localLikesOffset += wasLiked ? -1 : 1;
+    });
+
     try {
-      if (post.isLiked) {
+      if (!wasLiked) {
+        // Now liked: insert row
         await SupabaseService.client.from('post_likes')
             .insert({'firebase_uid': user.uid, 'post_id': post.id});
       } else {
+        // Now unliked: delete row
         await SupabaseService.client.from('post_likes')
             .delete()
             .eq('firebase_uid', user.uid)
             .eq('post_id', post.id);
       }
     } catch (_) {
+      // Revert on failure
       if (!mounted) return;
-      setState(() => post.isLiked = !post.isLiked);
+      setState(() {
+        post.isLiked = wasLiked;
+        post.localLikesOffset -= wasLiked ? -1 : 1;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erreur lors du like'), backgroundColor: Colors.redAccent),
+      );
     }
   }
 
@@ -805,7 +831,7 @@ class _PostCard extends StatelessWidget {
                   icon: post.isLiked
                       ? Icons.favorite_rounded
                       : Icons.favorite_outline_rounded,
-                  label: '${post.likesCount + (post.isLiked ? 1 : 0)}',
+                  label: '${post.displayLikesCount}',
                   color: post.isLiked
                       ? AppColors.error
                       : AppColors.textSecondary,

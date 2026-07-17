@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # Relational Database
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: flyai_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: flyai
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Vector Database for semantic lookup
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: flyai_qdrant
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrantdata:/qdrant/storage
+
+  # Cache and event bus
+  redis:
+    image: redis:7.0-alpine
+    container_name: flyai_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # FastAPI Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flyai_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/flyai
+      - QDRANT_HOST=http://qdrant:6333
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - qdrant
+      - redis
+
+  # Next.js Frontend Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: flyai_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  qdrantdata:

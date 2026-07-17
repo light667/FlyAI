@@ -1,0 +1,28 @@
+services:
+  # FastAPI Web Service on Render (Docker-based build)
+  - type: web
+    name: flyai-backend
+    runtime: docker
+    dockerFilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    ports:
+      - port: 8000
+        protocol: http
+    envVars:
+      - key: DATABASE_URL
+        sync: false # Set in Render Dashboard settings
+      - key: GEMINI_API_KEY
+        sync: false # Set in Render Dashboard settings
+      - key: MISTRAL_API_KEY
+        sync: false # Set in Render Dashboard settings
+      - key: GROQ_API_KEY
+        sync: false # Set in Render Dashboard settings
+      - key: REDIS_HOST
+        sync: false # Point to Redis provider
+      - key: REDIS_PORT
+        value: "6379"
+      - key: PROJECT_NAME
+        value: "FlyAI Production Backend"
+      - key: API_V1_STR
+        value: "/api/v1"

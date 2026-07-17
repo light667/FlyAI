@@ -125,6 +125,8 @@ class AIService {
     String? cvBase64,
     String? scholarshipsContext,
     String? systemPrompt,
+    String? attachedFileBase64,
+    String? attachedFileMimeType,
   }) async {
     // Try Gemini first
     try {
@@ -133,6 +135,8 @@ class AIService {
         cvBase64: cvBase64,
         scholarshipsContext: scholarshipsContext,
         systemPrompt: systemPrompt,
+        attachedFileBase64: attachedFileBase64,
+        attachedFileMimeType: attachedFileMimeType,
       );
     } catch (_) {}
 
@@ -161,6 +165,8 @@ class AIService {
     String? cvBase64,
     String? scholarshipsContext,
     String? systemPrompt,
+    String? attachedFileBase64,
+    String? attachedFileMimeType,
   }) async {
     final apiKey = AppConfig.geminiApiKey;
     final url =
@@ -187,12 +193,39 @@ class AIService {
       contents.add({'role': 'user', 'parts': contextParts});
       contents.add({'role': 'model', 'parts': [{'text': 'Context received. Ready to assist.'}]});
     }
-    for (final msg in messages) {
+
+    // Add conversation history (all but the last message)
+    final allMessages = messages;
+    for (int i = 0; i < allMessages.length - 1; i++) {
+      final msg = allMessages[i];
       contents.add({
         'role': msg['role'] == 'assistant' ? 'model' : 'user',
         'parts': [{'text': msg['content']}],
       });
     }
+
+    // Build last user message with optional file attachment
+    if (allMessages.isNotEmpty) {
+      final lastMsg = allMessages.last;
+      final lastParts = <Map<String, dynamic>>[];
+
+      // Inject the user-uploaded file as inlineData BEFORE the text
+      if (attachedFileBase64 != null && attachedFileMimeType != null) {
+        lastParts.add({
+          'inlineData': {
+            'mimeType': attachedFileMimeType,
+            'data': attachedFileBase64,
+          }
+        });
+      }
+      lastParts.add({'text': lastMsg['content'] ?? ''});
+
+      contents.add({
+        'role': lastMsg['role'] == 'assistant' ? 'model' : 'user',
+        'parts': lastParts,
+      });
+    }
+
     final response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},

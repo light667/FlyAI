@@ -334,9 +334,10 @@ class _MessageBubble extends StatelessWidget {
         mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Flexible(
-            child: GestureDetector(
-              onLongPress: isMe ? () async {
+          // Delete icon — only for own messages, placed before the bubble when right-aligned
+          if (isMe && onDelete != null)
+            GestureDetector(
+              onTap: () async {
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
@@ -346,56 +347,61 @@ class _MessageBubble extends StatelessWidget {
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, false),
-                        child: Text('Annuler',
-                            style: TextStyle(color: AppColors.textSecondary)),
+                        child: Text('Annuler', style: TextStyle(color: AppColors.textSecondary)),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text('Supprimer',
-                            style: TextStyle(color: Colors.red)),
+                        child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
                       ),
                     ],
                   ),
                 );
                 if (confirm == true) onDelete?.call();
-              } : null,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isMe ? AppColors.primary : AppColors.card,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(16),
-                    topRight: const Radius.circular(16),
-                    bottomLeft: Radius.circular(isMe ? 16 : 4),
-                    bottomRight: Radius.circular(isMe ? 4 : 16),
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(right: 6, bottom: 4),
+                child: Icon(Icons.delete_outline_rounded,
+                    size: 16, color: AppColors.textSecondary.withValues(alpha: 0.6)),
+              ),
+            ),
+
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isMe ? AppColors.primary : AppColors.card,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(16),
+                  topRight: const Radius.circular(16),
+                  bottomLeft: Radius.circular(isMe ? 16 : 4),
+                  bottomRight: Radius.circular(isMe ? 4 : 16),
+                ),
+                border: isMe ? null : Border.all(color: AppColors.glassBorder),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    message.content,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: isMe ? Colors.white : AppColors.textPrimary,
+                    ),
                   ),
-                  border: isMe ? null : Border.all(color: AppColors.glassBorder),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      message.content,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: isMe ? Colors.white : AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          timeStr,
-                          style: AppTextStyles.caption.copyWith(
-                            fontSize: 9,
-                            color: isMe ? Colors.white60 : AppColors.textSecondary,
-                          ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        timeStr,
+                        style: AppTextStyles.caption.copyWith(
+                          fontSize: 9,
+                          color: isMe ? Colors.white60 : AppColors.textSecondary,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
@@ -404,6 +410,9 @@ class _MessageBubble extends StatelessWidget {
     );
   }
 }
+
+
+
 
 class _EmptyChatView extends StatelessWidget {
   final String peerName;

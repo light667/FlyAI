@@ -2,6 +2,23 @@ import '../../../core/services/supabase_service.dart';
 import '../models/chat_message_model.dart';
 
 class ChatRepository {
+  /// Returns the most recent session ID for a user, or null if none exists.
+  /// Does NOT create a new session — use [createNewSession] for that.
+  Future<String?> getMostRecentSession(String firebaseUid) async {
+    final sessions = await SupabaseService.client
+        .from('chat_sessions')
+        .select()
+        .eq('firebase_uid', firebaseUid)
+        .order('created_at', ascending: false)
+        .limit(1);
+
+    if ((sessions as List).isNotEmpty) {
+      return sessions[0]['id'] as String;
+    }
+    return null;
+  }
+
+  /// Legacy: get existing session or create one. Used by coaching flow only.
   Future<String?> getOrCreateSession(String firebaseUid) async {
     final sessions = await SupabaseService.client
         .from('chat_sessions')
@@ -14,7 +31,10 @@ class ChatRepository {
       return sessions[0]['id'] as String;
     }
 
-    // Create a new session
+    return createNewSession(firebaseUid);
+  }
+
+  Future<String> createNewSession(String firebaseUid) async {
     final res = await SupabaseService.client
         .from('chat_sessions')
         .insert({'firebase_uid': firebaseUid})
