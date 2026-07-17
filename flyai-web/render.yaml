@@ -1,28 +1,34 @@
 services:
-  # FastAPI Web Service on Render (Docker-based build)
   - type: web
     name: flyai-backend
     runtime: docker
-    dockerFilePath: backend/Dockerfile
-    dockerContext: backend
+    # Path to Dockerfile relative to the ROOT of the repo
+    dockerfilePath: ./backend/Dockerfile
+    # Build context relative to the ROOT of the repo
+    dockerContext: ./backend
     plan: free
-    ports:
-      - port: 8000
-        protocol: http
+    # Render injects $PORT automatically — no need for a ports block
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
-        sync: false # Set in Render Dashboard settings
+        sync: false          # Set manually in Render Dashboard → Environment
       - key: GEMINI_API_KEY
-        sync: false # Set in Render Dashboard settings
+        sync: false
       - key: MISTRAL_API_KEY
-        sync: false # Set in Render Dashboard settings
+        sync: false
       - key: GROQ_API_KEY
-        sync: false # Set in Render Dashboard settings
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
       - key: REDIS_HOST
-        sync: false # Point to Redis provider
+        sync: false          # Use Render Redis add-on or Upstash
       - key: REDIS_PORT
         value: "6379"
       - key: PROJECT_NAME
         value: "FlyAI Production Backend"
       - key: API_V1_STR
         value: "/api/v1"
+      - key: BACKEND_CORS_ORIGINS
+        sync: false          # Set to your Vercel URL e.g. https://flyai.vercel.app
