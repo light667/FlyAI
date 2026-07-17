@@ -1,0 +1,37 @@
+{
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "nextjs",
+      "buildCommand": "npm run build",
+      "installCommand": "npm ci",
+      "outputDirectory": ".next"
+    },
+    "backend": {
+      "root": "backend",
+      "builds": [
+        {
+          "src": "api/index.py",
+          "use": "@vercel/python"
+        }
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/backend/:path*",
+      "destination": {
+        "type": "service",
+        "service": "backend",
+        "path": "/api/:path*"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "frontend"
+      }
+    }
+  ]
+}
