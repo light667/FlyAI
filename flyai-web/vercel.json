@@ -1,34 +1,34 @@
 {
-  "services": {
-    "frontend": {
-      "root": "frontend",
-      "framework": "nextjs",
-      "buildCommand": "npm run build",
-      "installCommand": "npm ci",
-      "outputDirectory": ".next"
+  "builds": [
+    {
+      "src": "frontend/next.config.ts",
+      "use": "@vercel/next"
     },
-    "backend": {
-      "root": "backend",
-      "entrypoint": "api/index.py"
+    {
+      "src": "backend/api/index.py",
+      "use": "@vercel/python"
     }
-  },
+  ],
   "rewrites": [
     {
       "source": "/api/backend/:path*",
-      "destination": {
-        "type": "service",
-        "service": "backend",
-        "path": "/api/:path*"
-      }
+      "destination": "backend/api/index.py"
+    },
+    {
+      "source": "/logo.png",
+      "destination": "frontend/public/logo.png"
+    },
+    {
+      "source": "/icon.png",
+      "destination": "frontend/src/app/icon.png"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "frontend/public/logo.png"
     },
     {
       "source": "/(.*)",
-      "destination": {
-        "type": "service",
-        "service": "frontend"
-      }
+      "destination": "frontend/$1"
     }
   ]
 }
-
-
