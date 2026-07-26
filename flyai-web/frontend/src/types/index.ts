@@ -3,7 +3,8 @@ export interface UserProfile {
   fullName: string;
   email: string;
   photoUrl?: string;
-  degreeLevel: string; // e.g. 'master', 'doctorat', 'licence'
+  degreeLevel: string; // e.g. 'master', 'doctorat', 'licence' - NIVEAU ACTUEL
+  targetDegreeLevel?: string; // e.g. 'master', 'doctorat', 'licence' - NIVEAU VISE (pour le matching)
   fieldOfStudy: string; // e.g. 'Informatique', 'Intelligence Artificielle', 'Génie Civil'
   nationality: string;
   targetCountries: string[]; // e.g. ['France', 'Allemagne', 'Canada']
@@ -76,6 +77,7 @@ export interface Application {
   bourseId: string;
   bourse?: Scholarship;
   status: 'draft' | 'submitted' | 'under_review' | 'accepted' | 'rejected';
+  category?: 'favoris' | 'flyagent' | 'standard'; // Type de candidature
   checklist: {
     cv_uploaded: boolean;
     motivation_letter: boolean;

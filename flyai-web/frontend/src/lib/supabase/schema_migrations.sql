@@ -90,7 +90,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     avatar_url     TEXT DEFAULT '',
     nationality    TEXT DEFAULT 'International',
     country        TEXT DEFAULT '',                         -- pays de résidence (signup)
-    education_level TEXT DEFAULT 'master',                  -- ex. bachelor / master / phd
+    education_level TEXT DEFAULT 'master',                  -- ex. bachelor / master / phd - NIVEAU ACTUEL
+    target_degree_level TEXT DEFAULT NULL,               -- NIVEAU VISE pour le matching (ex: licence, master, doctorat)
     field_of_study TEXT DEFAULT 'Informatique',
     university     TEXT DEFAULT '',
     gpa            NUMERIC(3,2) DEFAULT 3.50,

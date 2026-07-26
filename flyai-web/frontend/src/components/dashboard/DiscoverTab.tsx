@@ -60,6 +60,7 @@ export default function DiscoverTab({ userId, onApplyScholarship, onOpenFlyAgent
           bourseId: sch.id,
           direction: "right",
           score: sch.matchScore || 85,
+          category: "favoris",
         }),
       });
       alert(`Bourse "${sch.titre}" ajoutée à tes favoris / candidatures !`);

@@ -9,7 +9,8 @@ import { ArrowRight, ArrowLeft, Check, GraduationCap, Globe2, MapPin, Sparkles, 
 
 interface ProfileState {
   fullName: string;
-  degreeLevel: string;
+  degreeLevel: string; // Niveau ACTUEL
+  targetDegreeLevel: string; // Niveau VISE (pour matching)
   fieldOfStudy: string;
   university: string;
   averageOutOf20: number;
@@ -112,6 +113,7 @@ export default function OnboardingPage() {
   const [profile, setProfile] = useState<ProfileState>({
     fullName: "",
     degreeLevel: "master",
+    targetDegreeLevel: "master",
     fieldOfStudy: "Informatique & Intelligence Artificielle",
     university: "Université de Lomé",
     averageOutOf20: 14,
@@ -145,7 +147,7 @@ export default function OnboardingPage() {
 
   const canNext = () => {
     if (step === 0) return !!profile.fullName && !!profile.nationality;
-    if (step === 1) return !!profile.degreeLevel && !!profile.fieldOfStudy;
+    if (step === 1) return !!profile.degreeLevel && !!profile.targetDegreeLevel && !!profile.fieldOfStudy;
     if (step === 2) return profile.averageOutOf20 >= 0;
     if (step === 3) return !!profile.englishLevel;
     if (step === 4) return profile.targetCountries.length > 0;
@@ -170,6 +172,7 @@ export default function OnboardingPage() {
             userId: user.uid,
             fullName: profile.fullName || user.displayName || "",
             degreeLevel: profile.degreeLevel,
+            targetDegreeLevel: profile.targetDegreeLevel,
             fieldOfStudy: profile.fieldOfStudy,
             university: profile.university,
             nationality: profile.nationality,
@@ -272,12 +275,26 @@ export default function OnboardingPage() {
               </p>
             </div>
             <div>
-              <label style={labelSt}>Niveau d etudes vise</label>
+              <label style={labelSt}>Niveau d etudes ACTUEL</label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)" }}>
                 {DEGREES.map((d) => {
                   const sel = profile.degreeLevel === d.value;
                   return (
                     <button key={d.value} onClick={() => setProfile({ ...profile, degreeLevel: d.value })} style={{ padding: "var(--space-3) var(--space-4)", borderRadius: "var(--radius)", border: `1px solid ${sel ? "var(--accent)" : "var(--border)"}`, background: sel ? "var(--accent-light)" : "var(--warm-100)", cursor: "pointer", textAlign: "left", transition: "all var(--transition-base)" }}>
+                      <div style={{ fontSize: "var(--text-body)", fontWeight: 600, color: sel ? "var(--accent)" : "var(--ink-text)" }}>{d.label}</div>
+                      <div style={{ fontSize: "10px", color: "var(--ink-subtle)", marginTop: 2 }}>{d.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <label style={labelSt}>Niveau d etudes VISE (pour les recommandations)</label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)" }}>
+                {DEGREES.map((d) => {
+                  const sel = profile.targetDegreeLevel === d.value;
+                  return (
+                    <button key={d.value} onClick={() => setProfile({ ...profile, targetDegreeLevel: d.value })} style={{ padding: "var(--space-3) var(--space-4)", borderRadius: "var(--radius)", border: `1px solid ${sel ? "var(--accent)" : "var(--border)"}`, background: sel ? "var(--accent-light)" : "var(--warm-100)", cursor: "pointer", textAlign: "left", transition: "all var(--transition-base)" }}>
                       <div style={{ fontSize: "var(--text-body)", fontWeight: 600, color: sel ? "var(--accent)" : "var(--ink-text)" }}>{d.label}</div>
                       <div style={{ fontSize: "10px", color: "var(--ink-subtle)", marginTop: 2 }}>{d.desc}</div>
                     </button>
@@ -503,11 +520,15 @@ export default function OnboardingPage() {
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        // For CV, we'll just store the file name for now
-                        setProfile({ ...profile, cvUrl: file.name });
+                        // Convert CV to DataURL like photo
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          setProfile({ ...profile, cvUrl: reader.result as string });
+                        };
+                        reader.readAsDataURL(file);
                       }
                     }}
                     style={{ display: "none" }}

@@ -44,6 +44,33 @@ export default function Dashboard() {
   // Active FlyAgent modal target
   const [agentScholarship, setAgentScholarship] = useState<Scholarship | null>(null);
 
+  // Function to handle FlyAgent application
+  const handleOpenFlyAgent = async (sch: Scholarship) => {
+    if (!currentUser?.uid) return;
+    
+    try {
+      // Add to applications with category "flyagent"
+      await fetch("/api/swipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUser.uid,
+          bourseId: sch.id,
+          direction: "right",
+          score: sch.matchScore || 85,
+          category: "flyagent",
+        }),
+      });
+      
+      // Open the FlyAgent modal
+      setAgentScholarship(sch);
+    } catch (err) {
+      console.error("Error saving FlyAgent application:", err);
+      // Still open the modal even if save fails
+      setAgentScholarship(sch);
+    }
+  };
+
   useEffect(() => {
     // Theme initialization
     const savedTheme = (localStorage.getItem("flyai_theme") as "light" | "dark") || "light";
@@ -142,7 +169,13 @@ export default function Dashboard() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  if (item.id === "settings") {
+                    router.push("/settings");
+                  } else {
+                    setActiveTab(item.id);
+                  }
+                }}
                 className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-extrabold transition-all duration-200 ${
                   active
                     ? "bg-accent text-accent-text shadow-lg shadow-accent/25"
@@ -248,14 +281,14 @@ export default function Dashboard() {
             <RecommendedTab
               userId={currentUser?.uid}
               userProfile={profile}
-              onOpenFlyAgent={(sch) => setAgentScholarship(sch)}
+              onOpenFlyAgent={handleOpenFlyAgent}
             />
           )}
 
           {activeTab === "discover" && (
             <DiscoverTab
               userId={currentUser?.uid}
-              onOpenFlyAgent={(sch) => setAgentScholarship(sch)}
+              onOpenFlyAgent={handleOpenFlyAgent}
             />
           )}
 
@@ -279,24 +312,7 @@ export default function Dashboard() {
             />
           )}
 
-          {activeTab === "settings" && (
-            <div className="flex items-center justify-center min-h-[50vh]">
-              <div className="text-center space-y-4">
-                <h3 className="text-xl font-bold text-[rgb(var(--ink-900))]">
-                  Parametres
-                </h3>
-                <p className="text-[rgb(var(--ink-muted))]">
-                  Redirection vers la page des parametres...
-                </p>
-                <button
-                  onClick={() => router.push("/settings")}
-                  className="px-6 py-3 bg-accent hover:bg-accent-hover text-accent-text font-semibold rounded-xl transition-all"
-                >
-                  Aller aux parametres
-                </button>
-              </div>
-            </div>
-          )}
+
         </div>
       </main>
 

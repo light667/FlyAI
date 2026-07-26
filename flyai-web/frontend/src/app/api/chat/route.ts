@@ -242,8 +242,19 @@ export async function POST(req: NextRequest) {
 
     // §8.1 — Fallback factuel : jamais simuler une réponse normale
     if (!reply) {
-      reply =
-        "Le service de conseil est momentanément indisponible. Veuillez réessayer dans quelques instants.";
+      // Si on a un contexte de bourse, donner des conseils basiques
+      if (scholarshipContext && scholarshipContext.length > 0) {
+        const sch = scholarshipContext[0];
+        reply = `Je suis momentanément hors ligne, mais voici des conseils de base pour votre recherche :\n\n` +
+          `1. **Vérifiez les critères d'éligibilité** : Assurez-vous que votre niveau d'étude (${userProfile?.degreeLevel || 'votre niveau'}) correspond aux exigences de la bourse.\n\n` +
+          `2. **Préparez vos documents** : CV académique, lettre de motivation, relevés de notes, et lettres de recommandation sont généralement requises.\n\n` +
+          `3. **Respectez les délais** : Les dates de clôture sont strictes. Commencez votre dossier au moins 2-3 mois à l'avance.\n\n` +
+          `4. **Adaptez votre candidature** : Personnalisez chaque dossier selon les spécificités de la bourse et du pays cible.\n\n` +
+          `5. **Vérifiez les exigences linguistiques** : TOEFL, IELTS, DELF/DALF sont souvent demandés selon la destination.\n\n` +
+          `Pour une aide personnalisée, réessayez dans quelques instants.`;
+      } else {
+        reply = "Le service de conseil est momentanément indisponible. Veuillez réessayer dans quelques instants.";
+      }
     }
 
     // 6. Sauvegarder la réponse de l'assistant

@@ -48,6 +48,7 @@ export default function ApplicationsTab({ userId }: Props) {
   const [loading, setLoading] = useState(true);
   const [activeApp, setActiveApp] = useState<Application | null>(null);
   const [showRejected, setShowRejected] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'favoris' | 'flyagent' | 'standard'>('all');
 
   useEffect(() => {
     if (!userId) return;
@@ -85,6 +86,11 @@ export default function ApplicationsTab({ userId }: Props) {
 
   const rejected = applications.filter((a) => a.status === "rejected");
   const visible = applications.filter((a) => a.status !== "rejected");
+  
+  // Filter by category
+  const filteredByCategory = categoryFilter === 'all' 
+    ? visible 
+    : visible.filter((a) => a.category === categoryFilter);
 
   if (loading) {
     return (
@@ -113,26 +119,39 @@ export default function ApplicationsTab({ userId }: Props) {
             </p>
           </div>
         </div>
-        <span style={{ fontSize: "var(--text-caption)", fontWeight: 700, padding: "4px 10px", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", color: "var(--ink-muted)" }}>
-          {visible.length} active{visible.length > 1 ? "s" : ""}
-        </span>
+        <div style={{ display: "flex", gap: "var(--space-2)" }}>
+          {/* Category filters */}
+          <select 
+            value={categoryFilter} 
+            onChange={(e) => setCategoryFilter(e.target.value as 'all' | 'favoris' | 'flyagent' | 'standard')}
+            style={{ fontSize: "var(--text-caption)", fontWeight: 700, padding: "4px 8px", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", color: "var(--ink-muted)", background: "var(--warm-50)" }}
+          >
+            <option value="all">Tous</option>
+            <option value="favoris">Favoris</option>
+            <option value="flyagent">FlyAgent</option>
+            <option value="standard">Standard</option>
+          </select>
+          <span style={{ fontSize: "var(--text-caption)", fontWeight: 700, padding: "4px 10px", borderRadius: "var(--radius-sm)", border: "1px solid var(--border)", color: "var(--ink-muted)" }}>
+            {filteredByCategory.length} active{filteredByCategory.length > 1 ? "s" : ""}
+          </span>
+        </div>
       </div>
 
-      {applications.length === 0 ? (
+      {filteredByCategory.length === 0 ? (
         <div style={{ padding: "var(--space-8)", textAlign: "center", background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius)" }}>
           <CheckSquare size={32} style={{ color: "var(--ink-subtle)", margin: "0 auto var(--space-4)" }} />
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h1)", fontWeight: 400, color: "var(--ink-text)", margin: "0 0 var(--space-2)" }}>
-            Aucune candidature en cours
+            {categoryFilter === 'all' ? 'Aucune candidature en cours' : `Aucune candidature dans la catégorie "${categoryFilter}"`}
           </h3>
           <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", maxWidth: 420, margin: "0 auto" }}>
-            Selectionnez une bourse dans l onglet "Mes meilleures options" et cliquez sur "Preparer ce dossier" pour demarrer.
+            Selectionnez une bourse dans l onglet "Mes meilleures options" et cliquez sur le cœur (favoris) ou "Postuler avec FlyAgent" pour demarrer.
           </p>
         </div>
       ) : (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "var(--space-4)", overflowX: "auto" }}>
             {COLUMNS.map((col) => {
-              const colApps = visible.filter((a) => a.status === col.id);
+              const colApps = filteredByCategory.filter((a) => a.status === col.id);
               return (
                 <div key={col.id} style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "var(--space-4)", minWidth: 220, display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

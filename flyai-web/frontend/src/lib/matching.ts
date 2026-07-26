@@ -10,7 +10,9 @@ export function calculateMatchScore(
   scholarship: Scholarship,
   overrideDegreeFilter?: string
 ): MatchBreakdown {
-  const targetDegree = (overrideDegreeFilter || profile?.degreeLevel || "master").toLowerCase();
+  // Utiliser targetDegreeLevel si disponible, sinon degreeLevel (niveau actuel)
+  // Cela permet à un étudiant en licence de viser des bourses master, etc.
+  const targetDegree = (overrideDegreeFilter || profile?.targetDegreeLevel || profile?.degreeLevel || "master").toLowerCase();
 
   const reasons: string[] = [];
 

@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const supabase = getSupabaseServerClient();
     const body = await req.json();
 
-    const { userId, bourseId, direction, score } = body;
+    const { userId, bourseId, direction, score, category } = body;
 
     if (!userId || !bourseId || !direction) {
       return NextResponse.json(
@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
             firebase_uid: userId,
             bourse_id: bourseId,
             status: "draft",
+            category: category || "standard",
             checklist: {
               cv_uploaded: false,
               motivation_letter: false,
