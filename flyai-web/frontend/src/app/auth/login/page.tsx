@@ -186,7 +186,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="p-6 md:p-8 w-full bg-[rgb(var(--warm-50))] border border-[rgb(var(--border))] rounded-2xl shadow-md"
+        <div className="p-6 md:p-8 w-full bg-[rgb(var(--warm-50))] border border-[rgb(var(--border))] rounded-2xl shadow-md">
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-alert-light border border-alert text-alert text-sm">
               {error}

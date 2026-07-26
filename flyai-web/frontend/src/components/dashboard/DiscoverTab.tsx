@@ -71,7 +71,7 @@ export default function DiscoverTab({ userId, onApplyScholarship, onOpenFlyAgent
   return (
     <div className="space-y-6">
       {/* Search and Filters Header Bar */}
-      <div className="bg-[rgb(var(--warm-50))] backdrop-blur-xl border border-[rgb(var(--border))] p-4 md:p-6 rounded-3xl space-y-4"
+      <div className="bg-[rgb(var(--warm-50))] backdrop-blur-xl border border-[rgb(var(--border))] p-4 md:p-6 rounded-3xl space-y-4">
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--ink-subtle))]" />
