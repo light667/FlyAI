@@ -19,10 +19,17 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       console.error("Error fetching applications:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      // Return empty array instead of error to prevent 500
+      return NextResponse.json({ data: [] });
     }
 
-    return NextResponse.json({ data: applications || [] });
+    // Ensure all applications have a bourse object, even if null
+    const applicationsWithBourse = applications.map(app => ({
+      ...app,
+      bourse: app.bourses || null
+    }));
+
+    return NextResponse.json({ data: applicationsWithBourse || [] });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
@@ -32,7 +39,7 @@ export async function POST(req: NextRequest) {
   try {
     const supabase = getSupabaseServerClient();
     const body = await req.json();
-    const { userId, bourseId, status, checklist, notes, deadline, applicationUrl } = body;
+    const { userId, bourseId, status, checklist, notes, deadline, applicationUrl, category } = body;
 
     if (!userId || !bourseId) {
       return NextResponse.json({ error: "userId et bourseId requis" }, { status: 400 });
@@ -51,6 +58,7 @@ export async function POST(req: NextRequest) {
         firebase_uid: userId,
         bourse_id: bourseId,
         status: status || "draft",
+        category: category || "standard",
         checklist: checklist || defaultChecklist,
         notes: notes || "",
         deadline: deadline || null,

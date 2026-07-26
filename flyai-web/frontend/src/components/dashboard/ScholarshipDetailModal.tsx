@@ -17,13 +17,13 @@ export default function ScholarshipDetailModal({ scholarship, onClose, onApply, 
   const breakdown = scholarship.matchBreakdown;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-3xl max-h-[90vh] bg-slate-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgb(var(--backdrop))]/80 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-3xl max-h-[90vh] bg-[rgb(var(--modal-bg))] border border-[rgb(var(--border))] rounded-3xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header Banner */}
-        <div className="relative p-6 md:p-8 bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-slate-900 border-b border-white/10">
+        <div className="relative p-6 md:p-8 bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-[rgb(var(--modal-bg))] border-b border-[rgb(var(--border))]">
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 transition-all"
+            className="absolute top-5 right-5 p-2 rounded-full bg-[rgb(var(--modal-bg))]/10 hover:bg-[rgb(var(--modal-bg))]/20 text-[rgb(var(--ink-text))] transition-all"
           >
             <X className="w-5 h-5" />
           </button>
@@ -39,11 +39,11 @@ export default function ScholarshipDetailModal({ scholarship, onClose, onApply, 
             </span>
           </div>
 
-          <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-[rgb(var(--ink-text))] leading-tight">
             {scholarship.titre}
           </h2>
 
-          <div className="flex flex-wrap gap-4 mt-4 text-xs font-medium text-slate-300">
+          <div className="flex flex-wrap gap-4 mt-4 text-xs font-medium text-[rgb(var(--ink-muted))]">
             {scholarship.pays_destination && scholarship.pays_destination.length > 0 && (
               <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
                 <MapPin className="w-4 h-4 text-indigo-400" />
@@ -102,10 +102,10 @@ export default function ScholarshipDetailModal({ scholarship, onClose, onApply, 
 
           {/* Description */}
           <div>
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <h3 className="text-sm font-bold text-[rgb(var(--ink-text))] uppercase tracking-wider mb-2 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-indigo-400" /> Description de la Bourse
             </h3>
-            <p className="text-sm leading-relaxed text-slate-300 bg-white/5 p-4 rounded-2xl border border-white/5 whitespace-pre-line">
+            <p className="text-sm leading-relaxed text-[rgb(var(--ink-text))] bg-[rgb(var(--modal-bg))]/5 p-4 rounded-2xl border border-[rgb(var(--border))] whitespace-pre-line">
               {scholarship.description || "Aucune description détaillée disponible."}
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function ScholarshipDetailModal({ scholarship, onClose, onApply, 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {scholarship.domaines && scholarship.domaines.length > 0 && (
               <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Domaines d'études</h4>
+                <h4 className="text-xs font-bold text-[rgb(var(--ink-muted))] uppercase tracking-wider mb-2">Domaines d'études</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {scholarship.domaines.map((d, i) => (
                     <span key={i} className="px-2.5 py-1 text-xs rounded-lg bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
@@ -127,7 +127,7 @@ export default function ScholarshipDetailModal({ scholarship, onClose, onApply, 
 
             {scholarship.niveau_etude && scholarship.niveau_etude.length > 0 && (
               <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Niveaux requis</h4>
+                <h4 className="text-xs font-bold text-[rgb(var(--ink-muted))] uppercase tracking-wider mb-2">Niveaux requis</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {scholarship.niveau_etude.map((n, i) => (
                     <span key={i} className="px-2.5 py-1 text-xs rounded-lg bg-purple-500/10 text-purple-300 border border-purple-500/20 uppercase font-semibold">
@@ -141,10 +141,10 @@ export default function ScholarshipDetailModal({ scholarship, onClose, onApply, 
         </div>
 
         {/* Footer Actions */}
-        <div className="p-5 md:p-6 bg-slate-950 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="p-5 md:p-6 bg-[rgb(var(--modal-bg))] border-t border-[rgb(var(--border))] flex flex-col sm:flex-row items-center justify-between gap-4">
           <button
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-slate-300 hover:bg-white/5 text-sm font-semibold transition-all"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-[rgb(var(--border))] text-[rgb(var(--ink-text))] hover:bg-[rgb(var(--modal-bg))]/5 text-sm font-semibold transition-all"
           >
             Fermer
           </button>
@@ -168,7 +168,7 @@ export default function ScholarshipDetailModal({ scholarship, onClose, onApply, 
                 href={scholarship.lien_candidature || scholarship.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-white/10 transition-all"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[rgb(var(--button-bg))] hover:bg-[rgb(var(--button-bg-hover))] text-[rgb(var(--button-text))] font-bold text-xs border border-[rgb(var(--border))] transition-all"
               >
                 <span>Site officiel</span>
                 <ExternalLink className="w-3.5 h-3.5" />

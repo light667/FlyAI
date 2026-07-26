@@ -80,13 +80,17 @@ export async function POST(req: NextRequest) {
       targetDegreeLevel,
       fieldOfStudy,
       nationality,
+      university,
       targetCountries,
+      budgetMax,
       gpa,
       languages,
       skills,
       bio,
       cvUrl,
       avatarUrl,
+      onboardingCompleted,
+      termsAccepted,
     } = body;
 
     if (!userId) {

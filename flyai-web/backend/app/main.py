@@ -42,7 +42,9 @@ async def health_check():
         "api_v1_prefix": settings.API_V1_STR
     }
 
-# Entrypoint mock for route inclusion
-# To add v1 routers:
-# from app.api.v1 import router as api_v1_router
-# app.include_router(api_v1_router, prefix=settings.API_V1_STR)
+# Register API routers
+from api.scholarships import router as scholarships_router
+from api.matching import router as matching_router
+
+app.include_router(scholarships_router, prefix="/api")
+app.include_router(matching_router, prefix="/api")

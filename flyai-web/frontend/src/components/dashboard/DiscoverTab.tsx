@@ -7,6 +7,7 @@ import { Search, Filter, Compass, Sparkles, MapPin, Calendar, ExternalLink, Refr
 
 interface Props {
   userId?: string;
+  userProfile?: any;
   onApplyScholarship?: (scholarship: Scholarship) => void;
   onOpenFlyAgent?: (scholarship: Scholarship) => void;
 }
@@ -28,11 +29,25 @@ export default function DiscoverTab({ userId, onApplyScholarship, onOpenFlyAgent
       if (countryFilter) params.append("country", countryFilter);
       if (degreeFilter) params.append("degree", degreeFilter);
       if (fundingFilter) params.append("funding", fundingFilter);
+      if (userId) params.append("user_id", userId);
 
       const res = await fetch(`/api/scholarships?${params.toString()}`);
       const json = await res.json();
       if (json.data) {
-        setScholarships(json.data);
+        // Filter out scholarships that don't match user's nationality if profile exists
+        let filteredScholarships = json.data;
+        if (userProfile?.nationality) {
+          const userNat = userProfile.nationality.toLowerCase();
+          filteredScholarships = json.data.filter((sch: any) => {
+            const eligibleNats = sch.nationalites_eligibles || [];
+            // If no specific nationalities required, or if user's nationality is eligible, or if open to all
+            if (eligibleNats.length === 0) return true;
+            if (eligibleNats.some((nat: string) => nat.toLowerCase().includes(userNat) || userNat.includes(nat.toLowerCase()))) return true;
+            if (eligibleNats.some((nat: string) => nat.toLowerCase().includes("all") || nat.toLowerCase().includes("tous") || nat.toLowerCase().includes("international"))) return true;
+            return false;
+          });
+        }
+        setScholarships(filteredScholarships);
       }
     } catch (e) {
       console.error("Failed to load scholarships", e);
@@ -46,7 +61,7 @@ export default function DiscoverTab({ userId, onApplyScholarship, onOpenFlyAgent
       fetchScholarships();
     }, 300);
     return () => clearTimeout(timer);
-  }, [search, countryFilter, degreeFilter, fundingFilter]);
+  }, [search, countryFilter, degreeFilter, fundingFilter, userId, userProfile]);
 
   const handleLike = async (sch: Scholarship, e: React.MouseEvent) => {
     e.stopPropagation();

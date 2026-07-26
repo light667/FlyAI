@@ -44,7 +44,12 @@ export async function generateFlyAgentResponse(
   // §8.1 — Fallback factuel : indiquer l'indisponibilité réelle, jamais simuler une réponse
   return {
     reply:
-      "Le service de conseil est momentanément indisponible. Veuillez réessayer dans quelques instants.",
-    suggestedActions: [],
+      "Le service de conseil est momentanément indisponible. Veuillez réessayer dans quelques instants. " +
+      "En attendant, vous pouvez consulter les descriptions détaillées des bourses et les guides dans l'onglet 'Découvrir'.",
+    suggestedActions: [
+      "Consulter les bourses recommandées",
+      "Lire les descriptions détaillées des bourses",
+      "Vérifier les critères d'éligibilité"
+    ],
   };
 }

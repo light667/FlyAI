@@ -68,7 +68,7 @@ export default function ApplicationsTab({ userId }: Props) {
       await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: app.userId || userId, bourseId: app.bourseId, status: app.status, checklist: updated }),
+        body: JSON.stringify({ userId: app.userId || userId, bourseId: app.bourseId, status: app.status, category: app.category, checklist: updated }),
       });
     } catch (e) { console.error(e); }
   };
@@ -79,7 +79,7 @@ export default function ApplicationsTab({ userId }: Props) {
       await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: app.userId || userId, bourseId: app.bourseId, status: newStatus, checklist: app.checklist }),
+        body: JSON.stringify({ userId: app.userId || userId, bourseId: app.bourseId, status: newStatus, category: app.category, checklist: app.checklist }),
       });
     } catch (e) { console.error(e); }
   };
