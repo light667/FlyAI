@@ -4,8 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Sparkles, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { supabase } from "@/lib/supabase";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  updateProfile,
+} from "firebase/auth";
+import { useRouter } from "next/navigation";
 
-// Inline Google logo (no lucide equivalent)
+// Inline Google logo
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
@@ -16,14 +25,6 @@ function GoogleIcon() {
     </svg>
   );
 }
-import { auth } from "@/lib/firebase";
-import {
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-  updateProfile,
-} from "firebase/auth";
-import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -34,6 +35,39 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const handleProfileCreation = async (user: any, nameStr: string) => {
+    try {
+      const localProfileRaw = localStorage.getItem("flyai_onboarding_profile");
+      if (localProfileRaw) {
+        const localProfile = JSON.parse(localProfileRaw);
+        const profileData = {
+          firebase_uid: user.uid,
+          full_name: nameStr || user.displayName || "Scholar",
+          country: localProfile.targetCountries?.[0] || localProfile.nationality || "",
+          nationality: localProfile.nationality || "",
+          education_level: localProfile.degreeLevel || "",
+          field_of_study: localProfile.fieldOfStudy || "",
+          university: "",
+          gpa: 3.5,
+          english_level: "intermediate",
+          french_level: "intermediate",
+          target_countries: localProfile.targetCountries || [],
+          target_fields: localProfile.fieldOfStudy ? [localProfile.fieldOfStudy] : [],
+          academic_goals: "Obtenir une bourse d'études internationale",
+        };
+
+        const { error } = await supabase.from("profiles").upsert(profileData, {
+          onConflict: "firebase_uid",
+        });
+
+        if (error) throw error;
+        localStorage.removeItem("flyai_onboarding_profile");
+      }
+    } catch (err) {
+      console.error("Error creating profile in Supabase on signup:", err);
+    }
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -41,6 +75,7 @@ export default function SignupPage() {
     try {
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(credential.user, { displayName: name });
+      await handleProfileCreation(credential.user, name);
       router.push("/onboarding");
     } catch (err: unknown) {
       const firebaseError = err as { message?: string };
@@ -55,7 +90,8 @@ export default function SignupPage() {
     setError("");
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const credential = await signInWithPopup(auth, provider);
+      await handleProfileCreation(credential.user, credential.user.displayName || "");
       router.push("/onboarding");
     } catch (err: unknown) {
       const firebaseError = err as { message?: string };
@@ -67,21 +103,18 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4">
-      {/* Ambient orbs */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute w-96 h-96 bg-violet-600/20 rounded-full blur-3xl -top-20 -left-20 animate-pulse" />
         <div className="absolute w-64 h-64 bg-indigo-600/15 rounded-full blur-3xl bottom-20 -right-16 animate-pulse" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <Image src="/logo.png" alt="FlyAI" width={48} height={48} className="rounded-xl mb-3" />
           <h1 className="text-2xl font-black text-white">Rejoins FlyAI</h1>
           <p className="text-slate-400 text-sm mt-1">Crée ton compte et découvre tes bourses</p>
         </div>
 
-        {/* Card */}
         <div className="glass-card p-8">
           {error && (
             <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
@@ -179,13 +212,13 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full py-3 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 text-slate-300 hover:text-white font-medium transition-all flex items-center justify-center gap-2 text-sm"
           >
-                        <GoogleIcon />
+            <GoogleIcon />
             Continuer avec Google
           </button>
 
           <p className="text-xs text-slate-500 text-center mt-4">
             En créant un compte, tu acceptes nos{" "}
-            <a href="#" className="text-indigo-400 hover:underline">conditions d&apos;utilisation</a>.
+            <Link href="/terms" className="text-indigo-400 hover:underline">conditions d&apos;utilisation</Link>.
           </p>
         </div>
 

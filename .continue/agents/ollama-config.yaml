@@ -1,0 +1,27 @@
+# Configuration locale optimisée pour Ollama
+name: Config Ollama Local
+version: 1.0.0
+schema: v1
+
+# Définition des modèles utilisés
+models:
+  - name: qwen2.5-coder 7b
+    provider: ollama
+    model: qwen2.5-coder:7b
+    roles:
+      - apply
+      - autocomplete
+      - chat
+      - edit
+    capabilities:
+      - tool_use
+
+{"name": "read_file", "arguments": {"filepath": "backend/server.js"}}
+{"name": "single_find_and_replace", "arguments": {"filepath": "backend/models/scholarship.js", "old_string": "// TODO: Integrate bourses and scholarships tables", "new_string": "const { createClient } = require('@supabase/supabase-js');\n\nconst supabaseUrl = process.env.SUPABASE_URL;\nconst supabaseAnonKey = process.env.SUPABASE_ANON_KEY;\n\nconst supabase = createClient(supabaseUrl, supabaseAnonKey);\n\n// Fetch bourses and scholarships from Supabase\nasync function fetchBourses() {\n  const { data: bourses, error } = await supabase.from('bourses').select('*');\n  if (error) throw error;\n  return bourses;\n}\n\nasync function fetchScholarships() {\n  const { data: scholarships, error } = await supabase.from('scholarships').select('*');\n  if (error) throw error;\n  return scholarships;\n}\n"}}
+{"name": "single_find_and_replace", "arguments": {"filepath": "backend/config/supabase.js", "old_string": "// TODO: Configure real-time communication with Supabase", "new_string": "const { createClient } = require('@supabase/supabase-js');\n\nconst supabaseUrl = process.env.SUPABASE_URL;\nconst supabaseAnonKey = process.env.SUPABASE_ANON_KEY;\n\nconst supabase = createClient(supabaseUrl, supabaseAnonKey);\n\n// Set up real-time communication with Supabase\nsupabase.on('postgres_changes', { channel: '*' }, payload => {\n  console.log('Change received:', payload.new);\n});\n"}}
+{"name": "read_file", "arguments": {"filepath": "backend/api/v1/index.js"}}
+{"name": "read_file", "arguments": {"filepath": "backend/services/matching.js"}}
+{"name": "create_new_file", "arguments": {"filepath": "next/public/designs/index.figma", "contents": "url: figma.com/file/..."}}
+{"name": "create_new_file", "arguments": {"filepath": "next/components/Button.js", "contents": "// TODO: Implement Button component\nimport React from 'react';\n\nconst Button = ({ children }) => {\n  return (\n    <button className='bg-blue-500 text-white px-4 py-2 rounded'>{children}</button>\n  );\n};\n\nexport default Button;\n"}}
+{"name": "edit_existing_file", "arguments": {"filepath": "next/pages/index.js", "changes": "// ... existing code ...\n\nimport Button from '../components/Button';\n\nconst Home = () => {\n  return (\n    <div>\n      <h1>Welcome to FlyAI</h1>\n      <Button>Get Started</Button>\n    </div>\n  );\n};\n\nexport default Home;\n// ... rest of code ..."}}
+

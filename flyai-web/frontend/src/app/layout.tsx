@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -7,13 +7,20 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
+// Instrument Serif n'existe qu'en weight 400 (normal + italique) sur Google Fonts.
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-instrument-serif",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "FlyAI",
-  description: "Découvre et postule aux meilleures bourses internationales avec l'aide de l'IA.",
+  title: "FlyAI — Plateforme Globale de Bourses & Matching IA",
+  description: "Découvre et postule aux meilleures bourses internationales avec l'aide de FlyAgent et du matching intelligent.",
   icons: {
-    icon: [
-      { url: "/logo.png", type: "image/png" },
-    ],
+    icon: "/logo.png",
     apple: "/logo.png",
     shortcut: "/logo.png",
   },
@@ -25,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable} h-full antialiased dark`}>
-      <body className="min-h-full flex flex-col bg-[#090d16] text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
+    <html lang="fr" className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-[#0A0F1C] text-slate-800 dark:text-slate-100 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
         {children}
       </body>
     </html>
