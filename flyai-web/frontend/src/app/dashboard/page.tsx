@@ -106,7 +106,7 @@ export default function Dashboard() {
     );
   }
 
-  const firstName = profile?.fullName?.split(" ")[0] || currentUser?.displayName?.split(" ")[0] || "Scholar";
+  const firstName = profile?.fullName?.split(" ")[0] || currentUser?.displayName?.split(" ")[0] || "Étudiant";
 
   return (
     <div className={`min-h-screen ${theme === "dark" ? "dark" : ""} bg-slate-50 dark:bg-[#0A0F1C] text-slate-800 dark:text-slate-100 flex flex-col md:flex-row font-sans overflow-hidden transition-colors duration-200`}>

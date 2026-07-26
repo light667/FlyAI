@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-[#0A0F1C] text-slate-800 dark:text-slate-100 font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+      <body className="min-h-full flex flex-col bg-[rgb(var(--background)] text-[rgb(var(--foreground))] font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
         {children}
       </body>
     </html>

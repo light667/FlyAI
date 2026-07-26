@@ -17,7 +17,7 @@ export async function GET(
       .single();
 
     if (error || !bourse) {
-      return NextResponse.json({ error: "Bourss non trouvée" }, { status: 404 });
+      return NextResponse.json({ error: "Bourse non trouvée" }, { status: 404 });
     }
 
     const defaultProfile = {

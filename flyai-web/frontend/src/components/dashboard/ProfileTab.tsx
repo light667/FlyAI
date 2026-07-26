@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function ProfileTab({ userId, profile, onProfileUpdated }: Props) {
-  const [fullName, setFullName] = useState(profile?.fullName || "Étudiant FlyAI");
+  const [fullName, setFullName] = useState(profile?.fullName || "");
   const [degreeLevel, setDegreeLevel] = useState(profile?.degreeLevel || "master");
   const [fieldOfStudy, setFieldOfStudy] = useState(profile?.fieldOfStudy || "Informatique");
   const [nationality, setNationality] = useState(profile?.nationality || "International");
@@ -27,7 +27,7 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
 
   useEffect(() => {
     if (profile) {
-      setFullName(profile.fullName || "Étudiant FlyAI");
+      setFullName(profile.fullName || "");
       setDegreeLevel(profile.degreeLevel || "master");
       setFieldOfStudy(profile.fieldOfStudy || "Informatique");
       setNationality(profile.nationality || "International");

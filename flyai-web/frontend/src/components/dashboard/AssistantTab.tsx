@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ChatMessage, ChatSession, UserProfile } from "@/types";
 import { Sparkles, Send, User as UserIcon, Plus, MessageSquare } from "lucide-react";
+import FormattedText from "@/components/FormattedText";
 
 interface Props {
   userId?: string;
@@ -351,7 +352,7 @@ export default function AssistantTab({ userId, userProfile }: Props) {
                       boxShadow: "var(--shadow-sm)",
                     }}
                   >
-                    {msg.content}
+                    <FormattedText content={msg.content} />
                   </div>
                 </div>
               );

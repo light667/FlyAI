@@ -25,8 +25,8 @@ class Profile(Base):
     sessions = relationship("ChatSession", back_populates="profile", cascade="all, delete-orphan")
 
 
-class Scholarship(Base):
-    __tablename__ = "scholarships"
+class Bourse(Base):
+    __tablename__ = "bourses"
 
     id = Column(String, primary key=True)
     title = Column(String, nullable=False)
@@ -46,8 +46,8 @@ class Scholarship(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
-    swipes = relationship("Swipe", back_populates="scholarship", cascade="all, delete-orphan")
-    applications = relationship("Application", back_populates="scholarship", cascade="all, delete-orphan")
+    swipes = relationship("Swipe", back_populates="bourse", cascade="all, delete-orphan")
+    applications = relationship("Application", back_populates="bourse", cascade="all, delete-orphan")
 
 
 class Swipe(Base):
@@ -55,13 +55,13 @@ class Swipe(Base):
 
     id = Column(UUID(as_uuid=True), primary key=True, default=uuid.uuid4)
     profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="cascade"), nullable=False)
-    scholarship_id = Column(String, ForeignKey("scholarships.id", ondelete="cascade"), nullable=False)
+    bourse_id = Column(String, ForeignKey("bourses.id", ondelete="cascade"), nullable=False)
     direction = Column(String, nullable=False)  # 'right' (like) | 'left' (skip)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
     profile = relationship("Profile", back_populates="swipes")
-    scholarship = relationship("Scholarship", back_populates="swipes")
+    bourse = relationship("Bourse", back_populates="swipes")
 
 
 class ChatSession(Base):
@@ -96,7 +96,7 @@ class Application(Base):
 
     id = Column(UUID(as_uuid=True), primary key=True, default=uuid.uuid4)
     profile_id = Column(UUID(as_uuid=True), ForeignKey("profiles.id", ondelete="cascade"), nullable=False)
-    scholarship_id = Column(String, ForeignKey("scholarships.id", ondelete="cascade"), nullable=False)
+    bourse_id = Column(String, ForeignKey("bourses.id", ondelete="cascade"), nullable=False)
     status = Column(String, default="draft")  # draft | in_progress | submitted | accepted | rejected
     progress = Column(Integer, default=0)
     checklist = Column(JSON, default=dict)  # {"CV": false, "Passport": false...}
@@ -104,4 +104,4 @@ class Application(Base):
 
     # Relationships
     profile = relationship("Profile", back_populates="applications")
-    scholarship = relationship("Scholarship", back_populates="applications")
+    bourse = relationship("Bourse", back_populates="applications")

@@ -18,6 +18,70 @@
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Migration pour ajouter avatar_url si la colonne n'existe pas
+ALTER TABLE IF EXISTS public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT DEFAULT '';
+
+-- Migration pour application_documents : changer le bucket et ajouter la colonne folder
+ALTER TABLE IF EXISTS public.application_documents ADD COLUMN IF NOT EXISTS folder TEXT DEFAULT '';
+ALTER TABLE IF EXISTS public.application_documents ALTER COLUMN bucket SET DEFAULT 'documents';
+
+-- Migration pour ajouter les colonnes manquantes à bourses (si la table existe déjà)
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS financement TEXT DEFAULT 'INCONNU';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS slug TEXT;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'flyai';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS sources TEXT[] DEFAULT '{}';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS sources_ids JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS deadline_raw TEXT DEFAULT '';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS date_publication TIMESTAMPTZ;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS annee INTEGER;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS universite TEXT;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS lieu_etude TEXT;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS montant_bourse TEXT;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS nb_bourses INTEGER;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS langues_requises TEXT[] DEFAULT '{}';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS nationalites_eligibles TEXT[] DEFAULT '{}';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS africains_eligibles BOOLEAN DEFAULT FALSE;
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS avantages TEXT[] DEFAULT '{}';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS couverture TEXT[] DEFAULT '{}';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS lien_candidature TEXT DEFAULT '';
+ALTER TABLE IF EXISTS public.bourses ADD COLUMN IF NOT EXISTS qualite_score INTEGER DEFAULT 0;
+
+-- Migration critique : renommer scholarship_id en bourse_id dans les tables existantes
+-- (pour compatibilité avec le nouveau schéma basé sur 'bourses' au lieu de 'scholarships')
+-- On vérifie d'abord si la colonne existe avant de la renommer
+DO $$
+BEGIN
+    -- Pour swipes
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'swipes' AND column_name = 'scholarship_id'
+    ) THEN
+        EXECUTE 'ALTER TABLE public.swipes RENAME COLUMN scholarship_id TO bourse_id';
+    END IF;
+    
+    -- Pour matches
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'matches' AND column_name = 'scholarship_id'
+    ) THEN
+        EXECUTE 'ALTER TABLE public.matches RENAME COLUMN scholarship_id TO bourse_id';
+    END IF;
+    
+    -- Pour applications
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'applications' AND column_name = 'scholarship_id'
+    ) THEN
+        EXECUTE 'ALTER TABLE public.applications RENAME COLUMN scholarship_id TO bourse_id';
+    END IF;
+END $$;
+
+-- Migration pour ajouter avatar_url si la colonne n'existe pas
+ALTER TABLE IF EXISTS public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT DEFAULT '';
+
+-- Note: La contrainte CHECK sur financement est déjà dans la définition de la table bourses
+-- Pas besoin de l'ajouter séparément car elle est incluse dans le CREATE TABLE
+
 -- 1. Profiles (clé = Firebase UID)
 CREATE TABLE IF NOT EXISTS public.profiles (
     firebase_uid   TEXT PRIMARY KEY,
@@ -43,27 +107,38 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     updated_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Bourses (catalogue — pas d'utilisateur)
+-- 2. Bourses (catalogue — pas d'utilisateur) - SCHEMA COMPATIBLE AVEC DONNEES EXISTANTES
 CREATE TABLE IF NOT EXISTS public.bourses (
     id TEXT PRIMARY KEY,
+    slug TEXT,
     titre TEXT NOT NULL,
     url TEXT UNIQUE NOT NULL,
+    source TEXT DEFAULT 'flyai',
+    sources TEXT[] DEFAULT '{}',
+    sources_ids JSONB DEFAULT '{}'::jsonb,
     deadline DATE,
     deadline_raw TEXT DEFAULT '',
+    date_publication TIMESTAMPTZ,
+    annee INTEGER,
+    universite TEXT,
     pays_destination TEXT[] DEFAULT '{}',
+    lieu_etude TEXT,
     niveau_etude TEXT[] DEFAULT '{}',
     financement TEXT DEFAULT 'INCONNU' CHECK (financement IN ('TOTAL', 'PARTIEL', 'INCONNU')),
+    montant_bourse TEXT,
+    nb_bourses INTEGER,
     domaines TEXT[] DEFAULT '{}',
     langues_requises TEXT[] DEFAULT '{}',
     nationalites_eligibles TEXT[] DEFAULT '{}',
+    africains_eligibles BOOLEAN DEFAULT FALSE,
     description TEXT DEFAULT '',
     avantages TEXT[] DEFAULT '{}',
     criteres TEXT[] DEFAULT '{}',
+    couverture TEXT[] DEFAULT '{}',
     lien_candidature TEXT DEFAULT '',
     image_url TEXT DEFAULT '',
-    date_publication TIMESTAMPTZ,
-    source TEXT DEFAULT 'flyai',
     active BOOLEAN DEFAULT TRUE,
+    qualite_score INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -113,6 +188,29 @@ CREATE TABLE IF NOT EXISTS public.applications (
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (firebase_uid, bourse_id)
 );
+
+-- 5b. Application Documents (for user-uploaded documents)
+CREATE TABLE IF NOT EXISTS public.application_documents (
+    id TEXT PRIMARY KEY,
+    firebase_uid TEXT NOT NULL,
+    file_name TEXT NOT NULL,
+    stored_name TEXT NOT NULL,
+    category TEXT NOT NULL,
+    file_size BIGINT NOT NULL,
+    mime_type TEXT NOT NULL,
+    file_extension TEXT DEFAULT '',
+    storage_path TEXT NOT NULL,
+    bucket TEXT DEFAULT 'documents',
+    folder TEXT DEFAULT '',
+    download_url TEXT DEFAULT '',
+    uploaded_at TIMESTAMPTZ DEFAULT NOW(),
+    status TEXT DEFAULT 'uploaded' CHECK (status IN ('uploaded', 'processing', 'error'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_application_documents_user ON public.application_documents (firebase_uid);
+CREATE INDEX IF NOT EXISTS idx_application_documents_category ON public.application_documents (category);
+CREATE INDEX IF NOT EXISTS idx_application_documents_folder ON public.application_documents (folder);
+CREATE INDEX IF NOT EXISTS idx_application_documents_uploaded ON public.application_documents (uploaded_at DESC);
 
 -- 6. Chat Sessions & Messages
 CREATE TABLE IF NOT EXISTS public.chat_sessions (
@@ -176,6 +274,7 @@ ALTER TABLE public.bourses          DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.swipes           DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.matches          DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.applications     DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.application_documents DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_sessions    DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_messages    DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.posts            DISABLE ROW LEVEL SECURITY;
@@ -183,13 +282,51 @@ ALTER TABLE public.post_likes       DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.direct_messages  DISABLE ROW LEVEL SECURITY;
 
 -- Realtime publications
-ALTER PUBLICATION supabase_realtime ADD TABLE public.posts;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.direct_messages;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.applications;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.swipes;
+-- On utilise un bloc DO avec EXCEPTION pour ignorer les erreurs si la table est déjà dans la publication
+-- (compatible avec toutes les versions de PostgreSQL/Supabase)
+DO $$
+BEGIN
+    BEGIN
+        EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.posts';
+    EXCEPTION WHEN duplicate_object THEN
+        -- Table déjà dans la publication, on ignore
+        RAISE NOTICE 'Table posts already in supabase_realtime publication';
+    END;
+    
+    BEGIN
+        EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.direct_messages';
+    EXCEPTION WHEN duplicate_object THEN
+        RAISE NOTICE 'Table direct_messages already in supabase_realtime publication';
+    END;
+    
+    BEGIN
+        EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.applications';
+    EXCEPTION WHEN duplicate_object THEN
+        RAISE NOTICE 'Table applications already in supabase_realtime publication';
+    END;
+    
+    BEGIN
+        EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.swipes';
+    EXCEPTION WHEN duplicate_object THEN
+        RAISE NOTICE 'Table swipes already in supabase_realtime publication';
+    END;
+    
+    BEGIN
+        EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE public.bourses';
+    EXCEPTION WHEN duplicate_object THEN
+        RAISE NOTICE 'Table bourses already in supabase_realtime publication';
+    END;
+END $$;
+
+-- Vue de compatibilité pour le nom 'scholarships' (si utilisé dans le code)
+-- D'abord, supprimer la vue scholarships si elle existe (pour éviter le conflit)
+DROP VIEW IF EXISTS public.scholarships CASCADE;
+
+-- Puis créer la vue qui pointe vers bourses
+CREATE OR REPLACE VIEW public.scholarships AS SELECT * FROM public.bourses;
 
 -- ═══════════════════════════════════════════════════════════════
--- Advanced Matching RPC Function (inchangée — ne touche qu'à `bourses`)
+-- Advanced Matching RPC Function (ne touche qu'à `bourses`)
 -- ═══════════════════════════════════════════════════════════════
 CREATE OR REPLACE FUNCTION match_bourses_advanced(
     p_niveau TEXT,
@@ -264,6 +401,78 @@ BEGIN
     AND (b.deadline IS NULL OR b.deadline >= CURRENT_DATE)
     ORDER BY score DESC, b.deadline ASC NULLS LAST
     LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ═══════════════════════════════════════════════════════════════
+-- RPC pour obtenir les documents d'un utilisateur
+-- ═══════════════════════════════════════════════════════════════
+CREATE OR REPLACE FUNCTION get_user_documents(p_firebase_uid TEXT)
+RETURNS TABLE (
+    id TEXT,
+    firebase_uid TEXT,
+    file_name TEXT,
+    stored_name TEXT,
+    category TEXT,
+    file_size BIGINT,
+    mime_type TEXT,
+    file_extension TEXT,
+    storage_path TEXT,
+    bucket TEXT,
+    folder TEXT,
+    download_url TEXT,
+    uploaded_at TIMESTAMPTZ,
+    status TEXT
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        id,
+        firebase_uid,
+        file_name,
+        stored_name,
+        category,
+        file_size,
+        mime_type,
+        file_extension,
+        storage_path,
+        bucket,
+        folder,
+        download_url,
+        uploaded_at,
+        status
+    FROM public.application_documents
+    WHERE firebase_uid = p_firebase_uid
+    ORDER BY uploaded_at DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ═══════════════════════════════════════════════════════════════
+-- RPC pour obtenir la photo de profil d'un utilisateur
+-- ═══════════════════════════════════════════════════════════════
+CREATE OR REPLACE FUNCTION get_profile_photo(p_firebase_uid TEXT)
+RETURNS TABLE (
+    id TEXT,
+    firebase_uid TEXT,
+    file_name TEXT,
+    stored_name TEXT,
+    download_url TEXT,
+    uploaded_at TIMESTAMPTZ
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        id,
+        firebase_uid,
+        file_name,
+        stored_name,
+        download_url,
+        uploaded_at
+    FROM public.application_documents
+    WHERE firebase_uid = p_firebase_uid
+    AND category = 'Photo d''identité'
+    ORDER BY uploaded_at DESC
+    LIMIT 1;
 END;
 $$ LANGUAGE plpgsql;
 

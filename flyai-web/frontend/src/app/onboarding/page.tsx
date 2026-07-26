@@ -162,7 +162,7 @@ export default function OnboardingPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userId: user.uid,
-            fullName: profile.fullName || user.displayName || "Etudiant FlyAI",
+            fullName: profile.fullName || user.displayName || "",
             degreeLevel: profile.degreeLevel,
             fieldOfStudy: profile.fieldOfStudy,
             nationality: profile.nationality,

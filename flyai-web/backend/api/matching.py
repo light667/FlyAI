@@ -36,20 +36,20 @@ def _supabase():
 
 class ScoreRequest(BaseModel):
     user_id: str
-    scholarship_id: str
+    bourse_id: str
     profile: dict[str, Any]
 
 
 class FeedbackRequest(BaseModel):
     user_id: str
-    scholarship_id: str
+    bourse_id: str
     score_id: Optional[str] = None
     feedback: str  # "up" | "down"
 
 
 class DossierRequest(BaseModel):
     user_id: str
-    scholarship_id: str
+    bourse_id: str
     profile: dict[str, Any]
 
 
@@ -65,17 +65,17 @@ async def compute_score(req: ScoreRequest) -> dict[str, Any]:
     """
     supabase = _supabase()
 
-    resp = supabase.table("bourses").select("*").eq("id", req.scholarship_id).single().execute()
+    resp = supabase.table("bourses").select("*").eq("id", req.bourse_id).single().execute()
     if not resp.data:
-        raise HTTPException(status_code=404, detail="Bourse introuvable")
+        raise HTTPException(status_code=404, detail="Bourse not found")
 
     scholarship = resp.data
     result = calculate_compatibility_score(req.profile, scholarship)
-    score_id = store_matching_score(req.user_id, req.scholarship_id, result)
+    score_id = store_matching_score(req.user_id, req.bourse_id, result)
 
     return {
         "score_id": score_id,
-        "scholarship_id": req.scholarship_id,
+        "bourse_id": req.bourse_id,
         "overall_score": result["overall_score"],
         "summary": result["summary"],
         "breakdown": result["breakdown"],
@@ -134,7 +134,7 @@ async def record_feedback(req: FeedbackRequest) -> dict[str, Any]:
     supabase = _supabase()
     row = {
         "user_id": req.user_id,
-        "scholarship_id": req.scholarship_id,
+        "bourse_id": req.bourse_id,
         "score_id": req.score_id,
         "feedback": req.feedback,
         "created_at": datetime.utcnow().isoformat(),
@@ -155,9 +155,9 @@ async def prepare_dossier(req: DossierRequest) -> dict[str, Any]:
     """
     supabase = _supabase()
 
-    resp = supabase.table("bourses").select("*").eq("id", req.scholarship_id).single().execute()
+    resp = supabase.table("bourses").select("*").eq("id", req.bourse_id).single().execute()
     if not resp.data:
-        raise HTTPException(status_code=404, detail="Bourse introuvable")
+        raise HTTPException(status_code=404, detail="Bourse not found")
 
     scholarship = resp.data
     checklist = generate_checklist(scholarship)
@@ -175,11 +175,11 @@ async def prepare_dossier(req: DossierRequest) -> dict[str, Any]:
     work_plan = generate_work_plan(scholarship, days_remaining)
 
     try:
-        app_resp = supabase.table("applications").select("id").eq("user_id", req.user_id).eq("bourse_id", req.scholarship_id).execute()
+        app_resp = supabase.table("applications").select("id").eq("user_id", req.user_id).eq("bourse_id", req.bourse_id).execute()
         if not app_resp.data:
             supabase.table("applications").insert({
                 "user_id": req.user_id,
-                "bourse_id": req.scholarship_id,
+                "bourse_id": req.bourse_id,
                 "status": "draft",
                 "checklist": {doc["type"]: False for doc in checklist},
             }).execute()
@@ -187,7 +187,7 @@ async def prepare_dossier(req: DossierRequest) -> dict[str, Any]:
         print(f"[matching_api] Could not create application: {e}")
 
     return {
-        "scholarship_id": req.scholarship_id,
+        "bourse_id": req.bourse_id,
         "scholarship_name": scholarship.get("titre") or scholarship.get("title"),
         "days_remaining": days_remaining,
         "deadline": deadline_str,

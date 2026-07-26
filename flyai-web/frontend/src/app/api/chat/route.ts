@@ -6,11 +6,67 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 /**
+ * Determine if a query requires web search
+ * This checks if the query is about scholarships, deadlines, or information that might not be in the database
+ */
+function shouldSearchWeb(query: string, availableScholarships: any[] = []): boolean {
+  const queryLower = query.toLowerCase();
+
+  // Keywords that indicate a need for web search
+  const webSearchKeywords = [
+    "deadline",
+    "date limite",
+    "date de clôture",
+    "montant",
+    "amount",
+    "financement",
+    "funding",
+    "critères",
+    "criteria",
+    "conditions",
+    "éligibilité",
+    "eligibility",
+    "requis",
+    "required",
+    "documents nécessaires",
+    "required documents",
+    "comment postuler",
+    "how to apply",
+    "application procedure",
+    "procédure de candidature",
+    "dernières informations",
+    "latest information",
+    "mettre à jour",
+    "update",
+    "nouveauté",
+    "news",
+    "actualité",
+    "2026",
+    "2025",
+  ];
+
+  // Check if query contains web search keywords
+  const hasWebSearchKeyword = webSearchKeywords.some((kw) => queryLower.includes(kw));
+  
+  // Also check if query mentions a scholarship that might not be in our database
+  const scholarshipNames = availableScholarships.map((s) => s.titre?.toLowerCase() || "");
+  const mentionsKnownScholarship = scholarshipNames.some((name) => queryLower.includes(name));
+
+  // Search if query contains keywords or mentions unknown scholarships
+  return hasWebSearchKeyword || !mentionsKnownScholarship;
+}
+
+/**
  * System prompt FlyAgent — §8.1
  * Mentor académique exigeant et bienveillant. Vouvoiement. Zéro compliments gratuits.
  * Zéro emojis dans les messages système. Orienté action concrète.
  */
-function buildSystemPrompt(userProfile?: any, scholarshipContext?: any[]): string {
+function buildSystemPrompt(userProfile?: any, scholarshipContext?: any[], webSearchResults?: any[], webSources?: string[]): string {
+  // Build web search context if available
+  const webContext = webSearchResults && webSearchResults.length > 0
+    ? `\n\nCONTEXTE WEB (informations récentes vérifiées) :\n${webSearchResults.map((r: any) => `- Source: ${r.url || r.title}\n  Contenu: ${r.content || r.snippet || ''}`).join('\n\n')}\n\nSOURCES À CITER : ${webSources?.join(', ') || ''}`
+    : '';
+
   return `Tu es FlyAgent, le copilote de candidature de FlyAI.
 
 Ta mission : aider l'utilisateur à préparer son dossier de candidature aux bourses d'études internationales, de la sélection de la bourse jusqu'à la soumission du dossier complet.
@@ -24,6 +80,7 @@ PERSONNALITÉ ET TON — non négociables :
 - Si l'information manque pour répondre précisément, poser une question de clarification ciblée plutôt que de produire une réponse générique.
 - Chaque réponse doit se terminer par une action concrète proposée ou une question de clarification.
 - Utiliser "score de compatibilité" ou "niveau d'adéquation" — jamais "probabilité d'admission" ni "chances d'être pris".
+- Si vous utilisez des informations provenants de la recherche web, mentionnez explicitement : "Selon les informations vérifiées en ligne sur [source]..."
 
 DOMAINES DE COMPÉTENCE :
 - Stratégies de candidature : Eiffel, Erasmus Mundus, DAAD, Chevening, Fulbright, et autres bourses internationales.
@@ -36,7 +93,7 @@ PROFIL DE L'UTILISATEUR :
 ${userProfile ? JSON.stringify(userProfile, null, 2) : "Profil non renseigné — demander les informations manquantes si nécessaire."}
 
 BOURSES ACTUELLEMENT DISPONIBLES (contexte) :
-${scholarshipContext && scholarshipContext.length > 0 ? JSON.stringify(scholarshipContext.slice(0, 5), null, 2) : "Aucun contexte de bourse disponible."}`;
+${scholarshipContext && scholarshipContext.length > 0 ? JSON.stringify(scholarshipContext.slice(0, 5), null, 2) : "Aucun contexte de bourse disponible."}${webContext}`;
 }
 
 async function callGroq(
@@ -154,8 +211,31 @@ export async function POST(req: NextRequest) {
       topBourses = data || [];
     }
 
-    // 5. Générer la réponse : Groq → Gemini → fallback factuel §8.1
-    const systemPrompt = buildSystemPrompt(userProfile, topBourses);
+    // 5. Recherche web si nécessaire §4.2
+    let webSearchResults: any[] = [];
+    let webSources: string[] = [];
+    const needsWebSearch = shouldSearchWeb(message, topBourses);
+
+    if (needsWebSearch) {
+      try {
+        // Call web search API
+        const searchRes = await fetch("http://localhost:3000/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: message, userId }),
+        });
+        const searchData = await searchRes.json();
+        if (searchData.success) {
+          webSearchResults = searchData.results || [];
+          webSources = searchData.sources || [];
+        }
+      } catch (searchError) {
+        console.log("Web search failed, continuing without it:", searchError);
+      }
+    }
+
+    // 5b. Construire le prompt avec les résultats de recherche
+    const systemPrompt = buildSystemPrompt(userProfile, topBourses, webSearchResults, webSources);
     let reply =
       (await callGroq(systemPrompt, history, message)) ||
       (await callGemini(systemPrompt, message));

@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         data: {
           id: userId,
-          fullName: "Étudiant FlyAI",
+          fullName: "",
           email: "",
           degreeLevel: "master",
           fieldOfStudy: "Informatique",
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
           budgetMax: 15000,
           gpa: 3.5,
           languages: { english: "B2", french: "C1" },
-          skills: ["Python", "Machine Learning", "Analyse de Données"],
+          skills: [],
         },
       });
     }
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       data: {
         id: profile.firebase_uid,
-        fullName: profile.full_name || "Étudiant FlyAI",
+        fullName: profile.full_name || "",
         email: profile.email || "",
         degreeLevel: profile.education_level || "master",
         fieldOfStudy: profile.field_of_study || "Informatique",
@@ -108,17 +108,9 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error("Error upserting profile:", error);
       return NextResponse.json({
-        success: true,
-        data: {
-          id: userId,
-          fullName: profileData.full_name,
-          degreeLevel: profileData.education_level,
-          fieldOfStudy: profileData.field_of_study,
-          nationality: profileData.nationality,
-          targetCountries: profileData.target_countries,
-          gpa: profileData.gpa,
-        },
-      });
+        success: false,
+        error: error.message,
+      }, { status: 500 });
     }
 
     return NextResponse.json({

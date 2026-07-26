@@ -5,25 +5,20 @@
    §7.3 : source unique, aucune valeur hardcodée dans les composants
    ═══════════════════════════════════════════════════════════════════ */
 @theme {
-  /* Couleurs */
+  /* Theme based on CSS variables - light mode (white + blue) */
+  --color-background: rgb(var(--background, 255 255 255));
+  --color-foreground: rgb(var(--foreground, 0 0 0));
+  --color-primary: rgb(var(--primary, 0 102 255));
+  --color-secondary: rgb(var(--secondary, 245 245 245));
+  --color-border: rgb(var(--border, 224 224 224));
+  --color-text: rgb(var(--text, 51 51 51));
+  --color-text-muted: rgb(var(--text-muted, 102 102 102));
+  
+  /* Keep existing colors for backward compatibility */
   --color-ink-900: #0f1a2e;
-  --color-ink-800: #162236;
-  --color-ink-700: #1e3a5f;
-  --color-ink-600: #254b7a;
-  --color-ink-text: #1a2332;
-  --color-ink-muted: #4a5568;
-  --color-ink-subtle: #718096;
   --color-warm-50: #faf8f5;
-  --color-warm-100: #f0ede8;
-  --color-warm-200: #e5e0d8;
-  --color-warm-300: #d4ccbf;
-  --color-accent: #0f7b6c;
-  --color-accent-hover: #0a6459;
-  --color-accent-light: #e6f4f1;
+  --color-accent: #0066ff;
   --color-alert: #c84b31;
-  --color-alert-light: #fdf0ed;
-  --color-border: #d4ccbf;
-  --color-border-subtle: #e5e0d8;
 
   /* Typographie — branchée sur les variables next/font (cf. layout.tsx) */
   --font-display: var(--font-instrument-serif), Georgia, serif;
@@ -40,15 +35,47 @@
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Dark mode theme - black + blue */
+html.dark {
+  @theme {
+    --color-background: rgb(var(--background, 0 0 0));
+    --color-foreground: rgb(var(--foreground, 255 255 255));
+    --color-primary: rgb(var(--primary, 0 102 255));
+    --color-secondary: rgb(var(--secondary, 17 17 17));
+    --color-border: rgb(var(--border, 51 51 51));
+    --color-text: rgb(var(--text, 204 204 204));
+    --color-text-muted: rgb(var(--text-muted, 136 136 136));
+  }
+}
 
 /* ═══════════════════════════════════════════════════════════════════
-   DESIGN TOKENS FLYAI — §7.3
-   Source of truth pour toutes les valeurs visuelles.
-   Aucun composant ne doit utiliser de valeur hors de ce fichier.
+   THEME FLYAI - Mode clair (blanc + bleu) par defaut, Mode sombre (noir + bleu)
    ═══════════════════════════════════════════════════════════════════ */
 
+/* Theme variables for light mode (white + blue) */
 :root {
-  /* Couleur dominante — navy institutionnel */
+  --background: 210 210 210;
+  --foreground: 30 30 30;
+  --primary: 0 102 255;
+  --secondary: 245 245 245;
+  --border: 224 224 224;
+  --text: 51 51 51;
+  --text-muted: 102 102 102;
+}
+
+/* Theme variables for dark mode (black + blue) */
+html.dark {
+  --background: 0 0 0;
+  --foreground: 255 255 255;
+  --primary: 0 102 255;
+  --secondary: 17 17 17;
+  --border: 51 51 51;
+  --text: 204 204 204;
+  --text-muted: 136 136 136;
+}
+
+/* Couleur dominante — navy institutionnel */
+:root {
   --ink-900: #0f1a2e;
   --ink-800: #162236;
   --ink-700: #1e3a5f;

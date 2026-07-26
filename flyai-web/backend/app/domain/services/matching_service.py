@@ -260,10 +260,10 @@ def get_top_scholarships(
 
     # Récupérer toutes les bourses actives
     resp = supabase.table("bourses").select("*").eq("active", True).execute()
-    scholarships = resp.data or []
+    bourses = resp.data or []
 
     scored = []
-    for sch in scholarships:
+    for sch in bourses:
         result = calculate_compatibility_score(profile, sch)
         score_id = store_matching_score(user_id, sch.get("id", ""), result)
         scored.append({

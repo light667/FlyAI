@@ -12,7 +12,7 @@ interface BreakdownItem {
 }
 
 interface Props {
-  scholarshipId: string;
+  bourseId: string;
   userId?: string;
   profile?: any;
   /** Si passé directement (ex: depuis DiscoverTab), pas de fetch */
@@ -29,7 +29,7 @@ interface Props {
  * Terminologie imposée : "Score de compatibilité", jamais "Probabilité d'admission".
  * Feedback utilisateur (pouce haut/bas) → table matching_feedback §10.2.
  */
-export default function CompatibilityScore({ scholarshipId, userId, profile, precomputed }: Props) {
+export default function CompatibilityScore({ bourseId, userId, profile, precomputed }: Props) {
   const [data, setData] = useState(precomputed || null);
   const [loading, setLoading] = useState(!precomputed);
   const [showBreakdown, setShowBreakdown] = useState(false);
@@ -37,13 +37,13 @@ export default function CompatibilityScore({ scholarshipId, userId, profile, pre
   const [scoreId, setScoreId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (precomputed || !scholarshipId || !userId) return;
+    if (precomputed || !bourseId || !userId) return;
 
     setLoading(true);
     fetch("/api/matching/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId, scholarship_id: scholarshipId, profile: profile || {} }),
+      body: JSON.stringify({ user_id: userId, bourse_id: bourseId, profile: profile || {} }),
     })
       .then((r) => r.json())
       .then((json) => {
@@ -63,7 +63,7 @@ export default function CompatibilityScore({ scholarshipId, userId, profile, pre
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: userId,
-          scholarship_id: scholarshipId,
+          bourse_id: bourseId,
           score_id: scoreId,
           feedback: type,
         }),
