@@ -15,32 +15,36 @@ function ChecklistItem({ item, index }: ChecklistItemProps) {
   const [completed, setCompleted] = useState(item.completed || false);
   
   return (
-    <div className={`flex items-center gap-3 p-3.5 rounded-2xl border transition-all ${
-      completed 
-        ? 'bg-emerald-500/10 border-emerald-500/20' 
-        : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 hover:border-indigo-500'
-    }`}>
+    <div style={{
+      display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "var(--space-3.5)", borderRadius: "var(--radius-xl)", border: "1px solid", transition: "all var(--transition-base)",
+      background: completed ? "var(--success-light)" : "var(--warm-50)",
+      borderColor: completed ? "var(--success-200)" : "var(--border)",
+      cursor: "pointer"
+    }} onMouseEnter={(e) => { if (!completed) (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)"; }}
+      onMouseLeave={(e) => { if (!completed) (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; }}
+    >
       <button 
         onClick={() => setCompleted(!completed)}
-        className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all ${
-          completed 
-            ? 'bg-emerald-500 text-white' 
-            : 'bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600'
-        }`}
+        style={{
+          width: "20px", height: "20px", borderRadius: "var(--radius-full)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all var(--transition-base)",
+          background: completed ? "var(--success)" : "var(--warm-100)",
+          color: completed ? "var(--accent-text)" : "var(--ink-muted)",
+          border: completed ? "none" : "2px solid var(--border)"
+        }}
       >
-        {completed ? <CheckCircle2 className="w-3.5 h-3.5" /> : <div className="w-3.5 h-3.5" />}
+        {completed ? <CheckCircle2 style={{ width: "14px", height: "14px", color: "var(--accent-text)" }} /> : <div style={{ width: "14px", height: "14px" }} />}
       </button>
-      <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-xs text-slate-900 dark:text-white">{item.label}</h4>
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{item.description}</p>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ fontWeight: 600, fontSize: "var(--text-caption)", color: "var(--ink-text)", margin: 0 }}>{item.label}</h4>
+        <p style={{ fontSize: "11px", color: "var(--ink-muted)", marginTop: "4px" }}>{item.description}</p>
         {item.estimatedTime && (
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 flex items-center gap-1">
-            <Clock className="w-3 h-3" /> {item.estimatedTime}
+          <p style={{ fontSize: "10px", color: "var(--ink-subtle)", marginTop: "4px", display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
+            <Clock style={{ width: "12px", height: "12px", color: "var(--ink-subtle)" }} /> {item.estimatedTime}
           </p>
         )}
       </div>
       {item.required && (
-        <span className="text-[10px] font-black text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full uppercase">Requis</span>
+        <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--alert)", background: "var(--alert-light)", padding: "2px 8px", borderRadius: "var(--radius-full)", textTransform: "uppercase" }}>Requis</span>
       )}
     </div>
   );
@@ -77,9 +81,9 @@ function ChecklistItems({ scholarship, userProfile }: { scholarship: any; userPr
 
   if (loading) {
     return (
-      <div className="p-8 text-center">
-        <Sparkles className="w-6 h-6 text-indigo-500 animate-spin mx-auto" />
-        <p className="text-xs text-slate-400 mt-2">Génération de la checklist...</p>
+      <div style={{ padding: "var(--space-8)", textAlign: "center" }}>
+        <Sparkles style={{ width: "24px", height: "24px", color: "var(--accent)", margin: "0 auto", animation: "spin 1s linear infinite" }} />
+        <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: "var(--space-2)" }}>Génération de la checklist...</p>
       </div>
     );
   }
@@ -232,29 +236,29 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+    <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-4)", background: "rgba(15, 26, 46, 0.6)", backdropFilter: "blur(8px)" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: "1200px", maxHeight: "90vh", height: "90vh", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-xl)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
         {/* Header */}
-        <div className="p-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center font-bold">
-              <Bot className="w-6 h-6" />
+        <div style={{ padding: "var(--space-6)", background: "var(--gradient-accent)", color: "var(--accent-text)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+            <div style={{ width: "40px", height: "40px", borderRadius: "var(--radius-xl)", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>
+              <Bot style={{ width: "24px", height: "24px" }} />
             </div>
             <div>
-              <span className="text-xs uppercase font-bold text-indigo-200 tracking-wider">
+              <span style={{ fontSize: "var(--text-caption)", fontWeight: 700, textTransform: "uppercase", color: "rgba(255, 255, 255, 0.8)", letterSpacing: "0.04em" }}>
                 FlyAgent Application Assistant
               </span>
-              <h2 className="text-xl font-extrabold line-clamp-1">{scholarship.titre}</h2>
+              <h2 style={{ fontSize: "var(--text-h1)", fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{scholarship.titre}</h2>
             </div>
           </div>
 
-          <button onClick={onClose} className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} style={{ padding: "8px", borderRadius: "var(--radius-full)", background: "rgba(255, 255, 255, 0.1)", color: "var(--accent-text)", cursor: "pointer", transition: "all var(--transition-base)" }} onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255, 255, 255, 0.2)"; }} onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255, 255, 255, 0.1)"; }}>
+            <X style={{ width: "20px", height: "20px" }} />
           </button>
         </div>
 
         {/* Navigation Sub-Tabs */}
-        <div className="flex border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/50 px-6 pt-3 gap-4">
+        <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--warm-100)", paddingLeft: "var(--space-6)", paddingTop: "var(--space-3)", gap: "var(--space-4)", paddingRight: "var(--space-6)" }}>
           {[
             { id: "plan", label: "Plan d'Action IA", icon: Sparkles },
             { id: "letter", label: "Lettre de Motivation IA", icon: FileText },
@@ -266,13 +270,15 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 pb-3 text-xs font-extrabold border-b-2 transition-all ${
-                  active
-                    ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
-                    : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                }`}
+                style={{
+                  display: "flex", alignItems: "center", gap: "var(--space-2)", paddingBottom: "var(--space-3)", fontSize: "var(--text-caption)", fontWeight: 700, borderBottom: "2px solid", transition: "all var(--transition-base)",
+                  borderBottomColor: active ? "var(--accent)" : "transparent",
+                  color: active ? "var(--accent)" : "var(--ink-muted)"
+                }}
+                onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-text)"; }}
+                onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-muted)"; }}
               >
-                <Icon className="w-4 h-4" />
+                <Icon style={{ width: "16px", height: "16px", color: active ? "var(--accent)" : "var(--ink-subtle)" }} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -280,21 +286,21 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 p-6 overflow-y-auto space-y-6 custom-scrollbar text-slate-800 dark:text-slate-200">
+        <div style={{ flex: 1, padding: "var(--space-6)", overflowY: "auto", display: "flex", flexDirection: "column", gap: "var(--space-6)", color: "var(--ink-text)" }}>
           {loading ? (
-            <div className="p-12 text-center space-y-3">
-              <Sparkles className="w-8 h-8 text-indigo-500 animate-spin mx-auto" />
-              <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+            <div style={{ padding: "var(--space-12)", textAlign: "center", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+              <Sparkles style={{ width: "32px", height: "32px", color: "var(--accent)", margin: "0 auto", animation: "spin 1s linear infinite" }} />
+              <p style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)" }}>
                 FlyAgent analyse les critères de la bourse et prépare ton plan personnalisé...
               </p>
             </div>
           ) : (
             <>
               {activeTab === "plan" && (
-                <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-500/20 flex items-center gap-3">
-                    <ShieldCheck className="w-5 h-5 text-indigo-600 shrink-0" />
-                    <p className="text-xs text-indigo-900 dark:text-indigo-200">
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+                  <div style={{ padding: "var(--space-4)", borderRadius: "var(--radius-xl)", background: "var(--accent-50)", border: "1px solid var(--accent-200)", display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+                    <ShieldCheck style={{ width: "20px", height: "20px", color: "var(--accent)", flexShrink: 0 }} />
+                    <p style={{ fontSize: "var(--text-caption)", color: "var(--accent)" }}>
                       Ce plan personnalisé a été conçu selon les exigences spécifiques de <strong>{scholarship.titre}</strong> et ton profil académique.
                     </p>
                   </div>
@@ -303,14 +309,15 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
               )}
 
               {activeTab === "letter" && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-slate-900 dark:text-white">Brouillon de Lettre Généré par FlyAgent</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <h3 style={{ fontWeight: 700, fontSize: "var(--text-body)", color: "var(--ink-text)" }}>Brouillon de Lettre Généré par FlyAgent</h3>
                     <button
                       onClick={handleCopyLetter}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold shadow-md hover:bg-indigo-500 transition-all"
+                      className="btn-primary"
+                      style={{ padding: "var(--space-1.5) var(--space-3)", borderRadius: "var(--radius-xl)", fontWeight: 700, fontSize: "var(--text-caption)", boxShadow: "var(--shadow-md)" }}
                     >
-                      <Copy className="w-3.5 h-3.5" />
+                      <Copy style={{ width: "14px", height: "14px" }} />
                       <span>{copied ? "Copié !" : "Copier le texte"}</span>
                     </button>
                   </div>
@@ -319,16 +326,16 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
                     rows={12}
                     value={motivationLetter}
                     onChange={(e) => setMotivationLetter(e.target.value)}
-                    className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs leading-relaxed outline-none focus:border-indigo-500 font-mono"
+                    style={{ width: "100%", padding: "var(--space-4)", borderRadius: "var(--radius-xl)", background: "var(--warm-100)", border: "1px solid var(--border)", fontSize: "var(--text-caption)", lineHeight: 1.65, outline: "none", fontFamily: "monospace" }}
                   />
                 </div>
               )}
 
               {activeTab === "checklist" && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-slate-900 dark:text-white">Checklist des Documents pour {scholarship?.titre}</h3>
-                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-full">
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <h3 style={{ fontWeight: 700, fontSize: "var(--text-body)", color: "var(--ink-text)" }}>Checklist des Documents pour {scholarship?.titre}</h3>
+                    <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--success)", background: "var(--success-light)", padding: "4px 8px", borderRadius: "var(--radius-full)" }}>
                       {plan.includes('%') ? plan.match(/\d+%/)?.[0] : '0%'}
                     </span>
                   </div>
@@ -340,9 +347,9 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950 flex justify-between items-center">
-          <span className="text-xs text-slate-500">Ajouté automatiquement à tes candidatures</span>
-          <button onClick={onClose} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">
+        <div style={{ padding: "var(--space-4)", borderTop: "1px solid var(--border)", background: "var(--warm-100)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)" }}>Ajouté automatiquement à tes candidatures</span>
+          <button onClick={onClose} className="btn-primary" style={{ padding: "var(--space-2.5) var(--space-6)", borderRadius: "var(--radius-xl)", fontWeight: 700, fontSize: "var(--text-caption)" }}>
             Terminer & Fermer
           </button>
         </div>

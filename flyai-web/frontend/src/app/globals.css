@@ -1,161 +1,251 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════
-   TAILWIND v4 @theme — Design tokens exposés comme classes utilitaires
-   §7.3 : source unique, aucune valeur hardcodée dans les composants
+   FLYAI THEME SYSTEM - Unified Design Tokens
+   Light mode: Warm white backgrounds + Green accent + Navy text
+   Dark mode: Deep navy backgrounds + Green accent + Light text
    ═══════════════════════════════════════════════════════════════════ */
-@theme {
-  /* Theme based on CSS variables - light mode (white + blue) */
-  --color-background: rgb(var(--background, 255 255 255));
-  --color-foreground: rgb(var(--foreground, 0 0 0));
-  --color-primary: rgb(var(--primary, 0 102 255));
-  --color-secondary: rgb(var(--secondary, 245 245 245));
-  --color-border: rgb(var(--border, 224 224 224));
-  --color-text: rgb(var(--text, 51 51 51));
-  --color-text-muted: rgb(var(--text-muted, 102 102 102));
-  
-  /* Keep existing colors for backward compatibility */
-  --color-ink-900: #0f1a2e;
-  --color-warm-50: #faf8f5;
-  --color-accent: #0066ff;
-  --color-alert: #c84b31;
 
-  /* Typographie — branchée sur les variables next/font (cf. layout.tsx) */
+/* Tailwind v4 Theme Configuration */
+@theme {
+  /* Light mode colors */
+  --color-background: rgb(var(--background, 250 248 245));
+  --color-foreground: rgb(var(--foreground, 15 26 46));
+  --color-primary: rgb(var(--primary, 15 123 108));
+  --color-primary-light: rgb(var(--primary-light, 230 244 241));
+  --color-secondary: rgb(var(--secondary, 245 245 245));
+  --color-border: rgb(var(--border, 217 212 198));
+  --color-text: rgb(var(--text, 42 53 84));
+  --color-text-muted: rgb(var(--text-muted, 100 116 139));
+  
+  /* Accent colors */
+  --color-accent: #0f7b6c;
+  --color-accent-hover: #0a6459;
+  --color-accent-light: #e6f4f1;
+  --color-alert: #c84b31;
+  --color-alert-light: #fdf0ed;
+  
+  /* Typography */
   --font-display: var(--font-instrument-serif), Georgia, serif;
   --font-body: var(--font-sans), system-ui, -apple-system, sans-serif;
 
-  /* Radius §7.2 — une seule valeur de référence */
-  --radius-flyai: 5px;
-  --radius-flyai-sm: 3px;
-  --radius-flyai-lg: 8px;
+  /* Radius */
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
 
-  /* Transitions §7.4 */
+  /* Transitions */
   --transition-base: 200ms ease;
   --transition-valued: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(15, 26, 46, 0.08);
+  --shadow-md: 0 4px 12px rgba(15, 26, 46, 0.10);
+  --shadow-lg: 0 8px 24px rgba(15, 26, 46, 0.12);
+  --shadow-xl: 0 16px 40px rgba(15, 26, 46, 0.15);
 }
 
-/* Dark mode theme - black + blue */
+/* Dark mode theme */
 html.dark {
   @theme {
-    --color-background: rgb(var(--background, 0 0 0));
-    --color-foreground: rgb(var(--foreground, 255 255 255));
-    --color-primary: rgb(var(--primary, 0 102 255));
-    --color-secondary: rgb(var(--secondary, 17 17 17));
-    --color-border: rgb(var(--border, 51 51 51));
-    --color-text: rgb(var(--text, 204 204 204));
-    --color-text-muted: rgb(var(--text-muted, 136 136 136));
+    --color-background: rgb(var(--background, 10 15 28));
+    --color-foreground: rgb(var(--foreground, 248 250 252));
+    --color-primary: rgb(var(--primary, 15 123 108));
+    --color-primary-light: rgb(var(--primary-light, 15 123 108) / 0.1);
+    --color-secondary: rgb(var(--secondary, 17 24 39));
+    --color-border: rgb(var(--border, 51 65 85));
+    --color-text: rgb(var(--text, 224 231 255));
+    --color-text-muted: rgb(var(--text-muted, 148 163 184));
+    
+    --color-accent: #0f7b6c;
+    --color-accent-hover: #0a6459;
+    --color-accent-light: rgba(15, 123, 108, 0.1);
+    
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.30);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.40);
+    --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.50);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   THEME FLYAI - Mode clair (blanc + bleu) par defaut, Mode sombre (noir + bleu)
+   CSS CUSTOM PROPERTIES - Single Source of Truth
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Theme variables for light mode (white + blue) */
+/* Light Mode - Default */
 :root {
-  --background: 210 210 210;
-  --foreground: 30 30 30;
-  --primary: 0 102 255;
+  /* Background colors */
+  --background: 250 248 245;
+  --foreground: 15 26 46;
+  --primary: 15 123 108;
+  --primary-light: 230 244 241;
   --secondary: 245 245 245;
-  --border: 224 224 224;
-  --text: 51 51 51;
-  --text-muted: 102 102 102;
-}
-
-/* Theme variables for dark mode (black + blue) */
-html.dark {
-  --background: 0 0 0;
-  --foreground: 255 255 255;
-  --primary: 0 102 255;
-  --secondary: 17 17 17;
-  --border: 51 51 51;
-  --text: 204 204 204;
-  --text-muted: 136 136 136;
-}
-
-/* Couleur dominante — navy institutionnel */
-:root {
+  --border: 217 212 198;
+  --text: 42 53 84;
+  --text-muted: 100 116 139;
+  
+  /* Ink colors - Typography */
   --ink-900: #0f1a2e;
   --ink-800: #162236;
   --ink-700: #1e3a5f;
   --ink-600: #254b7a;
-
-  /* Texte — jamais noir pur */
   --ink-text: #1a2332;
   --ink-muted: #4a5568;
   --ink-subtle: #718096;
-
-  /* Surfaces — blanc cassé chaud (80% des surfaces) */
+  
+  /* Surface colors */
   --warm-50: #faf8f5;
   --warm-100: #f0ede8;
   --warm-200: #e5e0d8;
   --warm-300: #d4ccbf;
-
-  /* Accent — vert forêt sobre (CTA et succès uniquement) */
+  --warm-400: #c4b8a8;
+  
+  /* Accent colors - Green */
   --accent: #0f7b6c;
   --accent-hover: #0a6459;
   --accent-light: #e6f4f1;
   --accent-text: #ffffff;
-
-  /* Alerte — rouge terracotta (deadlines critiques et erreurs uniquement) */
+  --accent-50: #f0f7f6;
+  --accent-100: #e6f4f1;
+  --accent-200: #cce9e4;
+  --accent-300: #a5d8d0;
+  
+  /* Alert colors - Red/Amber */
   --alert: #c84b31;
   --alert-hover: #a83d27;
   --alert-light: #fdf0ed;
-
-  /* Bordures */
+  --warning: #d97706;
+  --warning-light: #fffbeb;
+  --success: #059669;
+  --success-light: #d1fae5;
+  --info: #0284c7;
+  --info-light: #dbeafe;
+  
+  /* Border colors */
   --border: #d4ccbf;
   --border-subtle: #e5e0d8;
-
-  /* Géométrie — §7.2 radius cohérent et faible */
-  --radius: 5px;
-  --radius-sm: 3px;
-  --radius-lg: 8px;
-
-  /* Transitions — §7.4 valeurs explicites */
+  --border-strong: #94a3b8;
+  
+  /* Geometry */
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
   --transition-base: 200ms ease;
   --transition-valued: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
   --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Typographie — §7.2 hiérarchie stricte 4 paliers */
+  
+  /* Typography */
   --font-display: var(--font-instrument-serif), Georgia, serif;
   --font-body: var(--font-sans), system-ui, -apple-system, sans-serif;
-  --text-h1: 2rem;       /* 32px */
-  --text-h2: 1.25rem;    /* 20px */
-  --text-body: 0.875rem; /* 14px */
-  --text-caption: 0.6875rem; /* 11px */
-
-  /* Espacement — multiples de 4px */
+  --text-xs: 0.6875rem;
+  --text-sm: 0.75rem;
+  --text-body: 0.875rem;
+  --text-caption: 0.6875rem;
+  --text-h3: 1rem;
+  --text-h2: 1.25rem;
+  --text-h1: 2rem;
+  --text-display: 2.5rem;
+  
+  /* Spacing */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
-
-  /* Ombres institutionnelles (jamais colorées) */
+  --space-10: 40px;
+  --space-12: 48px;
+  
+  /* Shadows */
   --shadow-sm: 0 1px 3px rgba(15, 26, 46, 0.08);
   --shadow-md: 0 4px 12px rgba(15, 26, 46, 0.10);
   --shadow-lg: 0 8px 24px rgba(15, 26, 46, 0.12);
+  --shadow-xl: 0 16px 40px rgba(15, 26, 46, 0.15);
+  
+  /* Glass effect */
+  --glass-bg: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  
+  /* Gradient backgrounds */
+  --gradient-accent: linear-gradient(135deg, #0f7b6c 0%, #0a6459 100%);
+  --gradient-warm: linear-gradient(135deg, #faf8f5 0%, #f0ede8 100%);
 }
 
-/* Mode sombre conservé — palette adaptée */
+/* Dark Mode */
 html.dark {
+  /* Background colors */
+  --background: 10 15 28;
+  --foreground: 248 250 252;
+  --primary: 15 123 108;
+  --primary-light: 15 123 108 / 0.1;
+  --secondary: 17 24 39;
+  --border: 51 65 85;
+  --text: 224 231 255;
+  --text-muted: 148 163 184;
+  
+  /* Ink colors - Typography */
   --ink-900: #0a0f1c;
   --ink-800: #111827;
   --ink-700: #1e2d45;
   --ink-text: #e8e4dc;
   --ink-muted: #94a3b8;
   --ink-subtle: #64748b;
+  
+  /* Surface colors */
   --warm-50: #111827;
   --warm-100: #1a2332;
   --warm-200: #243044;
   --warm-300: #2d3a50;
+  --warm-400: #3a475c;
+  
+  /* Accent colors */
+  --accent: #0f7b6c;
+  --accent-hover: #0a6459;
+  --accent-light: rgba(15, 123, 108, 0.1);
+  --accent-text: #ffffff;
+  --accent-50: rgba(15, 123, 108, 0.05);
+  --accent-100: rgba(15, 123, 108, 0.1);
+  --accent-200: rgba(15, 123, 108, 0.2);
+  
+  /* Alert colors */
+  --alert: #ef4444;
+  --alert-hover: #dc2626;
+  --alert-light: rgba(239, 68, 68, 0.1);
+  --warning: #f59e0b;
+  --warning-light: rgba(245, 158, 11, 0.1);
+  --success: #10b981;
+  --success-light: rgba(16, 185, 129, 0.1);
+  --info: #3b82f6;
+  --info-light: rgba(59, 130, 246, 0.1);
+  
+  /* Border colors */
   --border: rgba(255, 255, 255, 0.10);
   --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.20);
+  
+  /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.30);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.40);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.50);
+  
+  /* Glass effect */
+  --glass-bg: rgba(15, 23, 42, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  
+  /* Gradient backgrounds */
+  --gradient-accent: linear-gradient(135deg, #0f7b6c 0%, #0a6459 100%);
+  --gradient-warm: linear-gradient(135deg, #111827 0%, #1a2332 100%);
 }
 
 /* ═══════════════════════════════════════════════════════════════════

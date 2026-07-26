@@ -82,17 +82,21 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div style={{ maxWidth: "1000px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "var(--space-8)" }}>
       {/* Header Banner */}
-      <div className="bg-slate-900/60 backdrop-blur-xl border border-white/5 p-6 md:p-8 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-xl shadow-indigo-500/20">
-            {fullName[0]?.toUpperCase()}
+      <div style={{ background: "var(--warm-100)", backdropFilter: "blur(12px)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "var(--space-6)", position: "relative", overflow: "hidden" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+          <div style={{ width: "64px", height: "64px", borderRadius: "var(--radius-full)", background: "var(--gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-text)", fontWeight: 700, fontSize: "var(--text-h1)", boxShadow: "var(--shadow-lg), 0 4px 12px rgba(15, 123, 108, 0.2)" }}>
+            {profile?.photoUrl ? (
+              <img src={profile.photoUrl} alt={fullName} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+            ) : (
+              fullName[0]?.toUpperCase()
+            )}
           </div>
           <div>
-            <h2 className="text-2xl font-extrabold text-white">{fullName}</h2>
-            <p className="text-xs text-indigo-300 mt-1 flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> Profil optimisé pour les bourses 2026-2027
+            <h2 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: 0 }}>{fullName}</h2>
+            <p style={{ fontSize: "var(--text-caption)", color: "var(--accent)", marginTop: "var(--space-1)", display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
+              <Sparkles style={{ width: "14px", height: "14px" }} /> Profil optimisé pour les bourses 2026-2027
             </p>
           </div>
         </div>
@@ -100,16 +104,17 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-500/25 transition-all disabled:opacity-50"
+          className="btn-primary"
+          style={{ marginLeft: "auto", padding: "var(--space-3) var(--space-6)", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-lg)" }}
         >
           {savedSuccess ? (
             <>
-              <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+              <CheckCircle2 style={{ width: "16px", height: "16px", color: "var(--success)" }} />
               <span>Enregistré !</span>
             </>
           ) : (
             <>
-              <Save className="w-4 h-4" />
+              <Save style={{ width: "16px", height: "16px" }} />
               <span>{saving ? "Sauvegarde..." : "Enregistrer mon profil"}</span>
             </>
           )}
@@ -117,39 +122,39 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
       </div>
 
       {/* Profile Form Sections */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "var(--space-6)" }}>
         {/* Section 1: Informations Académiques */}
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-white/5 p-6 rounded-3xl space-y-4">
-          <h3 className="text-base font-extrabold text-white flex items-center gap-2 border-b border-white/5 pb-3">
-            <GraduationCap className="w-5 h-5 text-indigo-400" /> Parcours Académique
+        <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <h3 style={{ fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink-text)", display: "flex", alignItems: "center", gap: "var(--space-2)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)" }}>
+            <GraduationCap style={{ width: "20px", height: "20px", color: "var(--accent)" }} /> Parcours Académique
           </h3>
 
           <div>
-            <label className="text-xs font-bold uppercase text-slate-400 mb-1.5 block">Nom complet</label>
+            <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>Nom complet</label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full p-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white outline-none focus:border-indigo-500"
+              style={{ width: "100%", padding: "var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", fontSize: "var(--text-body)", color: "var(--ink-text)", outline: "none" }}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)" }}>
             <div>
-              <label className="text-xs font-bold uppercase text-slate-400 mb-1.5 block">Niveau d'étude cible</label>
+              <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>Niveau d'étude cible</label>
               <select
                 value={degreeLevel}
                 onChange={(e) => setDegreeLevel(e.target.value)}
-                className="w-full p-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white outline-none"
+                style={{ width: "100%", padding: "var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", fontSize: "var(--text-body)", color: "var(--ink-text)", outline: "none" }}
               >
-                <option value="master" className="bg-slate-900">Master / Graduate</option>
-                <option value="doctorat" className="bg-slate-900">Doctorat / PhD</option>
-                <option value="licence" className="bg-slate-900">Licence / Bachelor</option>
+                <option value="master">Master / Graduate</option>
+                <option value="doctorat">Doctorat / PhD</option>
+                <option value="licence">Licence / Bachelor</option>
               </select>
             </div>
 
             <div>
-              <label className="text-xs font-bold uppercase text-slate-400 mb-1.5 block">Moyenne / GPA (sur 4.0)</label>
+              <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>Moyenne / GPA (sur 4.0)</label>
               <input
                 type="number"
                 step="0.1"
@@ -157,44 +162,64 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
                 max="4.0"
                 value={gpa}
                 onChange={(e) => setGpa(parseFloat(e.target.value))}
-                className="w-full p-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white outline-none"
+                style={{ width: "100%", padding: "var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", fontSize: "var(--text-body)", color: "var(--ink-text)", outline: "none" }}
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-bold uppercase text-slate-400 mb-1.5 block">Domaine d'études / Spécialité</label>
+            <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>Domaine d'études / Spécialité</label>
             <input
               type="text"
               value={fieldOfStudy}
               onChange={(e) => setFieldOfStudy(e.target.value)}
               placeholder="Ex: Informatique, Droit, Génie Civil, Bio-Santé..."
-              className="w-full p-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white outline-none focus:border-indigo-500"
+              style={{ width: "100%", padding: "var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", fontSize: "var(--text-body)", color: "var(--ink-text)", outline: "none" }}
             />
           </div>
         </div>
 
         {/* Section 2: Préférences Géographiques & Budget */}
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-white/5 p-6 rounded-3xl space-y-4">
-          <h3 className="text-base font-extrabold text-white flex items-center gap-2 border-b border-white/5 pb-3">
-            <Globe className="w-5 h-5 text-purple-400" /> Destination & Budget
+        <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <h3 style={{ fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink-text)", display: "flex", alignItems: "center", gap: "var(--space-2)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)" }}>
+            <Globe style={{ width: "20px", height: "20px", color: "var(--accent)" }} /> Destination & Budget
           </h3>
 
           <div>
-            <label className="text-xs font-bold uppercase text-slate-400 mb-2 block">Pays de destination cibles</label>
-            <div className="flex flex-wrap gap-2">
-              {["France", "Allemagne", "Canada", "USA", "Royaume-Uni", "Suisse", "Japon"].map((country) => {
+            <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-2)", display: "block" }}>Pays de destination cibles</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
+              {["France", "Allemagne", "Canada", "USA", "Royaume-Uni", "Suisse", "Japon", "Togo"].map((country) => {
                 const selected = targetCountries.includes(country);
                 return (
                   <button
                     key={country}
                     type="button"
                     onClick={() => toggleCountry(country)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                      selected
-                        ? "bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/20"
-                        : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
-                    }`}
+                    style={{
+                      padding: "var(--space-3.5) var(--space-9)",
+                      borderRadius: "var(--radius-xl)",
+                      fontSize: "var(--text-caption)",
+                      fontWeight: 600,
+                      border: "1px solid",
+                      cursor: "pointer",
+                      transition: "all var(--transition-base)",
+                      background: selected ? "var(--accent)" : "var(--warm-50)",
+                      color: selected ? "var(--accent-text)" : "var(--ink-muted)",
+                      borderColor: selected ? "var(--accent)" : "var(--border)",
+                      boxShadow: selected ? "var(--shadow-md)" : "none"
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!selected) {
+                        (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-text)";
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!selected) {
+                        (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-muted)";
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+                      }
+                    }}
                   >
                     {country}
                   </button>
@@ -204,8 +229,8 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
           </div>
 
           <div>
-            <label className="text-xs font-bold uppercase text-slate-400 mb-1.5 block">
-              Budget max annuel estimé (€) : <span className="text-indigo-400 font-bold">{budgetMax} €</span>
+            <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>
+              Budget max annuel estimé (€) : <span style={{ color: "var(--accent)", fontWeight: 700 }}>{budgetMax} €</span>
             </label>
             <input
               type="range"
@@ -214,34 +239,34 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
               step="1000"
               value={budgetMax}
               onChange={(e) => setBudgetMax(parseInt(e.target.value))}
-              className="w-full accent-indigo-500 cursor-pointer"
+              style={{ width: "100%", height: "4px", borderRadius: "var(--radius-sm)", background: "var(--warm-200)", outline: "none", WebkitAppearance: "none", cursor: "pointer" }}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)", paddingTop: "var(--space-2)" }}>
             <div>
-              <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Niveau d'Anglais</label>
+              <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1)", display: "block" }}>Niveau d'Anglais</label>
               <select
                 value={englishLevel}
                 onChange={(e) => setEnglishLevel(e.target.value)}
-                className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white outline-none"
+                style={{ width: "100%", padding: "var(--space-2.5) var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius)", fontSize: "var(--text-caption)", color: "var(--ink-text)", outline: "none" }}
               >
-                <option value="B1" className="bg-slate-900">B1 (Intermédiaire)</option>
-                <option value="B2" className="bg-slate-900">B2 (Avancé / TOEFL 80+)</option>
-                <option value="C1" className="bg-slate-900">C1 (Courant / IELTS 7.0+)</option>
+                <option value="B1">B1 (Intermédiaire)</option>
+                <option value="B2">B2 (Avancé / TOEFL 80+)</option>
+                <option value="C1">C1 (Courant / IELTS 7.0+)</option>
               </select>
             </div>
 
             <div>
-              <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">Niveau de Français</label>
+              <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1)", display: "block" }}>Niveau de Français</label>
               <select
                 value={frenchLevel}
                 onChange={(e) => setFrenchLevel(e.target.value)}
-                className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white outline-none"
+                style={{ width: "100%", padding: "var(--space-2.5) var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius)", fontSize: "var(--text-caption)", color: "var(--ink-text)", outline: "none" }}
               >
-                <option value="B2" className="bg-slate-900">B2 (DELF B2)</option>
-                <option value="C1" className="bg-slate-900">C1 (DALF C1)</option>
-                <option value="Natif" className="bg-slate-900">Langue maternelle / Natif</option>
+                <option value="B2">B2 (DELF B2)</option>
+                <option value="C1">C1 (DALF C1)</option>
+                <option value="Natif">Langue maternelle / Natif</option>
               </select>
             </div>
           </div>
@@ -249,24 +274,36 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
       </div>
 
       {/* CV & Document Upload */}
-      <div className="bg-slate-900/60 backdrop-blur-xl border border-white/5 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
-            <FileText className="w-8 h-8" />
+      <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "var(--space-6)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+          <div style={{ padding: "var(--space-4)", borderRadius: "var(--radius-2xl)", background: "var(--accent-50)", border: "1px solid var(--accent-200)", color: "var(--accent)" }}>
+            <FileText style={{ width: "32px", height: "32px" }} />
           </div>
           <div>
-            <h4 className="font-extrabold text-white text-base">Curriculum Vitae (CV Académique)</h4>
-            <p className="text-xs text-slate-400 mt-0.5">Format PDF recommandé. Utilisé par l'IA pour évaluer ton éligibilité.</p>
+            <h4 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", margin: 0 }}>Curriculum Vitae (CV Académique)</h4>
+            <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: "var(--space-0.5)" }}>Format PDF recommandé. Utilisé par l'IA pour évaluer ton éligibilité.</p>
           </div>
         </div>
 
-        <button
-          onClick={() => alert("Upload du CV vers Supabase Storage configuré !")}
-          className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/10 transition-all"
-        >
-          <UploadCloud className="w-4 h-4 text-indigo-400" />
-          <span>Téléverser mon CV (.pdf)</span>
-        </button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)", width: "100%" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+            <div style={{ padding: "var(--space-4)", borderRadius: "var(--radius-2xl)", background: "var(--accent-50)", border: "1px solid var(--accent-200)", color: "var(--accent)" }}>
+              <UploadCloud style={{ width: "16px", height: "16px" }} />
+            </div>
+            <div>
+              <h4 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", margin: 0 }}>Photo de profil</h4>
+              <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: "var(--space-0.5)" }}>JPG ou PNG, max 2Mo. Affichée dans ton profil et les candidatures.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => alert("Upload du CV et photo vers Supabase Storage configuré !")}
+            className="btn-secondary"
+            style={{ padding: "var(--space-3) var(--space-5)", borderRadius: "var(--radius-2xl)", fontWeight: 700, border: "1px solid var(--accent)", color: "var(--accent)" }}
+          >
+            <UploadCloud style={{ width: "16px", height: "16px" }} />
+            <span>Téléverser CV & Photo</span>
+          </button>
+        </div>
       </div>
     </div>
   );

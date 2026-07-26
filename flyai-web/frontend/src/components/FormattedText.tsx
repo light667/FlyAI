@@ -25,14 +25,14 @@ export default function FormattedText({ content, className = "" }: Props) {
         // Headings
         if (trimmed.startsWith("### ")) {
           return (
-            <h4 key={idx} className="font-extrabold text-base text-slate-900 dark:text-white mt-3 mb-1">
+            <h4 key={idx} className="font-extrabold text-base text-[rgb(var(--ink-900))] mt-3 mb-1">
               {formatInline(trimmed.replace("### ", ""))}
             </h4>
           );
         }
         if (trimmed.startsWith("## ")) {
           return (
-            <h3 key={idx} className="font-black text-lg text-indigo-600 dark:text-indigo-400 mt-4 mb-2">
+            <h3 key={idx} className="font-black text-lg text-accent mt-4 mb-2">
               {formatInline(trimmed.replace("## ", ""))}
             </h3>
           );
@@ -54,7 +54,7 @@ export default function FormattedText({ content, className = "" }: Props) {
         if (numMatch) {
           return (
             <div key={idx} className="flex items-start gap-2 pl-2">
-              <span className="font-bold text-indigo-600 dark:text-indigo-400 shrink-0">{numMatch[1]}.</span>
+              <span className="font-bold text-accent shrink-0">{numMatch[1]}.</span>
               <span>{formatInline(numMatch[2])}</span>
             </div>
           );
@@ -72,7 +72,7 @@ function formatInline(text: string): React.ReactNode {
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
       return (
-        <strong key={i} className="font-extrabold text-slate-900 dark:text-white">
+        <strong key={i} className="font-extrabold text-[rgb(var(--ink-900))]">
           {part.slice(2, -2)}
         </strong>
       );

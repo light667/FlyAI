@@ -2,8 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Sparkles, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Sparkles, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { supabase } from "@/lib/supabase";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
 
 // Inline Google logo (no lucide equivalent)
 function GoogleIcon() {
@@ -16,13 +25,6 @@ function GoogleIcon() {
     </svg>
   );
 }
-import { auth } from "@/lib/firebase";
-import {
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,14 +33,84 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // Vérifier si l'utilisateur est déjà connecté
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Vérifier si le profil existe
+        try {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("firebase_uid", user.uid)
+            .single();
+          
+          if (data) {
+            // Vérifier si l'onboarding est complété
+            const isOnboardingCompleted = data.onboarding_completed || 
+              (data.full_name && data.nationality && data.education_level);
+            
+            if (isOnboardingCompleted) {
+              router.replace("/dashboard");
+            } else {
+              // Marquer comme nouveau utilisateur pour les guides
+              localStorage.setItem("flyai_is_new_user", "true");
+              router.replace("/onboarding");
+            }
+          } else {
+            // Pas de profil, rediriger vers onboarding
+            // Marquer comme nouveau utilisateur pour les guides
+            localStorage.setItem("flyai_is_new_user", "true");
+            router.replace("/onboarding");
+          }
+        } catch (err) {
+          console.error("Error checking profile:", err);
+        } finally {
+          setIsCheckingAuth(false);
+        }
+      } else {
+        setIsCheckingAuth(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Vérifier si le profil existe
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("firebase_uid", userCredential.user.uid)
+        .single();
+      
+      if (profile) {
+        // Vérifier si l'onboarding est complété
+        const isOnboardingCompleted = profile.onboarding_completed || 
+          (profile.full_name && profile.nationality && profile.education_level);
+        
+        // Marquer comme nouveau utilisateur pour les guides du dashboard
+        localStorage.setItem("flyai_is_new_user", "true");
+        
+        if (isOnboardingCompleted) {
+          router.push("/dashboard");
+        } else {
+          router.push("/onboarding");
+        }
+      } else {
+        // Nouveau utilisateur, rediriger vers onboarding
+        // Marquer comme nouveau utilisateur
+        localStorage.setItem("flyai_is_new_user", "true");
+        router.push("/onboarding");
+      }
     } catch (err: unknown) {
       const firebaseError = err as { message?: string };
       setError(firebaseError.message || "Échec de la connexion. Vérifiez vos identifiants.");
@@ -52,8 +124,34 @@ export default function LoginPage() {
     setError("");
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      router.push("/dashboard");
+      const userCredential = await signInWithPopup(auth, provider);
+      
+      // Vérifier si le profil existe
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("firebase_uid", userCredential.user.uid)
+        .single();
+      
+      if (profile) {
+        // Vérifier si l'onboarding est complété
+        const isOnboardingCompleted = profile.onboarding_completed || 
+          (profile.full_name && profile.nationality && profile.education_level);
+        
+        // Marquer comme nouveau utilisateur pour les guides du dashboard
+        localStorage.setItem("flyai_is_new_user", "true");
+        
+        if (isOnboardingCompleted) {
+          router.push("/dashboard");
+        } else {
+          router.push("/onboarding");
+        }
+      } else {
+        // Nouveau utilisateur, rediriger vers onboarding
+        // Marquer comme nouveau utilisateur
+        localStorage.setItem("flyai_is_new_user", "true");
+        router.push("/onboarding");
+      }
     } catch (err: unknown) {
       const firebaseError = err as { message?: string };
       setError(firebaseError.message || "Échec de la connexion Google.");
@@ -62,66 +160,75 @@ export default function LoginPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#090d16] flex items-center justify-center p-4">
-      {/* Ambient orbs */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl -top-20 -right-20 animate-pulse" />
-        <div className="absolute w-64 h-64 bg-violet-600/15 rounded-full blur-3xl bottom-20 -left-16 animate-pulse" />
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-[rgb(var(--background))] flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+          <p className="text-sm text-[rgb(var(--ink-muted))]">Verification de l'authentification...</p>
+        </div>
       </div>
+    );
+  }
 
-      <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
+  return (
+    <div className="min-h-screen bg-[rgb(var(--background))] flex items-center justify-center p-4 md:p-6 lg:p-8 w-full">
+      <div className="w-full max-w-md">
+        {/* Header */}
         <div className="flex flex-col items-center mb-8">
-          <Image src="/logo.png" alt="FlyAI" width={48} height={48} className="rounded-xl mb-3" />
-          <h1 className="text-2xl font-black text-white">Bon retour sur FlyAI</h1>
-          <p className="text-slate-400 text-sm mt-1">Connecte-toi pour continuer ta progression</p>
+          <Image src="/logo.png" alt="FlyAI" width={48} height={48} className="rounded-xl mb-3 shadow-md" />
+          <h1 className="text-2xl font-black text-[rgb(var(--ink-900))]">
+            Bon retour sur FlyAI
+          </h1>
+          <p className="text-[rgb(var(--ink-muted))] text-sm mt-1">
+            Connecte-toi pour continuer ta progression
+          </p>
         </div>
 
         {/* Card */}
-        <div className="glass-card p-8">
+        <div className="p-6 md:p-8 w-full bg-[rgb(var(--warm-50))] border border-[rgb(var(--border))] rounded-2xl shadow-md"
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            <div className="mb-4 p-3 rounded-xl bg-alert-light border border-alert text-alert text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleEmailLogin} className="space-y-4">
             <div>
-              <label className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-2 block">
+              <label className="text-xs text-[rgb(var(--ink-muted))] font-medium uppercase tracking-wider mb-2 block">
                 Adresse email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--ink-subtle))]" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ton@email.com"
                   required
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 focus:bg-white/8 transition-all"
+                  className="w-full bg-[rgb(var(--warm-100))] border border-[rgb(var(--border))] rounded-xl pl-10 pr-4 py-3 text-sm text-[rgb(var(--ink-text))] placeholder:text-[rgb(var(--ink-subtle))] focus:outline-none focus:border-accent/50 transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-2 block">
+              <label className="text-xs text-[rgb(var(--ink-muted))] font-medium uppercase tracking-wider mb-2 block">
                 Mot de passe
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--ink-subtle))]" />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-10 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-all"
+                  className="w-full bg-[rgb(var(--warm-100))] border border-[rgb(var(--border))] rounded-xl pl-10 pr-10 py-3 text-sm text-[rgb(var(--ink-text))] placeholder:text-[rgb(var(--ink-subtle))] focus:outline-none focus:border-accent/50 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgb(var(--ink-subtle))] hover:text-[rgb(var(--ink-text))]"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -129,18 +236,18 @@ export default function LoginPage() {
             </div>
 
             <div className="flex justify-end">
-              <a href="#" className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
-                Mot de passe oublié ?
+              <a href="#" className="text-xs text-accent hover:text-accent-hover transition-colors">
+                Mot de passe oublie ?
               </a>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold transition-all hover:shadow-lg hover:shadow-indigo-500/25 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-accent to-accent-hover hover:from-accent-hover text-accent-text font-semibold transition-all hover:shadow-lg hover:shadow-accent/25 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
                   <Sparkles className="w-4 h-4" />
@@ -152,26 +259,28 @@ export default function LoginPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
+              <div className="w-full border-t border-[rgb(var(--border))]" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-[#111827] px-3 text-xs text-slate-500">ou continuer avec</span>
+              <span className="bg-[rgb(var(--background))] px-3 text-xs text-[rgb(var(--ink-muted))]">
+                ou continuer avec
+              </span>
             </div>
           </div>
 
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full py-3 rounded-xl border border-white/10 hover:border-white/20 hover:bg-white/5 text-slate-300 hover:text-white font-medium transition-all flex items-center justify-center gap-2 text-sm"
+            className="w-full py-3.5 rounded-xl border border-[rgb(var(--border))] hover:border-[rgb(var(--border-subtle))] hover:bg-[rgb(var(--warm-100))] text-[rgb(var(--ink-text))] font-medium transition-all flex items-center justify-center gap-2 text-sm"
           >
-                      <GoogleIcon />
+            <GoogleIcon />
             Continuer avec Google
           </button>
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-6">
-          Pas encore de compte ?{" "}
-          <Link href="/auth/signup" className="text-indigo-400 hover:text-indigo-300 font-medium">
+        <p className="text-center text-sm text-[rgb(var(--ink-muted))] mt-6">
+          Pas encore de compte ? {" "}
+          <Link href="/auth/signup" className="text-accent hover:text-accent-hover font-medium">
             S&apos;inscrire gratuitement
           </Link>
         </p>

@@ -20,45 +20,46 @@ export default function SettingsTab({ theme, onToggleTheme }: Props) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 text-slate-800 dark:text-slate-200">
+    <div style={{ maxWidth: "800px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "var(--space-8)", color: "var(--ink-text)" }}>
       {/* Banner */}
-      <div className="bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 p-6 rounded-3xl flex items-center justify-between">
+      <div style={{ background: "var(--warm-100)", backdropFilter: "blur(12px)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-            <Settings className="w-6 h-6 text-indigo-500" /> Paramètres & Préférences
+          <h2 style={{ fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", display: "flex", alignItems: "center", gap: "var(--space-2)", margin: 0 }}>
+            <Settings style={{ width: "24px", height: "24px", color: "var(--accent)" }} /> Paramètres & Préférences
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", marginTop: "var(--space-1)" }}>
             Personnalise ton expérience d'application, thème et notifications.
           </p>
         </div>
       </div>
 
       {/* Theme & Appearance */}
-      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 p-6 rounded-3xl space-y-4">
-        <h3 className="font-extrabold text-slate-900 dark:text-white text-base border-b border-slate-100 dark:border-white/5 pb-3 flex items-center gap-2">
-          {theme === "light" ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5 text-indigo-400" />} Thème & Apparence
+      <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <h3 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+          {theme === "light" ? <Sun style={{ width: "20px", height: "20px", color: "var(--warning)" }} /> : <Moon style={{ width: "20px", height: "20px", color: "var(--accent)" }} />} Thème & Apparence
         </h3>
 
-        <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-4)", borderRadius: "var(--radius-xl)", background: "var(--warm-50)", border: "1px solid var(--border)" }}>
           <div>
-            <div className="font-bold text-sm text-slate-900 dark:text-white">Mode d'affichage</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">
+            <div style={{ fontWeight: 700, fontSize: "var(--text-body)", color: "var(--ink-text)" }}>Mode d'affichage</div>
+            <div style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)" }}>
               {theme === "light" ? "Mode Clair actif (par défaut)" : "Mode Sombre actif"}
             </div>
           </div>
 
           <button
             onClick={onToggleTheme}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md transition-all"
+            className="btn-primary"
+            style={{ padding: "var(--space-2) var(--space-4)", borderRadius: "var(--radius-xl)", fontWeight: 700, fontSize: "var(--text-caption)", boxShadow: "var(--shadow-md)" }}
           >
             {theme === "light" ? (
               <>
-                <Moon className="w-4 h-4" />
+                <Moon style={{ width: "16px", height: "16px" }} />
                 <span>Passer en Mode Sombre</span>
               </>
             ) : (
               <>
-                <Sun className="w-4 h-4" />
+                <Sun style={{ width: "16px", height: "16px" }} />
                 <span>Passer en Mode Clair</span>
               </>
             )}
@@ -67,30 +68,70 @@ export default function SettingsTab({ theme, onToggleTheme }: Props) {
       </div>
 
       {/* Language */}
-      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 p-6 rounded-3xl space-y-4">
-        <h3 className="font-extrabold text-slate-900 dark:text-white text-base border-b border-slate-100 dark:border-white/5 pb-3 flex items-center gap-2">
-          <Globe className="w-5 h-5 text-indigo-500" /> Langue de l'interface
+      <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <h3 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+          <Globe style={{ width: "20px", height: "20px", color: "var(--accent)" }} /> Langue de l'interface
         </h3>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-4)" }}>
           <button
             onClick={() => setLanguage("fr")}
-            className={`p-4 rounded-2xl border text-left font-bold text-xs transition-all ${
-              language === "fr"
-                ? "bg-indigo-600 text-white border-indigo-500 shadow-md"
-                : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300"
-            }`}
+            style={{
+              padding: "var(--space-4)",
+              borderRadius: "var(--radius-xl)",
+              border: "1px solid",
+              textAlign: "left",
+              fontWeight: 700,
+              fontSize: "var(--text-caption)",
+              transition: "all var(--transition-base)",
+              background: language === "fr" ? "var(--accent)" : "var(--warm-50)",
+              color: language === "fr" ? "var(--accent-text)" : "var(--ink-muted)",
+              borderColor: language === "fr" ? "var(--accent)" : "var(--border)",
+              boxShadow: language === "fr" ? "var(--shadow-md)" : "none"
+            }}
+            onMouseEnter={(e) => {
+              if (language !== "fr") {
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-text)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (language !== "fr") {
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-muted)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+              }
+            }}
           >
             🇫🇷 Français (Default)
           </button>
 
           <button
             onClick={() => setLanguage("en")}
-            className={`p-4 rounded-2xl border text-left font-bold text-xs transition-all ${
-              language === "en"
-                ? "bg-indigo-600 text-white border-indigo-500 shadow-md"
-                : "bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300"
-            }`}
+            style={{
+              padding: "var(--space-4)",
+              borderRadius: "var(--radius-xl)",
+              border: "1px solid",
+              textAlign: "left",
+              fontWeight: 700,
+              fontSize: "var(--text-caption)",
+              transition: "all var(--transition-base)",
+              background: language === "en" ? "var(--accent)" : "var(--warm-50)",
+              color: language === "en" ? "var(--accent-text)" : "var(--ink-muted)",
+              borderColor: language === "en" ? "var(--accent)" : "var(--border)",
+              boxShadow: language === "en" ? "var(--shadow-md)" : "none"
+            }}
+            onMouseEnter={(e) => {
+              if (language !== "en") {
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-text)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (language !== "en") {
+                (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-muted)";
+                (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
+              }
+            }}
           >
             🇬🇧 English
           </button>
@@ -98,17 +139,19 @@ export default function SettingsTab({ theme, onToggleTheme }: Props) {
       </div>
 
       {/* Terms & Legal */}
-      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 p-6 rounded-3xl space-y-4">
-        <h3 className="font-extrabold text-slate-900 dark:text-white text-base border-b border-slate-100 dark:border-white/5 pb-3 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-emerald-500" /> Informations Légales
+      <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <h3 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+          <FileText style={{ width: "20px", height: "20px", color: "var(--success)" }} /> Informations Légales
         </h3>
 
         <Link
           href="/terms"
-          className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-indigo-500 transition-all"
+          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-4)", borderRadius: "var(--radius-xl)", background: "var(--warm-50)", border: "1px solid var(--border)", transition: "all var(--transition-base)", textDecoration: "none", color: "inherit" }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accent)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border)"; }}
         >
-          <span className="font-bold text-xs text-slate-900 dark:text-white">Conditions Générales d'Utilisation & Confidentialité</span>
-          <span className="text-xs text-indigo-600 dark:text-indigo-400 font-bold">&rarr; Voir la page</span>
+          <span style={{ fontWeight: 700, fontSize: "var(--text-caption)", color: "var(--ink-text)" }}>Conditions Générales d'Utilisation & Confidentialité</span>
+          <span style={{ fontSize: "var(--text-caption)", color: "var(--accent)", fontWeight: 700 }}>&rarr; Voir la page</span>
         </Link>
       </div>
     </div>

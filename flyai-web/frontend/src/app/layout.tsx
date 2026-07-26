@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,9 +33,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[rgb(var(--background)] text-[rgb(var(--foreground))] font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
-        {children}
+    <html lang="fr" className={`${inter.variable} ${instrumentSerif.variable} h-full antialiased`} suppressHydrationWarning>
+      <body className="min-h-screen w-full bg-[rgb(var(--background)] text-[rgb(var(--foreground))] font-sans selection:bg-accent selection:text-accent-text transition-colors duration-200">
+        <ThemeProvider defaultTheme="light">
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

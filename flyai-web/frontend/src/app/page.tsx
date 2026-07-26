@@ -43,17 +43,17 @@ export default function SplashScreen() {
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center bg-[#0A0F1C] transition-opacity duration-350 ${
+      className={`fixed inset-0 flex items-center justify-center bg-[rgb(var(--ink-900))] transition-opacity duration-350 ${
         exiting ? "opacity-0" : "opacity-100"
       }`}
     >
-      {/* Ambient glow — top-left (primary blue) */}
+      {/* Ambient glow — top-left (primary green) */}
       <div className="absolute -top-24 -left-20 w-96 h-96 rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(37,99,235,0.20) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(15,123,108,0.20) 0%, transparent 70%)" }}
       />
-      {/* Ambient glow — bottom-right (violet) */}
+      {/* Ambient glow — bottom-right (accent) */}
       <div className="absolute -bottom-24 -right-20 w-80 h-80 rounded-full pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, rgba(15,123,108,0.15) 0%, transparent 70%)" }}
       />
 
       {/* Center content */}
@@ -69,7 +69,7 @@ export default function SplashScreen() {
         <div className="relative flex items-center justify-center mb-9">
           {/* Outer ring */}
           <div
-            className="absolute rounded-full border border-indigo-500/25 transition-all duration-700"
+            className="absolute rounded-full border border-accent/25 transition-all duration-700"
             style={{
               width: ringsVisible ? 144 : 90,
               height: ringsVisible ? 144 : 90,
@@ -83,14 +83,14 @@ export default function SplashScreen() {
               width: ringsVisible ? 116 : 90,
               height: ringsVisible ? 116 : 90,
               background: ringsVisible
-                ? "radial-gradient(circle, rgba(37,99,235,0.20) 0%, transparent 70%)"
+                ? "radial-gradient(circle, rgba(15,123,108,0.20) 0%, transparent 70%)"
                 : "transparent",
               opacity: ringsVisible ? 1 : 0,
             }}
           />
           {/* Logo circle */}
           <div className="relative w-[90px] h-[90px] rounded-full overflow-hidden shadow-2xl"
-            style={{ boxShadow: "0 0 40px rgba(37,99,235,0.4)" }}
+            style={{ boxShadow: "0 0 40px rgba(15,123,108,0.4)" }}
           >
             <Image src="/logo.png" alt="FlyAI" width={90} height={90} className="object-cover" priority />
           </div>
@@ -100,7 +100,7 @@ export default function SplashScreen() {
         <h1
           className="text-5xl font-black tracking-[6px] uppercase"
           style={{
-            background: "linear-gradient(180deg, #ffffff 0%, #CBD5E1 100%)",
+            background: "linear-gradient(180deg, #ffffff 0%, #e6f4f1 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
@@ -111,7 +111,7 @@ export default function SplashScreen() {
         {/* Tagline */}
         <p
           className="mt-2.5 text-[13px] font-medium tracking-[2.5px] uppercase"
-          style={{ color: "rgba(255,255,255,0.40)" }}
+          style={{ color: "rgba(255,255,255,0.70)" }}
         >
           Swipe. Match. Apply. Fly.
         </p>
@@ -121,7 +121,7 @@ export default function SplashScreen() {
           {dots.map((active, i) => (
             <div
               key={i}
-              className="w-[7px] h-[7px] rounded-full bg-indigo-500 transition-all duration-300"
+              className="w-[7px] h-[7px] rounded-full bg-accent transition-all duration-300"
               style={{ opacity: active ? 1 : 0.2, transform: active ? "scale(1)" : "scale(0.6)" }}
             />
           ))}

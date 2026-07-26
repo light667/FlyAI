@@ -70,19 +70,19 @@ function getCategoryIcon(category: string): string {
   return icons[category] || "📄";
 }
 
-function getCategoryColor(category: string): string {
-  const colors: Record<string, string> = {
-    CV: "bg-indigo-500/10 text-indigo-500",
-    "Relevé de notes": "bg-emerald-500/10 text-emerald-500",
-    Diplôme: "bg-amber-500/10 text-amber-500",
-    "Certificat de Langue": "bg-rose-500/10 text-rose-500",
-    "Lettre de motivation": "bg-cyan-500/10 text-cyan-500",
-    "Lettre de recommandation": "bg-violet-500/10 text-violet-500",
-    Passeport: "bg-sky-500/10 text-sky-500",
-    "Photo d'identité": "bg-pink-500/10 text-pink-500",
-    Autre: "bg-slate-500/10 text-slate-500",
+function getCategoryColor(category: string): { background: string; color: string } {
+  const colors: Record<string, { background: string; color: string }> = {
+    CV: { background: "var(--accent-50)", color: "var(--accent)" },
+    "Relevé de notes": { background: "var(--success-light)", color: "var(--success)" },
+    Diplôme: { background: "var(--warning-light)", color: "var(--warning)" },
+    "Certificat de Langue": { background: "var(--alert-light)", color: "var(--alert)" },
+    "Lettre de motivation": { background: "var(--info-light)", color: "var(--info)" },
+    "Lettre de recommandation": { background: "var(--accent-100)", color: "var(--accent)" },
+    Passeport: { background: "var(--info-light)", color: "var(--info)" },
+    "Photo d'identité": { background: "var(--alert-light)", color: "var(--alert)" },
+    Autre: { background: "var(--warm-200)", color: "var(--ink-subtle)" },
   };
-  return colors[category] || "bg-slate-500/10 text-slate-500";
+  return colors[category] || { background: "var(--warm-200)", color: "var(--ink-subtle)" };
 }
 
 function isProfilePhoto(category: string): boolean {
@@ -225,49 +225,49 @@ export default function DocumentsTab({ userId, userProfile }: Props) {
     }
   };
 
-  const getStatusColor = (status: string): string => {
+  const getStatusColor = (status: string): { background: string; color: string } => {
     switch (status) {
       case "uploaded":
-        return "bg-emerald-500/10 text-emerald-600";
+        return { background: "var(--success-light)", color: "var(--success)" };
       case "processing":
-        return "bg-amber-500/10 text-amber-600";
+        return { background: "var(--warning-light)", color: "var(--warning)" };
       case "error":
-        return "bg-rose-500/10 text-rose-600";
+        return { background: "var(--alert-light)", color: "var(--alert)" };
       default:
-        return "bg-slate-500/10 text-slate-600";
+        return { background: "var(--warm-200)", color: "var(--ink-subtle)" };
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 text-slate-800 dark:text-slate-200">
+    <div style={{ maxWidth: "1000px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "var(--space-8)", color: "var(--ink-text)" }}>
       {/* Upload Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-            <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <UploadCloud className="w-6 h-6 text-indigo-500" />
+        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-4)", background: "rgba(0, 0, 0, 0.5)", backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", maxWidth: "448px", width: "100%", boxShadow: "var(--shadow-xl)" }}>
+            <h3 style={{ fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: "0 0 var(--space-4)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+              <UploadCloud style={{ width: "24px", height: "24px", color: "var(--accent)" }} />
               Télécharger un document
             </h3>
 
-            <div className="mb-4">
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+            <div style={{ marginBottom: "var(--space-4)" }}>
+              <label style={{ display: "block", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink-muted)", marginBottom: "var(--space-2)" }}>
                 Catégorie du document
               </label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full p-3 rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 font-medium"
+                style={{ width: "100%", padding: "var(--space-3)", borderRadius: "var(--radius-xl)", border: "1px solid var(--border)", background: "var(--warm-100)", color: "var(--ink-text)", fontSize: "var(--text-body)" }}
               >
                 {DOCUMENT_CATEGORIES.map((category) => (
-                  <option key={category} value={category} className="dark:bg-slate-800">
+                  <option key={category} value={category}>
                     {category}
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+            <div style={{ marginBottom: "var(--space-4)" }}>
+              <label style={{ display: "block", fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink-muted)", marginBottom: "var(--space-2)" }}>
                 Sélectionner un fichier
               </label>
               <input
@@ -276,56 +276,57 @@ export default function DocumentsTab({ userId, userProfile }: Props) {
                 onChange={handleFileChange}
                 accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
                 disabled={uploading}
-                className="w-full p-3 rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/60 text-slate-800 dark:text-slate-200 file:mr-4 file:py-2 file:px-4 file:rounded-l-2xl file:border-0 file:bg-indigo-500/10 file:text-indigo-600 hover:file:bg-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ width: "100%", padding: "var(--space-3)", borderRadius: "var(--radius-xl)", border: "1px solid var(--border)", background: "var(--warm-100)", color: "var(--ink-text)", fontSize: "var(--text-body)" }}
               />
-              <p className="text-[10px] text-slate-400 mt-1">
+              <p style={{ fontSize: "10px", color: "var(--ink-subtle)", marginTop: "var(--space-1)" }}>
                 Types autorisés: PDF, JPG, PNG, WebP, DOC, DOCX. Taille max: {MAX_FILE_SIZE / 1024 / 1024} Mo
               </p>
             </div>
 
             {uploading && (
-              <div className="mb-4">
-                <div className="flex justify-between text-xs text-slate-400 mb-1">
+              <div style={{ marginBottom: "var(--space-4)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--text-caption)", color: "var(--ink-subtle)", marginBottom: "var(--space-1)" }}>
                   <span>Téléversement...</span>
                   <span>{uploadProgress}%</span>
                 </div>
-                <div className="h-2 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div style={{ height: "8px", background: "var(--warm-200)", borderRadius: "var(--radius-full)", overflow: "hidden" }}>
                   <div
-                    className="h-full bg-indigo-500 rounded-full transition-all"
-                    style={{ width: `${uploadProgress}%` }}
+                    style={{ height: "100%", background: "var(--accent)", borderRadius: "var(--radius-full)", width: `${uploadProgress}%`, transition: "width 0.3s ease" }}
                   />
                 </div>
               </div>
             )}
 
             {error && (
-              <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-600 text-sm flex items-center gap-2 mb-4">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <div style={{ padding: "var(--space-3)", background: "var(--alert-light)", border: "1px solid var(--alert)", borderRadius: "var(--radius-xl)", color: "var(--alert)", fontSize: "var(--text-body)", display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "var(--space-4)" }}>
+                <AlertCircle style={{ width: "16px", height: "16px", flexShrink: 0 }} />
                 {error}
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div style={{ display: "flex", gap: "var(--space-3)" }}>
               <button
                 onClick={() => setIsModalOpen(false)}
                 disabled={uploading}
-                className="flex-1 p-3 rounded-2xl border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 dark:hover:bg-white/5 transition-all disabled:opacity-50"
+                className="btn-secondary"
+                style={{ flex: 1, padding: "var(--space-3)", borderRadius: "var(--radius-xl)", fontWeight: 700, fontSize: "var(--text-caption)" }}
               >
                 Annuler
               </button>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="flex-1 p-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="btn-primary"
+                style={{ flex: 1, padding: "var(--space-3)", borderRadius: "var(--radius-xl)", fontWeight: 700, fontSize: "var(--text-caption)", boxShadow: "var(--shadow-md)" }}
               >
                 {uploading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 style={{ width: "16px", height: "16px", animation: "spin 1s linear infinite" }} />
                     <span>Téléversement...</span>
                   </>
                 ) : (
                   <>
-                    <UploadCloud className="w-4 h-4" />
+                    <UploadCloud style={{ width: "16px", height: "16px" }} />
                     <span>Télécharger</span>
                   </>
                 )}
@@ -336,12 +337,12 @@ export default function DocumentsTab({ userId, userProfile }: Props) {
       )}
 
       {/* Header Banner */}
-      <div className="bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 p-6 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div style={{ background: "var(--warm-100)", backdropFilter: "blur(12px)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "var(--space-4)" }}>
         <div>
-          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-            <FileText className="w-6 h-6 text-indigo-500" /> Mes Documents & Pièces Justificatives
+          <h2 style={{ fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", display: "flex", alignItems: "center", gap: "var(--space-2)", margin: 0 }}>
+            <FileText style={{ width: "24px", height: "24px", color: "var(--accent)" }} /> Mes Documents & Pièces Justificatives
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", marginTop: "var(--space-1)" }}>
             Gère tes fichiers (CV, diplômes, lettres, tests de langue) utilisés par FlyAgent pour tes candidatures.
           </p>
         </div>
@@ -349,92 +350,102 @@ export default function DocumentsTab({ userId, userProfile }: Props) {
         <button
           onClick={handleUploadClick}
           disabled={uploading}
-          className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50"
+          className="btn-primary"
+          style={{ marginLeft: "auto", padding: "var(--space-3) var(--space-5)", borderRadius: "var(--radius-2xl)", fontWeight: 700, fontSize: "var(--text-caption)", boxShadow: "var(--shadow-md)" }}
         >
-          <UploadCloud className={`w-4 h-4 ${uploading ? "animate-spin" : ""}`} />
+          <UploadCloud style={{ width: "16px", height: "16px" }} />
           <span>Ajouter un document</span>
         </button>
       </div>
 
       {success && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-600 text-sm flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+        <div style={{ padding: "var(--space-4)", background: "var(--success-light)", border: "1px solid var(--success)", borderRadius: "var(--radius-xl)", color: "var(--success)", fontSize: "var(--text-body)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+          <CheckCircle2 style={{ width: "20px", height: "20px", flexShrink: 0 }} />
           {success}
         </div>
       )}
 
       {error && !isModalOpen && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-600 text-sm flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+        <div style={{ padding: "var(--space-4)", background: "var(--alert-light)", border: "1px solid var(--alert)", borderRadius: "var(--radius-xl)", color: "var(--alert)", fontSize: "var(--text-body)", display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+          <AlertCircle style={{ width: "20px", height: "20px", flexShrink: 0 }} />
           {error}
         </div>
       )}
 
       {loading && documents.length === 0 && (
-        <div className="p-8 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-500" />
-          <p className="text-sm text-slate-400 mt-2">Chargement des documents...</p>
+        <div style={{ padding: "var(--space-8)", textAlign: "center" }}>
+          <Loader2 style={{ width: "32px", height: "32px", margin: "0 auto", color: "var(--accent)", animation: "spin 1s linear infinite" }} />
+          <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", marginTop: "var(--space-2)" }}>Chargement des documents...</p>
         </div>
       )}
 
-      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 p-6 rounded-3xl space-y-4">
-        <h3 className="font-extrabold text-slate-900 dark:text-white text-base border-b border-slate-100 dark:border-white/5 pb-3">
+      <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <h3 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)" }}>
           Documents Enregistrés ({documents.length})
         </h3>
 
         {documents.length === 0 && !loading ? (
-          <div className="p-8 text-center text-slate-400 text-sm">
-            <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
+          <div style={{ padding: "var(--space-8)", textAlign: "center", color: "var(--ink-muted)", fontSize: "var(--text-body)" }}>
+            <FileText style={{ width: "48px", height: "48px", margin: "0 auto var(--space-2)", opacity: 0.5, color: "var(--ink-subtle)" }} />
             <p>Aucun document téléversé.</p>
-            <p className="text-xs mt-1">Cliquez sur "Ajouter un document" pour commencer.</p>
+            <p style={{ fontSize: "var(--text-caption)", marginTop: "var(--space-1)" }}>Cliquez sur "Ajouter un document" pour commencer.</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {documents.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-indigo-500 transition-all"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className={`p-3 rounded-xl ${getCategoryColor(doc.category)} font-bold`}>
-                    <span className="text-lg">{getCategoryIcon(doc.category)}</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xs text-slate-900 dark:text-white">{doc.file_name}</h4>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
-                      {doc.category} • {formatFileSize(doc.file_size)} • Ajouté le {formatDate(doc.uploaded_at)}
-                      {isProfilePhoto(doc.category) && userProfile?.avatar_url === doc.download_url && (
-                        <span className="ml-2 text-pink-500 font-bold">• Photo de profil active</span>
-                      )}
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+            {documents.map((doc) => {
+              const categoryColor = getCategoryColor(doc.category);
+              const statusColor = getStatusColor(doc.status);
+              return (
+                <div
+                  key={doc.id}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-4)", borderRadius: "var(--radius-xl)", background: "var(--warm-50)", border: "1px solid var(--border)", transition: "all var(--transition-base)" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3.5)" }}>
+                    <div style={{ padding: "var(--space-3)", borderRadius: "var(--radius-xl)", background: categoryColor.background, color: categoryColor.color, fontWeight: 700 }}>
+                      <span style={{ fontSize: "var(--text-h2)" }}>{getCategoryIcon(doc.category)}</span>
+                    </div>
+                    <div>
+                      <h4 style={{ fontWeight: 700, fontSize: "var(--text-caption)", color: "var(--ink-text)", margin: 0 }}>{doc.file_name}</h4>
+                      <div style={{ fontSize: "11px", color: "var(--ink-muted)", marginTop: "4px" }}>
+                        {doc.category} • {formatFileSize(doc.file_size)} • Ajouté le {formatDate(doc.uploaded_at)}
+                        {isProfilePhoto(doc.category) && userProfile?.avatar_url === doc.download_url && (
+                          <span style={{ marginLeft: "8px", color: "var(--alert)", fontWeight: 700 }}>• Photo de profil active</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-1 text-[10px] font-black rounded-full ${getStatusColor(doc.status)}`}>
-                    {doc.status === "uploaded" ? "✓" : doc.status === "processing" ? "..." : "✗"}
-                  </span>
-                  
-                  {doc.download_url && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                    <span style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, borderRadius: "var(--radius-full)", background: statusColor.background, color: statusColor.color }}>
+                      {doc.status === "uploaded" ? "✓" : doc.status === "processing" ? "..." : "✗"}
+                    </span>
+                    
+                    {doc.download_url && (
+                      <button
+                        onClick={() => handleDownload(doc.download_url, doc.file_name)}
+                        style={{ padding: "8px", borderRadius: "var(--radius-xl)", color: "var(--accent)", border: "1px solid var(--accent-200)", background: "transparent", cursor: "pointer", transition: "all var(--transition-base)" }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--accent-50)"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                        title="Télécharger"
+                      >
+                        <Download style={{ width: "16px", height: "16px" }} />
+                      </button>
+                    )}
+                    
                     <button
-                      onClick={() => handleDownload(doc.download_url, doc.file_name)}
-                      className="p-2 rounded-xl text-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/10 transition-all"
-                      title="Télécharger"
+                      onClick={() => handleDelete(doc.id)}
+                      style={{ padding: "8px", borderRadius: "var(--radius-xl)", color: "var(--ink-subtle)", border: "1px solid var(--border)", background: "transparent", cursor: "pointer", transition: "all var(--transition-base)" }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "var(--alert)"; (e.currentTarget as HTMLButtonElement).style.background = "var(--alert-light)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-subtle)"; (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                      title="Supprimer"
                     >
-                      <Download className="w-4 h-4" />
+                      <Trash2 style={{ width: "16px", height: "16px" }} />
                     </button>
-                  )}
-                  
-                  <button
-                    onClick={() => handleDelete(doc.id)}
-                    className="p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );})}
           </div>
         )}
       </div>

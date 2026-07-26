@@ -107,27 +107,27 @@ export default function DirectMessagesTab({ userId, userProfile }: Props) {
   return (
     <div className="h-[calc(100vh-180px)] flex flex-col md:flex-row gap-6">
       {/* Student Directory List */}
-      <div className="w-full md:w-80 bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-3xl p-4 flex flex-col shrink-0">
-        <h3 className="font-extrabold text-slate-900 dark:text-white text-base mb-3 flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-indigo-500" /> Réseau Étudiants
+      <div className="w-full md:w-80 bg-[rgb(var(--warm-50))] backdrop-blur-xl border border-[rgb(var(--border))] rounded-3xl p-4 flex flex-col shrink-0">
+        <h3 className="font-extrabold text-[rgb(var(--ink-900))] text-base mb-3 flex items-center gap-2">
+          <MessageCircle className="w-5 h-5 text-accent" /> Réseau Étudiants
         </h3>
 
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--ink-subtle))]" />
           <input
             type="text"
             placeholder="Rechercher un membre..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs outline-none text-slate-800 dark:text-slate-200"
+            className="w-full pl-9 pr-3 py-2 bg-[rgb(var(--warm-100))] border border-[rgb(var(--border))] rounded-xl text-xs outline-none text-[rgb(var(--ink-text))]"
           />
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar">
           {loading ? (
-            <div className="text-xs text-slate-400 text-center py-6">Chargement des membres...</div>
+            <div className="text-xs text-[rgb(var(--ink-muted))] text-center py-6">Chargement des membres...</div>
           ) : filteredProfiles.length === 0 ? (
-            <div className="text-xs text-slate-400 text-center py-6">Aucun membre trouvé</div>
+            <div className="text-xs text-[rgb(var(--ink-muted))] text-center py-6">Aucun membre trouvé</div>
           ) : (
             filteredProfiles.map((p) => {
               const active = selectedUser?.id === p.id;
@@ -137,8 +137,8 @@ export default function DirectMessagesTab({ userId, userProfile }: Props) {
                   onClick={() => setSelectedUser(p)}
                   className={`p-3 rounded-2xl cursor-pointer transition-all border flex items-center gap-3 ${
                     active
-                      ? "bg-indigo-600 text-white border-indigo-500 shadow-md"
-                      : "bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border-slate-200 dark:border-white/5 text-slate-800 dark:text-slate-200"
+                      ? "bg-accent text-accent-text border-accent shadow-md"
+                      : "bg-[rgb(var(--warm-100))] hover:bg-[rgb(var(--warm-200))] border-[rgb(var(--border))] text-[rgb(var(--ink-text))]"
                   }`}
                 >
                   <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center font-bold text-white text-xs shrink-0">
@@ -156,17 +156,17 @@ export default function DirectMessagesTab({ userId, userProfile }: Props) {
       </div>
 
       {/* Main Chat Drawer Area */}
-      <div className="flex-1 bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-3xl flex flex-col overflow-hidden">
+      <div className="flex-1 bg-[rgb(var(--warm-50))] backdrop-blur-xl border border-[rgb(var(--border))] rounded-3xl flex flex-col overflow-hidden">
         {selectedUser ? (
           <>
             {/* Header */}
-            <div className="p-4 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-950/40 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center">
+            <div className="p-4 border-b border-[rgb(var(--border))] bg-[rgb(var(--warm-100))] flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-accent text-accent-text font-bold text-sm flex items-center justify-center">
                 {selectedUser.fullName[0]}
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">{selectedUser.fullName}</h4>
-                <div className="text-xs text-slate-500 flex items-center gap-2">
+                <h4 className="font-bold text-[rgb(var(--ink-900))] text-sm">{selectedUser.fullName}</h4>
+                <div className="text-xs text-[rgb(var(--ink-muted))] flex items-center gap-2">
                   <span>{selectedUser.fieldOfStudy}</span>
                   <span>•</span>
                   <span>Cible : {selectedUser.targetCountries?.join(", ")}</span>
@@ -177,7 +177,7 @@ export default function DirectMessagesTab({ userId, userProfile }: Props) {
             {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar">
               {messages.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                <div className="h-full flex items-center justify-center text-xs text-[rgb(var(--ink-muted))]">
                   Démarre la discussion avec {selectedUser.fullName} !
                 </div>
               ) : (
@@ -185,7 +185,7 @@ export default function DirectMessagesTab({ userId, userProfile }: Props) {
                   const isMe = dm.sender_id === userId;
                   return (
                     <div key={dm.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                      <div className={`p-3 rounded-2xl text-xs max-w-[75%] ${isMe ? "bg-indigo-600 text-white rounded-tr-none shadow-md" : "bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-slate-200 rounded-tl-none"}`}>
+                      <div className={`p-3 rounded-2xl text-xs max-w-[75%] ${isMe ? "bg-accent text-accent-text rounded-tr-none shadow-md" : "bg-[rgb(var(--warm-100))] text-[rgb(var(--ink-text))] rounded-tl-none"}`}>
                         {dm.content}
                       </div>
                     </div>
@@ -195,28 +195,28 @@ export default function DirectMessagesTab({ userId, userProfile }: Props) {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-950/40 flex gap-2">
+            <div className="p-4 border-t border-[rgb(var(--border))] bg-[rgb(var(--warm-100))] flex gap-2">
               <input
                 type="text"
                 placeholder={`Envoyer un message privé à ${selectedUser.fullName}...`}
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                className="flex-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 text-xs outline-none text-slate-800 dark:text-slate-200"
+                className="flex-1 bg-[rgb(var(--warm-50))] border border-[rgb(var(--border))] rounded-2xl px-4 text-xs outline-none text-[rgb(var(--ink-text))]"
               />
               <button
                 onClick={handleSend}
                 disabled={!inputMessage.trim()}
-                className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs disabled:opacity-50 transition-all"
+                className="px-5 py-2.5 rounded-2xl bg-accent hover:bg-accent-hover text-accent-text font-bold text-xs disabled:opacity-50 transition-all"
               >
                 <Send className="w-4 h-4" />
               </button>
             </div>
           </>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center p-8 text-center space-y-3 text-slate-400">
-            <MessageCircle className="w-12 h-12 text-slate-400 mx-auto" />
-            <h4 className="text-base font-bold text-slate-900 dark:text-white">Sélectionne un membre du réseau</h4>
+          <div className="h-full flex flex-col items-center justify-center p-8 text-center space-y-3 text-[rgb(var(--ink-muted))]">
+            <MessageCircle className="w-12 h-12 text-[rgb(var(--ink-muted))] mx-auto" />
+            <h4 className="text-base font-bold text-[rgb(var(--ink-900))]">Sélectionne un membre du réseau</h4>
             <p className="text-xs max-w-sm">
               Clique sur un étudiant dans la liste de gauche pour échanger des conseils, partager des expériences ou collaborer.
             </p>

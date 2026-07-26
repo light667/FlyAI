@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
@@ -21,6 +21,8 @@ interface ProfileState {
   targetCountries: string[];
   needsFullFunding: boolean;
   projectSummary: string;
+  photoUrl: string;
+  cvUrl: string;
 }
 
 const WORLD_COUNTRIES = [
@@ -66,7 +68,7 @@ const DEGREES = [
   { value: "ingenieur", label: "Diplome d Ingenieur", desc: "Cycle specialise" },
 ];
 
-// 7 etapes micro-succes -- §4.3 onboarding
+// 8 etapes micro-succes -- §4.3 onboarding
 const STEPS = [
   { id: "identity",     label: "Identite",      short: "Qui etes-vous ?" },
   { id: "academic",     label: "Parcours",      short: "Votre niveau d etudes" },
@@ -74,6 +76,7 @@ const STEPS = [
   { id: "languages",    label: "Langues",       short: "Vos niveaux de langue" },
   { id: "destination",  label: "Destinations",  short: "Ou souhaitez-vous etudier ?" },
   { id: "funding",      label: "Financement",   short: "Vos besoins de financement" },
+  { id: "documents",    label: "Documents",     short: "Photo & CV" },
   { id: "project",      label: "Projet",        short: "En une phrase, votre projet" },
 ];
 
@@ -110,16 +113,18 @@ export default function OnboardingPage() {
     fullName: "",
     degreeLevel: "master",
     fieldOfStudy: "Informatique & Intelligence Artificielle",
-    university: "",
+    university: "Université de Lomé",
     averageOutOf20: 14,
     gpa: 3.5,
-    nationality: "Senegal",
+    nationality: "Togo",
     englishLevel: "B2",
     frenchLevel: "C1",
     otherLanguages: [],
     targetCountries: ["France", "Allemagne"],
     needsFullFunding: true,
     projectSummary: "",
+    photoUrl: "",
+    cvUrl: "",
   });
 
   useEffect(() => {
@@ -144,8 +149,9 @@ export default function OnboardingPage() {
     if (step === 2) return profile.averageOutOf20 >= 0;
     if (step === 3) return !!profile.englishLevel;
     if (step === 4) return profile.targetCountries.length > 0;
-    if (step === 5) return true;
-    if (step === 6) return true;
+    if (step === 5) return true; // Financement
+    if (step === 6) return true; // Documents (optional)
+    if (step === 7) return true; // Project
     return false;
   };
 
@@ -165,12 +171,16 @@ export default function OnboardingPage() {
             fullName: profile.fullName || user.displayName || "",
             degreeLevel: profile.degreeLevel,
             fieldOfStudy: profile.fieldOfStudy,
+            university: profile.university,
             nationality: profile.nationality,
             targetCountries: profile.targetCountries,
             gpa: profile.gpa,
+            averageOutOf20: profile.averageOutOf20,
             needsFullFunding: profile.needsFullFunding,
             projectSummary: profile.projectSummary,
             languages: { english: profile.englishLevel, french: profile.frenchLevel, others: profile.otherLanguages },
+            photoUrl: profile.photoUrl,
+            cvUrl: profile.cvUrl,
           }),
         });
         router.push("/dashboard");
@@ -430,8 +440,98 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Etape 6 — Projet (micro-commitment) */}
+        {/* Etape 6 — Documents (Photo & CV) */}
         {step === 6 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+            <div style={{ textAlign: "center" }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h1)", fontWeight: 400, color: "var(--ink-text)", margin: "0 0 var(--space-2)" }}>
+                Vos documents
+              </h2>
+              <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", margin: 0 }}>
+                Ajoutez votre photo de profil et votre CV pour completer votre profil et beneficier du matching personnalise.
+              </p>
+            </div>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+              {/* Photo de profil */}
+              <div>
+                <label style={labelSt}>Photo de profil</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", alignItems: "center" }}>
+                  <div style={{ width: 100, height: 100, borderRadius: "var(--radius-full)", background: "var(--warm-200)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", border: "2px dashed var(--border)" }}>
+                    {profile.photoUrl ? (
+                      <img src={profile.photoUrl} alt="Photo de profil" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      <span style={{ fontSize: "var(--text-caption)", color: "var(--ink-subtle)" }}>Pas de photo</span>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          setProfile({ ...profile, photoUrl: reader.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    style={{ display: "none" }}
+                    id="photo-upload"
+                  />
+                  <label htmlFor="photo-upload" style={{ cursor: "pointer", padding: "var(--space-2) var(--space-4)", background: "var(--accent)", color: "var(--accent-text)", borderRadius: "var(--radius)", fontSize: "var(--text-body)", fontWeight: 600 }}>
+                    Choisir une photo
+                  </label>
+                </div>
+              </div>
+
+              {/* CV */}
+              <div>
+                <label style={labelSt}>CV (PDF ou Word)</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)", alignItems: "center" }}>
+                  <div style={{ width: "100%", padding: "var(--space-6)", background: "var(--warm-100)", border: "1px dashed var(--border)", borderRadius: "var(--radius)", display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--space-2)" }}>
+                    {profile.cvUrl ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+                        <span style={{ color: "var(--accent)"}}>✓</span>
+                        <span style={{ fontSize: "var(--text-body)", color: "var(--ink-text)"}}>CV telecharge</span>
+                      </div>
+                    ) : (
+                      <span style={{ fontSize: "var(--text-body)", color: "var(--ink-subtle)"}}>Aucun CV selectionne</span>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        // For CV, we'll just store the file name for now
+                        setProfile({ ...profile, cvUrl: file.name });
+                      }
+                    }}
+                    style={{ display: "none" }}
+                    id="cv-upload"
+                  />
+                  <label htmlFor="cv-upload" style={{ cursor: "pointer", padding: "var(--space-2) var(--space-4)", background: "var(--accent)", color: "var(--accent-text)", borderRadius: "var(--radius)", fontSize: "var(--text-body)", fontWeight: 600 }}>
+                    Choisir un CV
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ padding: "var(--space-4)", background: "var(--accent-50)", border: "1px solid var(--accent)", borderRadius: "var(--radius)" }}>
+              <p style={{ fontSize: "var(--text-body)", color: "var(--accent)", margin: 0, fontWeight: 500 }}>
+                {profile.photoUrl && profile.cvUrl 
+                  ? "Parfait ! Votre profil est complet." 
+                  : "Ces documents sont facultatifs mais fortement recommandes pour un meilleur matching."}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Etape 7 — Projet (micro-commitment) */}
+        {step === 7 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
             <div style={{ textAlign: "center" }}>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h1)", fontWeight: 400, color: "var(--ink-text)", margin: "0 0 var(--space-2)" }}>
@@ -445,7 +545,7 @@ export default function OnboardingPage() {
               <label style={labelSt}>Votre projet professionnel ou academique</label>
               <textarea
                 rows={4}
-                placeholder="Ex: Obtenir un Master en IA en Allemagne pour contribuer au developpement de systemes de sante intelligents au Senegal."
+                placeholder="Ex: Obtenir un Master en IA en Allemagne pour contribuer au developpement de systemes de sante intelligents au Togo."
                 value={profile.projectSummary}
                 onChange={(e) => setProfile({ ...profile, projectSummary: e.target.value })}
                 style={{ ...inputSt, resize: "vertical", lineHeight: 1.6 }}
@@ -471,7 +571,7 @@ export default function OnboardingPage() {
             </button>
           )}
           <button onClick={handleNext} disabled={!canNext() || saving} className="btn-primary" style={{ flex: 1, justifyContent: "center", opacity: !canNext() || saving ? 0.4 : 1 }}>
-            <span>{step === STEPS.length - 1 ? (saving ? "Sauvegarde..." : "Acceder au tableau de bord") : step === 5 ? "Presque fini" : "Continuer"}</span>
+            <span>{step === STEPS.length - 1 ? (saving ? "Sauvegarde..." : "Acceder au tableau de bord") : step >= 6 ? "Presque fini" : "Continuer"}</span>
             <ArrowRight size={14} />
           </button>
         </div>

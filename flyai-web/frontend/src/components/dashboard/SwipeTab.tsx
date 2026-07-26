@@ -83,13 +83,13 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
   const currentCard = deck[currentIndex];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[75vh] relative px-4 text-slate-800 dark:text-slate-100">
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "75vh", position: "relative", padding: "var(--space-4)", color: "var(--ink-text)", width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
       {/* Title */}
-      <div className="text-center mb-6 space-y-1">
-        <h2 className="text-2xl font-black text-slate-900 dark:text-white flex items-center justify-center gap-2">
-          <Sparkles className="w-6 h-6 text-blue-600 dark:text-indigo-400" /> Deck de Matching Avancé
+      <div style={{ textAlign: "center", marginBottom: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+        <h2 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--ink-text)", display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-2)", margin: 0 }}>
+          <Sparkles style={{ width: "var(--space-6)", height: "var(--space-6)", color: "var(--accent)" }} /> Deck de Matching Avancé
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", margin: 0 }}>
           Les opportunités classées par compatibilité directe avec ton profil académique.
         </p>
       </div>
@@ -101,21 +101,21 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-lg"
+            style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-4)", background: "rgba(15, 26, 46, 0.6)", backdropFilter: "blur(8px)" }}
           >
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-indigo-500/40 p-8 rounded-3xl max-w-md w-full text-center space-y-6 shadow-2xl">
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-blue-600 to-violet-600 flex items-center justify-center animate-bounce shadow-lg text-white">
-                <Sparkles className="w-10 h-10" />
+            <div style={{ background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-8)", maxWidth: "448px", width: "100%", textAlign: "center", display: "flex", flexDirection: "column", gap: "var(--space-6)", boxShadow: "var(--shadow-xl)" }}>
+              <div style={{ width: "var(--space-20)", height: "var(--space-20)", margin: "0 auto", borderRadius: "var(--radius-full)", background: "var(--gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center", animation: "bounce 1s infinite", boxShadow: "var(--shadow-lg)", color: "var(--accent-text)" }}>
+                <Sparkles style={{ width: "var(--space-10)", height: "var(--space-10)" }} />
               </div>
 
               <div>
-                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">Compatible à {lastMatch.matchScore || 90}% ! 🎉</h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 mt-2">
-                  <span className="font-bold text-blue-600 dark:text-indigo-300">{lastMatch.titre}</span> a été ajoutée à tes candidatures.
+                <h3 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: 0 }}>Compatible à {lastMatch.matchScore || 90}% !</h3>
+                <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", marginTop: "var(--space-2)" }}>
+                  <span style={{ fontWeight: 700, color: "var(--accent)" }}>{lastMatch.titre}</span> a été ajoutée à tes candidatures.
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3">
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
                 {onOpenFlyAgent && (
                   <button
                     onClick={() => {
@@ -123,16 +123,18 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                       setLastMatch(null);
                       onOpenFlyAgent(m);
                     }}
-                    className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2"
+                    className="btn-primary"
+                    style={{ padding: "var(--space-3.5) var(--space-6)", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-lg)" }}
                   >
-                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <Sparkles style={{ width: "var(--space-4)", height: "var(--space-4)", color: "var(--accent-text)" }} />
                     <span>Postuler avec FlyAgent</span>
                   </button>
                 )}
 
                 <button
                   onClick={() => setLastMatch(null)}
-                  className="w-full py-3 rounded-2xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 text-xs font-bold"
+                  className="btn-secondary"
+                  style={{ padding: "var(--space-3) var(--space-6)", borderRadius: "var(--radius-2xl)", fontWeight: 700 }}
                 >
                   Continuer le Matching
                 </button>
@@ -143,32 +145,33 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
       </AnimatePresence>
 
       {/* Main Matching Deck Container */}
-      <div className="relative w-full max-w-md h-[520px] flex items-center justify-center">
+      <div style={{ position: "relative", width: "100%", maxWidth: "448px", height: "520px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {loading ? (
-          <div className="w-full h-full rounded-3xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 animate-pulse flex items-center justify-center text-slate-400 text-xs font-bold">
+          <div style={{ width: "100%", height: "100%", borderRadius: "var(--radius-2xl)", background: "var(--warm-50)", border: "1px solid var(--border)", animation: "pulse 2s ease-in-out infinite", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)", fontSize: "var(--text-caption)", fontWeight: 700 }}>
             Calcul des scores de matching...
           </div>
         ) : !currentCard ? (
-          <div className="w-full p-8 text-center bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 rounded-3xl space-y-4 shadow-lg">
-            <Sparkles className="w-12 h-12 text-blue-600 dark:text-indigo-400 mx-auto" />
-            <h3 className="text-xl font-black text-slate-900 dark:text-white">Toutes les bourses ont été examinées ! 🚀</h3>
+          <div style={{ width: "100%", padding: "var(--space-8)", textAlign: "center", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", display: "flex", flexDirection: "column", gap: "var(--space-4)", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-lg)" }}>
+            <Sparkles style={{ width: "var(--space-12)", height: "var(--space-12)", color: "var(--accent)", margin: "0 auto" }} />
+            <h3 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: 0 }}>Toutes les bourses ont été examinées !</h3>
             <button
               onClick={loadDeck}
-              className="px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl text-xs shadow-lg hover:bg-blue-500 transition-all"
+              className="btn-primary"
+              style={{ padding: "var(--space-3) var(--space-6)", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-lg)" }}
             >
               Recharger le Deck
             </button>
           </div>
         ) : (
-          <div className="relative w-full h-full">
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
             {/* Card Preview behind */}
             {deck[currentIndex + 1] && (
-              <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-3xl scale-95 opacity-50 translate-y-3 pointer-events-none shadow-md" />
+              <div style={{ position: "absolute", inset: 0, background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", transform: "scale(0.95) translateY(12px)", opacity: 0.5, pointerEvents: "none", boxShadow: "var(--shadow-md)" }} />
             )}
 
             {/* Top Interactive Card */}
             <motion.div
-              style={{ x, rotate }}
+              style={{ x, rotate, position: "absolute", inset: 0, background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", justifyContent: "space-between", cursor: "grab", boxShadow: "var(--shadow-xl)", overflow: "hidden" }}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               onDragEnd={(_, info) => {
@@ -178,49 +181,46 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                   handleSwipe("left");
                 }
               }}
-              className="absolute inset-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-xl flex flex-col justify-between cursor-grab active:cursor-grabbing select-none overflow-hidden"
             >
               {/* Swipe Badges */}
               <motion.div
-                style={{ opacity: opacityLike }}
-                className="absolute top-6 left-6 z-20 px-4 py-2 bg-emerald-500 text-white font-black text-base uppercase rounded-2xl shadow-xl rotate-[-12deg]"
+                style={{ opacity: opacityLike, position: "absolute", top: "var(--space-6)", left: "var(--space-6)", zIndex: 20, padding: "var(--space-4) var(--space-10)", background: "var(--success)", color: "var(--accent-text)", fontWeight: 700, fontSize: "var(--text-body)", textTransform: "uppercase", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-xl)", transform: "rotate(-12deg)" }}
               >
-                LIKE ❤️
+                LIKE
               </motion.div>
 
               <motion.div
-                style={{ opacity: opacitySkip }}
-                className="absolute top-6 right-6 z-20 px-4 py-2 bg-rose-500 text-white font-black text-base uppercase rounded-2xl shadow-xl rotate-[12deg]"
+                style={{ opacity: opacitySkip, position: "absolute", top: "var(--space-6)", right: "var(--space-6)", zIndex: 20, padding: "var(--space-4) var(--space-10)", background: "var(--alert)", color: "var(--accent-text)", fontWeight: 700, fontSize: "var(--text-body)", textTransform: "uppercase", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-xl)", transform: "rotate(12deg)" }}
               >
-                SKIP ✕
+                SKIP
               </motion.div>
 
               {/* Card Body */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="px-3.5 py-1.5 text-xs font-black rounded-full bg-blue-50 dark:bg-indigo-500/20 text-blue-600 dark:text-indigo-300 border border-blue-200 dark:border-indigo-500/30 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-indigo-400" />
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ padding: "var(--space-3.5) var(--space-9)", fontSize: "var(--text-caption)", fontWeight: 700, borderRadius: "var(--radius-full)", background: "var(--accent-50)", color: "var(--accent)", border: "1px solid var(--accent-200)", display: "flex", alignItems: "center", gap: "var(--space-1.5)" }}>
+                    <Sparkles style={{ width: "var(--space-3.5)", height: "var(--space-3.5)", color: "var(--accent)" }} />
                     Match Score {currentCard.matchScore || 85}%
                   </span>
 
-                  <span className="px-3 py-1 text-[11px] font-extrabold rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 uppercase">
+                  <span style={{ padding: "var(--space-3) var(--space-9)", fontSize: "11px", fontWeight: 700, borderRadius: "var(--radius-full)", background: "var(--success-light)", color: "var(--success)", border: "1px solid var(--success-200)", textTransform: "uppercase" }}>
                     {currentCard.financement === "TOTAL" ? "100% Financé" : "Partiel"}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight">
+                <h3 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: 0, lineHeight: 1.2 }}>
                   {currentCard.titre}
                 </h3>
 
-                <div className="flex flex-wrap gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-lg">
-                    <MapPin className="w-3.5 h-3.5 text-blue-600 dark:text-indigo-400" />
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)", fontSize: "var(--text-caption)", fontWeight: 600, color: "var(--ink-muted)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", background: "var(--warm-100)", padding: "var(--space-2.5) var(--space-6)", borderRadius: "var(--radius)" }}>
+                    <MapPin style={{ width: "var(--space-3.5)", height: "var(--space-3.5)", color: "var(--accent)" }} />
                     <span>{currentCard.pays_destination?.join(", ") || "International"}</span>
                   </div>
 
                   {currentCard.deadline && (
-                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-lg text-amber-600 dark:text-amber-400">
-                      <Calendar className="w-3.5 h-3.5" />
+                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", background: "var(--warning-light)", padding: "var(--space-2.5) var(--space-6)", borderRadius: "var(--radius)", color: "var(--warning)" }}>
+                      <Calendar style={{ width: "var(--space-3.5)", height: "var(--space-3.5)" }} />
                       <span>{new Date(currentCard.deadline).toLocaleDateString("fr-FR")}</span>
                     </div>
                   )}
@@ -228,36 +228,37 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
 
                 {/* Score Reasons */}
                 {currentCard.matchBreakdown?.reasons && (
-                  <div className="p-3 rounded-2xl bg-blue-50/60 dark:bg-indigo-950/30 border border-blue-100 dark:border-indigo-500/20 space-y-1">
+                  <div style={{ padding: "var(--space-3)", borderRadius: "var(--radius-2xl)", background: "var(--accent-50)", border: "1px solid var(--accent-100)", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
                     {currentCard.matchBreakdown.reasons.slice(0, 2).map((r, i) => (
-                      <div key={i} className="flex items-center gap-1.5 text-[11px] font-semibold text-blue-900 dark:text-indigo-200">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-indigo-400 shrink-0" />
-                        <span className="truncate">{r}</span>
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--space-1.5)", fontSize: "11px", fontWeight: 600, color: "var(--accent)" }}>
+                        <CheckCircle2 style={{ width: "var(--space-3.5)", height: "var(--space-3.5)", color: "var(--accent)", flexShrink: 0 }} />
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
+                <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: 1.65 }}>
                   {currentCard.description}
                 </p>
               </div>
 
               {/* Card Footer */}
-              <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs">
+              <div style={{ paddingTop: "var(--space-3)", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "var(--text-caption)" }}>
                 <button
                   onClick={() => setInspectScholarship(currentCard)}
-                  className="text-blue-600 dark:text-indigo-400 font-extrabold hover:underline"
+                  style={{ color: "var(--accent)", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 4 }}
                 >
-                  Détails complets &rarr;
+                  Détails complets
                 </button>
 
                 {onOpenFlyAgent && (
                   <button
                     onClick={() => onOpenFlyAgent(currentCard)}
-                    className="px-3 py-1.5 rounded-xl bg-blue-600 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm"
+                    className="btn-primary"
+                    style={{ padding: "var(--space-1.5) var(--space-3)", borderRadius: "var(--radius-xl)", fontSize: "11px", boxShadow: "var(--shadow-sm)" }}
                   >
-                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <Sparkles style={{ width: "var(--space-3)", height: "var(--space-3)", color: "var(--accent-text)" }} />
                     <span>FlyAgent</span>
                   </button>
                 )}
@@ -269,29 +270,36 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
 
       {/* Control Buttons */}
       {currentCard && (
-        <div className="flex items-center justify-center gap-6 mt-6">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-6)", marginTop: "var(--space-6)" }}>
           <button
             onClick={() => handleSwipe("left")}
-            className="w-14 h-14 rounded-full bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-500/30 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/20 hover:scale-110 transition-all flex items-center justify-center shadow-lg"
+            style={{ width: "56px", height: "56px", borderRadius: "var(--radius-full)", background: "var(--warm-50)", border: "2px solid var(--alert)", color: "var(--alert)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, cursor: "pointer", boxShadow: "var(--shadow-lg)", transition: "all var(--transition-base)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--alert-light)"; e.currentTarget.style.transform = "scale(1.1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--warm-50)"; e.currentTarget.style.transform = "scale(1)"; }}
             title="Passer"
           >
-            <X className="w-6 h-6" />
+            <X style={{ width: "24px", height: "24px" }} />
           </button>
 
           <button
             onClick={() => handleSwipe("superlike")}
-            className="w-12 h-12 rounded-full bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-500/30 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/20 hover:scale-110 transition-all flex items-center justify-center shadow-lg"
+            style={{ width: "48px", height: "48px", borderRadius: "var(--radius-full)", background: "var(--warm-50)", border: "2px solid var(--warning)", color: "var(--warning)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, cursor: "pointer", boxShadow: "var(--shadow-lg)", transition: "all var(--transition-base)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--warning-light)"; e.currentTarget.style.transform = "scale(1.1)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--warm-50)"; e.currentTarget.style.transform = "scale(1)"; }}
             title="Super Match"
           >
-            <Star className="w-5 h-5 fill-amber-400/20" />
+            <Star style={{ width: "20px", height: "20px" }} />
           </button>
 
           <button
             onClick={() => handleSwipe("right")}
-            className="w-14 h-14 rounded-full bg-blue-600 text-white hover:scale-110 transition-all flex items-center justify-center shadow-lg shadow-blue-600/30"
+            className="btn-primary"
+            style={{ width: "56px", height: "56px", borderRadius: "var(--radius-full)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-lg), 0 4px 12px rgba(15, 123, 108, 0.3)", transition: "transform var(--transition-base)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.1)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)"; }}
             title="Aimer"
           >
-            <Heart className="w-6 h-6 fill-white/20" />
+            <Heart style={{ width: "24px", height: "24px", fill: "rgba(255, 255, 255, 0.2)", color: "var(--accent-text)" }} />
           </button>
         </div>
       )}
