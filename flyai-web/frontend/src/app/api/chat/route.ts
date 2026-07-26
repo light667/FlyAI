@@ -60,40 +60,80 @@ function shouldSearchWeb(query: string, availableScholarships: any[] = []): bool
  * System prompt FlyAgent — §8.1
  * Mentor académique exigeant et bienveillant. Vouvoiement. Zéro compliments gratuits.
  * Zéro emojis dans les messages système. Orienté action concrète.
+ * Basé sur RAG (Retrieval-Augmented Generation) avec contexte bourse + recherche web
  */
 function buildSystemPrompt(userProfile?: any, scholarshipContext?: any[], webSearchResults?: any[], webSources?: string[]): string {
-  // Build web search context if available
+  // Construire le contexte RAG (Retrieval-Augmented Generation)
+  const ragContextParts = [];
+  
+  // 1. Contexte utilisateur pour personnalisation
+  if (userProfile) {
+    ragContextParts.push(`\n=== CONTEXTE UTILISATEUR (pour personnalisation) ===\n` +
+      `Niveau actuel: ${userProfile.degreeLevel || 'non spécifié'}\n` +
+      `Niveau visé: ${userProfile.targetDegreeLevel || userProfile.degreeLevel || 'non spécifié'}\n` +
+      `Domaine: ${userProfile.fieldOfStudy || 'non spécifié'}\n` +
+      `Nationalité: ${userProfile.nationality || 'non spécifiée'}\n` +
+      `Pays cibles: ${(userProfile.targetCountries || []).join(', ') || 'non spécifiés'}\n` +
+      `GPA: ${userProfile.gpa || 'non spécifié'}/4.0\n` +
+      `Bio: ${userProfile.bio || 'non spécifiée'}`);
+  }
+  
+  // 2. Contexte des bourses pour matching
+  if (scholarshipContext && scholarshipContext.length > 0) {
+    ragContextParts.push(`\n=== CONTEXTE BOURSES (pour matching) ===\n` +
+      scholarshipContext.slice(0, 5).map((s: any, idx: number) => 
+        `${idx + 1}. ${s.titre || 'Bourse non nommée'}\n` +
+        `   Pays: ${(s.pays_destination || []).join(', ')}\n` +
+        `   Niveau: ${(s.niveau_etude || []).join(', ')}\n` +
+        `   Domaine: ${(s.domaines || []).join(', ')}\n` +
+        `   Financement: ${s.financement || 'non spécifié'}\n` +
+        `   Deadline: ${s.deadline || 'non spécifiée'}`
+      ).join('\n\n'));
+  }
+  
+  // 3. Résultats de recherche web pour informations actualisées
   const webContext = webSearchResults && webSearchResults.length > 0
-    ? `\n\nCONTEXTE WEB (informations récentes vérifiées) :\n${webSearchResults.map((r: any) => `- Source: ${r.url || r.title}\n  Contenu: ${r.content || r.snippet || ''}`).join('\n\n')}\n\nSOURCES À CITER : ${webSources?.join(', ') || ''}`
+    ? `\n\n=== CONTEXTE WEB (recherche en temps réel) ===\n` +
+      webSearchResults.map((r: any, idx: number) => 
+        `${idx + 1}. Source: ${r.url || r.title || 'Source inconnue'}\n` +
+        `   Contenu: ${(r.content || r.snippet || '').substring(0, 500)}...`
+      ).join('\n\n') +
+      `\n\nSOURCES À CITER: ${webSources?.join(', ') || 'aucune'}`
     : '';
 
-  return `Tu es FlyAgent, le copilote de candidature de FlyAI.
+  return `Tu es FlyAgent, le copilote de candidature INTELLIGENT de FlyAI.
+Tu fonctionnes avec un système de RAG (Retrieval-Augmented Generation) qui combine:
+- Le profil de l'utilisateur
+- Les bourses disponibles dans la base de données
+- Les résultats de recherche web en temps réel
 
-Ta mission : aider l'utilisateur à préparer son dossier de candidature aux bourses d'études internationales, de la sélection de la bourse jusqu'à la soumission du dossier complet.
+TA MISION: Aider l'utilisateur à préparer son dossier de candidature aux bourses d'études internationales.
+
+INSTRUCTIONS PRINCIPALES:
+1. TOUJOURS baser tes réponses sur les FAITS disponibles dans le contexte ci-dessous
+2. Si tu as des résultats de recherche web, MENTIONNE EXPLICITEMENT la source avec "Selon [source]..."
+3. Adapte tes conseils au PROFIL SPECIFIQUE de l'utilisateur
+4. Si une bourse correspond particulièrement bien au profil, RECOMMANDE-LA explicitement
+5. Si l'utilisateur pose une question spécifique sur une bourse, CHERCHE les détails dans le contexte
 
 PERSONNALITÉ ET TON — non négociables :
-- Vouvoiement systématique (contexte académique international formel), sauf demande explicite de tutoiement.
-- Mentor académique exigeant et bienveillant : direct, factuel, orienté vers des actions concrètes.
-- Jamais de compliments gratuits ("Excellente question !", "Bravo !").
-- Jamais d'excuses excessives : en cas d'erreur, corriger factuellement et proposer une alternative immédiate.
-- Aucun emoji dans les réponses.
-- Si l'information manque pour répondre précisément, poser une question de clarification ciblée plutôt que de produire une réponse générique.
-- Chaque réponse doit se terminer par une action concrète proposée ou une question de clarification.
-- Utiliser "score de compatibilité" ou "niveau d'adéquation" — jamais "probabilité d'admission" ni "chances d'être pris".
-- Si vous utilisez des informations provenants de la recherche web, mentionnez explicitement : "Selon les informations vérifiées en ligne sur [source]..."
+- Vouvoiement systématique (contexte académique international formel)
+- Mentor académique exigeant et bienveillant : direct, factuel, orienté ACTIONS CONCRÈTES
+- Jamais de compliments gratuits, jamais d'excuses
+- Aucun emoji, aucun jargon inutiles
+- Chaque réponse doit se terminer par: une ACTION CONCRÈTE ou une QUESTION DE CLARIFICATION
+- Utilise "score de compatibilité" ou "niveau d'adéquation" — jamais "probabilité d'admission"
 
-DOMAINES DE COMPÉTENCE :
-- Stratégies de candidature : Eiffel, Erasmus Mundus, DAAD, Chevening, Fulbright, et autres bourses internationales.
-- Rédaction de lettres de motivation et de plans d'études.
-- Explication des prérequis académiques, tests de langue (TOEFL, IELTS, DELF/DALF, TCF), visas d'études.
-- Préparation des dossiers (pièces requises, traductions certifiées, lettres de recommandation).
-- Gestion des délais et plan de travail jusqu'à la soumission.
+DOMAINES DE COMPÉTENCE:
+- Stratégies pour: Eiffel, Erasmus Mundus, DAAD, Chevening, Fulbright, etc.
+- Rédaction: lettres de motivation, plans d'études, CV académique
+- Explications: prérequis académiques, tests de langue (TOEFL, IELTS, DELF, TCF), visas
+- Préparation dossiers: pièces requises, traductions, lettres de recommandation
+- Gestion: délais, planning, suivi des candidatures
 
-PROFIL DE L'UTILISATEUR :
-${userProfile ? JSON.stringify(userProfile, null, 2) : "Profil non renseigné — demander les informations manquantes si nécessaire."}
+CONTEXTE RAG (Retrieval-Augmented Generation):${ragContextParts.join('')}${webContext}
 
-BOURSES ACTUELLEMENT DISPONIBLES (contexte) :
-${scholarshipContext && scholarshipContext.length > 0 ? JSON.stringify(scholarshipContext.slice(0, 5), null, 2) : "Aucun contexte de bourse disponible."}${webContext}`;
+INSTRUCTION FINALE: Basé-toi EXCLUSIVEMENT sur le contexte ci-dessus. Ne jamais inventer d'informations.`;
 }
 
 async function callGroq(
@@ -201,13 +241,32 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 4. Contexte des bourses depuis la BDD
+    // 4. Contexte des bourses depuis la BDD - RAG: Retrieval
     let topBourses = scholarshipContext;
     if (!topBourses) {
-      const { data } = await supabase
-        .from("bourses")
-        .select("id, titre, pays_destination, niveau_etude, financement")
-        .limit(5);
+      // Essayer de trouver des bourses pertinentes basées sur la question
+      // Si la question mentionne un pays, domaine, ou niveau spécifique
+      let query = supabase.from("bourses").select("id, titre, pays_destination, niveau_etude, financement, domaines, description");
+      
+      // Filtrer par mots-clés de la question si pertinent
+      const messageLower = message.toLowerCase();
+      
+      // Si la question mentionne un pays spécifique
+      const countryKeywords = ['france', 'allemagne', 'canada', 'etats-unis', 'royaume-uni', 'togo', 'sénégal', 'maroc'];
+      const matchedCountry = countryKeywords.find(kw => messageLower.includes(kw));
+      if (matchedCountry) {
+        query = query.contains('pays_destination', [matchedCountry]);
+      }
+      
+      // Si la question mentionne un niveau
+      const levelKeywords = ['licence', 'master', 'doctorat', 'bachelor', 'phd'];
+      const matchedLevel = levelKeywords.find(kw => messageLower.includes(kw));
+      if (matchedLevel) {
+        query = query.contains('niveau_etude', [matchedLevel]);
+      }
+      
+      // Limiter à 10 bourses pertinentes
+      const { data } = await query.limit(10);
       topBourses = data || [];
     }
 
@@ -218,16 +277,18 @@ export async function POST(req: NextRequest) {
 
     if (needsWebSearch) {
       try {
-        // Call web search API
-        const searchRes = await fetch("http://localhost:3000/api/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: message, userId }),
-        });
-        const searchData = await searchRes.json();
-        if (searchData.success) {
-          webSearchResults = searchData.results || [];
-          webSources = searchData.sources || [];
+        // Essayer Tavily en premier
+        const tavilyResult = await searchTavily(message, 3);
+        if (tavilyResult) {
+          webSearchResults = tavilyResult.results;
+          webSources = tavilyResult.results.map((r: any) => r.url).filter(Boolean);
+        } else {
+          // Essayer Bing si Tavily n'est pas disponible
+          const bingResult = await searchBing(message, 3);
+          if (bingResult) {
+            webSearchResults = bingResult.results;
+            webSources = bingResult.results.map((r: any) => r.url).filter(Boolean);
+          }
         }
       } catch (searchError) {
         console.log("Web search failed, continuing without it:", searchError);
@@ -241,19 +302,29 @@ export async function POST(req: NextRequest) {
       (await callGemini(systemPrompt, message));
 
     // §8.1 — Fallback factuel : jamais simuler une réponse normale
+    // Si aucun LLM n'est disponible, essayer de construire une réponse basée sur le contexte
     if (!reply) {
-      // Si on a un contexte de bourse, donner des conseils basiques
+      const contextParts = [];
+      
+      // Ajouter le contexte des bourses
       if (scholarshipContext && scholarshipContext.length > 0) {
-        const sch = scholarshipContext[0];
-        reply = `Je suis momentanément hors ligne, mais voici des conseils de base pour votre recherche :\n\n` +
-          `1. **Vérifiez les critères d'éligibilité** : Assurez-vous que votre niveau d'étude (${userProfile?.degreeLevel || 'votre niveau'}) correspond aux exigences de la bourse.\n\n` +
-          `2. **Préparez vos documents** : CV académique, lettre de motivation, relevés de notes, et lettres de recommandation sont généralement requises.\n\n` +
-          `3. **Respectez les délais** : Les dates de clôture sont strictes. Commencez votre dossier au moins 2-3 mois à l'avance.\n\n` +
-          `4. **Adaptez votre candidature** : Personnalisez chaque dossier selon les spécificités de la bourse et du pays cible.\n\n` +
-          `5. **Vérifiez les exigences linguistiques** : TOEFL, IELTS, DELF/DALF sont souvent demandés selon la destination.\n\n` +
-          `Pour une aide personnalisée, réessayez dans quelques instants.`;
+        contextParts.push(`Contexte des bourses disponibles: ${JSON.stringify(scholarshipContext.slice(0, 3).map(s => ({titre: s.titre, pays: s.pays_destination, niveau: s.niveau_etude})))}`);
+      }
+      
+      // Ajouter le profil utilisateur
+      if (userProfile) {
+        contextParts.push(`Profil utilisateur: ${JSON.stringify({niveau: userProfile.degreeLevel, domaine: userProfile.fieldOfStudy, paysCible: userProfile.targetCountries})}`);
+      }
+      
+      // Si on a du contexte, essayer de donner une réponse basée sur les données disponibles
+      if (contextParts.length > 0) {
+        reply = `Désolé, mon service de traitement avancé est temporairement indisponible. ` +
+                `Cependant, je peux vous aider avec les informations disponibles dans notre base de données. ` +
+                `Voici ce que je sais: ${contextParts.join('. ')}. ` +
+                `Pour une réponse plus précise, pourriez-vous reformuler votre question ou réessayer dans quelques instants?`;
       } else {
-        reply = "Le service de conseil est momentanément indisponible. Veuillez réessayer dans quelques instants.";
+        // Dernier recours: message minimal
+        reply = "Désolé, je ne peux pas répondre pour le moment. Veuillez réessayer dans quelques instants ou reformuler votre question.";
       }
     }
 
