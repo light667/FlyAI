@@ -32,15 +32,12 @@ export default function SignupPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Vérifier si le profil existe
+        // Vérifier si le profil existe via API (pas de requête directe à Supabase)
         try {
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("firebase_uid", user.uid)
-            .single();
+          const res = await fetch(`/api/profile?userId=${user.uid}`);
+          const json = await res.json();
           
-          if (data) {
+          if (json.data) {
             // Profil existe, rediriger vers dashboard
             router.replace("/dashboard");
           } else {
@@ -68,41 +65,40 @@ export default function SignupPage() {
       
       if (localProfileRaw) {
         const localProfile = JSON.parse(localProfileRaw);
-        const profileData = {
-          firebase_uid: user.uid,
-          full_name: localProfile.fullName || nameStr || user.displayName || "Scholar",
-          email: user.email || localProfile.email || "",
-          country: localProfile.targetCountries?.[0] || localProfile.nationality || "",
-          nationality: localProfile.nationality || "",
-          education_level: localProfile.degreeLevel || "",
-          target_degree_level: localProfile.targetDegreeLevel || null,
-          field_of_study: localProfile.fieldOfStudy || "",
-          university: localProfile.university || "",
-          gpa: localProfile.gpa || 3.5,
-          average_out_of_20: localProfile.averageOutOf20 || 14,
-          english_level: localProfile.englishLevel || "intermediate",
-          french_level: localProfile.frenchLevel || "intermediate",
-          languages: localProfile.otherLanguages || {},
-          target_countries: localProfile.targetCountries || [],
-          target_fields: localProfile.fieldOfStudy ? [localProfile.fieldOfStudy] : [],
-          needs_full_funding: localProfile.needsFullFunding || false,
-          academic_goals: localProfile.projectSummary || "Obtenir une bourse d'études internationale",
-          photo_url: localProfile.photoUrl || "",
-          cv_url: localProfile.cvUrl || "",
-          onboarding_completed: onboardingCompleted,
-          terms_accepted: acceptTerms,
-        };
-
-        const { error } = await supabase.from("profiles").upsert(profileData, {
-          onConflict: "firebase_uid",
+        
+        // Utiliser l'API /api/profile POST au lieu de requête directe à Supabase
+        const response = await fetch("/api/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user.uid,
+            fullName: localProfile.fullName || nameStr || user.displayName || "Scholar",
+            email: user.email || localProfile.email || "",
+            degreeLevel: localProfile.degreeLevel || "",
+            targetDegreeLevel: localProfile.targetDegreeLevel || null,
+            fieldOfStudy: localProfile.fieldOfStudy || "",
+            university: localProfile.university || "",
+            nationality: localProfile.nationality || "",
+            targetCountries: localProfile.targetCountries || [],
+            gpa: localProfile.gpa || 3.5,
+            averageOutOf20: localProfile.averageOutOf20 || 14,
+            languages: localProfile.otherLanguages || {},
+            needsFullFunding: localProfile.needsFullFunding || false,
+            projectSummary: localProfile.projectSummary || "Obtenir une bourse d'études internationale",
+            photoUrl: localProfile.photoUrl || "",
+            cvUrl: localProfile.cvUrl || "",
+            onboardingCompleted: onboardingCompleted,
+            termsAccepted: acceptTerms,
+          }),
         });
 
-        if (error) throw error;
+        if (!response.ok) throw new Error("Failed to save profile");
+        
         localStorage.removeItem("flyai_onboarding_profile");
         localStorage.removeItem("flyai_onboarding_completed");
       }
     } catch (err) {
-      console.error("Error creating profile in Supabase on signup:", err);
+      console.error("Error creating profile via API on signup:", err);
     }
   };
 
@@ -161,17 +157,14 @@ export default function SignupPage() {
       const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
       
-      // Vérifier si le profil existe déjà
-      const { data: existingProfile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("firebase_uid", credential.user.uid)
-        .single();
+      // Vérifier si le profil existe déjà via API
+      const res = await fetch(`/api/profile?userId=${credential.user.uid}`);
+      const json = await res.json();
       
-      if (existingProfile) {
+      if (json.data) {
         // Vérifier si l'onboarding est complété
-        const isOnboardingCompleted = existingProfile.onboarding_completed || 
-          (existingProfile.full_name && existingProfile.nationality && existingProfile.education_level);
+        const isOnboardingCompleted = json.data.onboardingCompleted || 
+          (json.data.fullName && json.data.nationality && json.data.degreeLevel);
         
         if (isOnboardingCompleted) {
           // Profil complet, rediriger vers dashboard

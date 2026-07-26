@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
       if (prof) {
         userProfile = {
           degreeLevel: prof.education_level || "master",
+          targetDegreeLevel: prof.target_degree_level || null,
           fieldOfStudy: prof.field_of_study || "Informatique",
           targetCountries: prof.target_countries || ["France", "Allemagne"],
           nationality: prof.nationality || "International",

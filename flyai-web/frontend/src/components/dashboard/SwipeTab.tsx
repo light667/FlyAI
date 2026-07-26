@@ -64,6 +64,11 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
 
     if (userId) {
       try {
+        // Déterminer la catégorie en fonction de la direction
+        let category = "standard";
+        if (direction === "right") category = "favoris";
+        if (direction === "superlike") category = "flyagent";
+        
         await fetch("/api/swipes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -72,6 +77,7 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
             bourseId: currentCard.id,
             direction,
             score: currentCard.matchScore || 85,
+            category,
           }),
         });
       } catch (err) {

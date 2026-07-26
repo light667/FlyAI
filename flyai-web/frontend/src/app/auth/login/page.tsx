@@ -39,18 +39,15 @@ export default function LoginPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Vérifier si le profil existe
+        // Vérifier si le profil existe via API (pas de requête directe à Supabase côté client)
         try {
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("firebase_uid", user.uid)
-            .single();
+          const res = await fetch(`/api/profile?userId=${user.uid}`);
+          const json = await res.json();
           
-          if (data) {
+          if (json.data) {
             // Vérifier si l'onboarding est complété
-            const isOnboardingCompleted = data.onboarding_completed || 
-              (data.full_name && data.nationality && data.education_level);
+            const isOnboardingCompleted = json.data.onboardingCompleted || 
+              (json.data.fullName && json.data.nationality && json.data.degreeLevel);
             
             if (isOnboardingCompleted) {
               router.replace("/dashboard");
@@ -85,17 +82,14 @@ export default function LoginPage() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
-      // Vérifier si le profil existe
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("firebase_uid", userCredential.user.uid)
-        .single();
+      // Vérifier si le profil existe via API (pas de requête directe à Supabase)
+      const res = await fetch(`/api/profile?userId=${userCredential.user.uid}`);
+      const json = await res.json();
       
-      if (profile) {
+      if (json.data) {
         // Vérifier si l'onboarding est complété
-        const isOnboardingCompleted = profile.onboarding_completed || 
-          (profile.full_name && profile.nationality && profile.education_level);
+        const isOnboardingCompleted = json.data.onboardingCompleted || 
+          (json.data.fullName && json.data.nationality && json.data.degreeLevel);
         
         // Marquer comme nouveau utilisateur pour les guides du dashboard
         localStorage.setItem("flyai_is_new_user", "true");
@@ -126,17 +120,14 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       
-      // Vérifier si le profil existe
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("firebase_uid", userCredential.user.uid)
-        .single();
+      // Vérifier si le profil existe via API (pas de requête directe à Supabase)
+      const res = await fetch(`/api/profile?userId=${userCredential.user.uid}`);
+      const json = await res.json();
       
-      if (profile) {
+      if (json.data) {
         // Vérifier si l'onboarding est complété
-        const isOnboardingCompleted = profile.onboarding_completed || 
-          (profile.full_name && profile.nationality && profile.education_level);
+        const isOnboardingCompleted = json.data.onboardingCompleted || 
+          (json.data.fullName && json.data.nationality && json.data.degreeLevel);
         
         // Marquer comme nouveau utilisateur pour les guides du dashboard
         localStorage.setItem("flyai_is_new_user", "true");
