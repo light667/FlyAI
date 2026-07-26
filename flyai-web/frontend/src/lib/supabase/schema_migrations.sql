@@ -104,6 +104,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     languages      JSONB DEFAULT '{"english": "B2", "french": "C1"}'::jsonb,
     cv_url         TEXT DEFAULT '',
     bio            TEXT DEFAULT '',
+    onboarding_completed BOOLEAN DEFAULT false,
+    terms_accepted BOOLEAN DEFAULT false,
     created_at     TIMESTAMPTZ DEFAULT NOW(),
     updated_at     TIMESTAMPTZ DEFAULT NOW()
 );

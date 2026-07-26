@@ -64,24 +64,32 @@ export default function SignupPage() {
   const handleProfileCreation = async (user: any, nameStr: string) => {
     try {
       const localProfileRaw = localStorage.getItem("flyai_onboarding_profile");
+      const onboardingCompleted = localStorage.getItem("flyai_onboarding_completed") === "true";
+      
       if (localProfileRaw) {
         const localProfile = JSON.parse(localProfileRaw);
         const profileData = {
           firebase_uid: user.uid,
-          full_name: nameStr || user.displayName || "Scholar",
-          email: user.email || "",
+          full_name: localProfile.fullName || nameStr || user.displayName || "Scholar",
+          email: user.email || localProfile.email || "",
           country: localProfile.targetCountries?.[0] || localProfile.nationality || "",
           nationality: localProfile.nationality || "",
           education_level: localProfile.degreeLevel || "",
+          target_degree_level: localProfile.targetDegreeLevel || null,
           field_of_study: localProfile.fieldOfStudy || "",
-          university: "",
-          gpa: 3.5,
-          english_level: "intermediate",
-          french_level: "intermediate",
+          university: localProfile.university || "",
+          gpa: localProfile.gpa || 3.5,
+          average_out_of_20: localProfile.averageOutOf20 || 14,
+          english_level: localProfile.englishLevel || "intermediate",
+          french_level: localProfile.frenchLevel || "intermediate",
+          languages: localProfile.otherLanguages || {},
           target_countries: localProfile.targetCountries || [],
           target_fields: localProfile.fieldOfStudy ? [localProfile.fieldOfStudy] : [],
-          academic_goals: "Obtenir une bourse d'études internationale",
-          onboarding_completed: false,
+          needs_full_funding: localProfile.needsFullFunding || false,
+          academic_goals: localProfile.projectSummary || "Obtenir une bourse d'études internationale",
+          photo_url: localProfile.photoUrl || "",
+          cv_url: localProfile.cvUrl || "",
+          onboarding_completed: onboardingCompleted,
           terms_accepted: acceptTerms,
         };
 
@@ -91,6 +99,7 @@ export default function SignupPage() {
 
         if (error) throw error;
         localStorage.removeItem("flyai_onboarding_profile");
+        localStorage.removeItem("flyai_onboarding_completed");
       }
     } catch (err) {
       console.error("Error creating profile in Supabase on signup:", err);
@@ -111,22 +120,32 @@ export default function SignupPage() {
       const credential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(credential.user, { displayName: name });
       
-      // Créer un profil temporaire dans localStorage
-      const tempProfile = {
-        fullName: name,
-        email: email,
-        degreeLevel: "",
-        fieldOfStudy: "",
-        nationality: "",
-        targetCountries: [],
-      };
-      localStorage.setItem("flyai_onboarding_profile", JSON.stringify(tempProfile));
+      // Vérifier si onboarding déjà complété dans localStorage
+      const hasOnboarding = localStorage.getItem("flyai_onboarding_profile");
       
-      // Marquer comme nouveau utilisateur pour afficher les guides plus tard
-      localStorage.setItem("flyai_is_new_user", "true");
-      
-      // Rediriger vers onboarding pour compléter le profil
-      router.push("/onboarding");
+      if (hasOnboarding) {
+        // Si onboarding déjà fait, créer le profil complet et rediriger vers dashboard
+        await handleProfileCreation(credential.user, name);
+        router.push("/dashboard");
+      } else {
+        // Créer un profil temporaire vide pour onboarding
+        const tempProfile = {
+          fullName: name,
+          email: email,
+          degreeLevel: "",
+          targetDegreeLevel: "",
+          fieldOfStudy: "",
+          nationality: "",
+          targetCountries: [],
+        };
+        localStorage.setItem("flyai_onboarding_profile", JSON.stringify(tempProfile));
+        
+        // Marquer comme nouveau utilisateur pour afficher les guides plus tard
+        localStorage.setItem("flyai_is_new_user", "true");
+        
+        // Rediriger vers onboarding pour compléter le profil
+        router.push("/onboarding");
+      }
     } catch (err: unknown) {
       const firebaseError = err as { message?: string };
       setError(firebaseError.message || "Échec de l'inscription. Réessaie.");
@@ -166,10 +185,21 @@ export default function SignupPage() {
           router.push("/onboarding");
         }
       } else {
-        // Nouveau utilisateur, rediriger vers onboarding
-        // Marquer comme nouveau utilisateur
-        localStorage.setItem("flyai_is_new_user", "true");
-        router.push("/onboarding");
+        // Nouveau utilisateur, vérifier si onboarding déjà dans localStorage
+        const hasOnboarding = localStorage.getItem("flyai_onboarding_profile");
+        
+        if (hasOnboarding) {
+          // Créer le profil depuis localStorage
+          await handleProfileCreation(credential.user, credential.user.displayName || "");
+          // Marquer comme nouveau utilisateur
+          localStorage.setItem("flyai_is_new_user", "true");
+          router.push("/dashboard");
+        } else {
+          // Nouveau utilisateur, rediriger vers onboarding
+          // Marquer comme nouveau utilisateur
+          localStorage.setItem("flyai_is_new_user", "true");
+          router.push("/onboarding");
+        }
       }
     } catch (err: unknown) {
       const firebaseError = err as { message?: string };

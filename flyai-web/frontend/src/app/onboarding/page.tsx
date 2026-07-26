@@ -165,7 +165,7 @@ export default function OnboardingPage() {
     setSaving(true);
     try {
       if (user) {
-        await fetch("/api/profile", {
+        const response = await fetch("/api/profile", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -184,15 +184,25 @@ export default function OnboardingPage() {
             languages: { english: profile.englishLevel, french: profile.frenchLevel, others: profile.otherLanguages },
             photoUrl: profile.photoUrl,
             cvUrl: profile.cvUrl,
+            onboardingCompleted: true,
           }),
         });
+        
+        if (!response.ok) {
+          throw new Error("Failed to save profile");
+        }
         router.push("/dashboard");
       } else {
+        // Sauvegarder dans localStorage pour récupération après signup
         localStorage.setItem("flyai_onboarding_profile", JSON.stringify(profile));
+        localStorage.setItem("flyai_onboarding_completed", "true");
         router.push("/auth/signup");
       }
-    } catch {
-      router.push("/dashboard");
+    } catch (err) {
+      console.error("Error saving profile:", err);
+      alert("Erreur lors de la sauvegarde du profil. Veuillez réessayer.");
+      setSaving(false);
+      return; // Ne pas rediriger si échec
     } finally {
       setSaving(false);
     }
