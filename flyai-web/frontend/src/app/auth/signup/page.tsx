@@ -32,24 +32,9 @@ export default function SignupPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Vérifier si le profil existe via API (pas de requête directe à Supabase)
-        try {
-          const res = await fetch(`/api/profile?userId=${user.uid}`);
-          const json = await res.json();
-          
-          if (json.data) {
-            // Profil existe, rediriger vers dashboard
-            router.replace("/dashboard");
-          } else {
-            // Pas de profil, rediriger vers onboarding
-            router.replace("/onboarding");
-          }
-        } catch (err) {
-          console.error("Error checking profile:", err);
-          // Si erreur, on reste sur la page
-        } finally {
-          setIsCheckingAuth(false);
-        }
+        // Ne PAS rediriger automatiquement
+        // On laisse le processus de signup gérer la redirection
+        // pour distinguer entre nouveau signup et reconnexion
       } else {
         setIsCheckingAuth(false);
       }

@@ -39,34 +39,9 @@ export default function LoginPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Vérifier si le profil existe via API (pas de requête directe à Supabase côté client)
-        try {
-          const res = await fetch(`/api/profile?userId=${user.uid}`);
-          const json = await res.json();
-          
-          if (json.data) {
-            // Vérifier si l'onboarding est complété
-            const isOnboardingCompleted = json.data.onboardingCompleted || 
-              (json.data.fullName && json.data.nationality && json.data.degreeLevel);
-            
-            if (isOnboardingCompleted) {
-              router.replace("/dashboard");
-            } else {
-              // Marquer comme nouveau utilisateur pour les guides
-              localStorage.setItem("flyai_is_new_user", "true");
-              router.replace("/onboarding");
-            }
-          } else {
-            // Pas de profil, rediriger vers onboarding
-            // Marquer comme nouveau utilisateur pour les guides
-            localStorage.setItem("flyai_is_new_user", "true");
-            router.replace("/onboarding");
-          }
-        } catch (err) {
-          console.error("Error checking profile:", err);
-        } finally {
-          setIsCheckingAuth(false);
-        }
+        // Pour le login, toujours rediriger vers dashboard
+        // L'onboarding ne doit s'afficher que lors du premier signup
+        router.replace("/dashboard");
       } else {
         setIsCheckingAuth(false);
       }

@@ -33,7 +33,7 @@ export default function SplashScreen() {
         unsub();
         setExiting(true);
         setTimeout(() => {
-          router.replace(user ? "/dashboard" : "/onboarding");
+          router.replace(user ? "/dashboard" : "/auth/signup");
         }, 350);
       });
     }, 2600);
