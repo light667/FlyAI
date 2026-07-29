@@ -170,6 +170,7 @@ export default function OnboardingPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userId: user.uid,
+            email: user.email || "",
             fullName: profile.fullName || user.displayName || "",
             degreeLevel: profile.degreeLevel,
             targetDegreeLevel: profile.targetDegreeLevel,

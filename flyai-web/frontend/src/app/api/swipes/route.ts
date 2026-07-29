@@ -15,7 +15,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Attempt to record Swipe in Supabase
+    const effectiveCategory = category || (direction === "superlike" ? "flyagent" : "favoris");
+
+    // 1. Record Swipe in Supabase
     try {
       await supabase.from("swipes").upsert(
         {
@@ -51,19 +53,20 @@ export async function POST(req: NextRequest) {
         console.warn("Matches table upsert warning:", e);
       }
 
-      // Also create draft application
+      // Create application record (category stored safely inside checklist JSONB)
       try {
         await supabase.from("applications").upsert(
           {
             firebase_uid: userId,
             bourse_id: bourseId,
             status: "draft",
-            category: category || "standard",
             checklist: {
               cv_uploaded: false,
               motivation_letter: false,
               transcripts: false,
               recommendation_letters: false,
+              language_test: false,
+              category: effectiveCategory,
             },
             updated_at: new Date().toISOString(),
           },
@@ -94,14 +97,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "userId requis" }, { status: 400 });
     }
 
-    const { data: swipes, error } = await supabase
+    const { data: swipes } = await supabase
       .from("swipes")
       .select("*")
       .eq("firebase_uid", userId);
-
-    if (error) {
-      return NextResponse.json({ data: [] });
-    }
 
     return NextResponse.json({ data: swipes || [] });
   } catch (err: any) {

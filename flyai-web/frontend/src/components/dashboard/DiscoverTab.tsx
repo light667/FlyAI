@@ -12,7 +12,7 @@ interface Props {
   onOpenFlyAgent?: (scholarship: Scholarship) => void;
 }
 
-export default function DiscoverTab({ userId, onApplyScholarship, onOpenFlyAgent }: Props) {
+export default function DiscoverTab({ userId, userProfile, onApplyScholarship, onOpenFlyAgent }: Props) {
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

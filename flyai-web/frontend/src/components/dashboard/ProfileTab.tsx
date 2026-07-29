@@ -1,8 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { UserProfile } from "@/types";
-import { User, GraduationCap, Globe, DollarSign, Award, FileText, Save, CheckCircle2, UploadCloud, Sparkles } from "lucide-react";
+import {
+  User, GraduationCap, Globe, Award, FileText, Save,
+  CheckCircle2, UploadCloud, Sparkles, MapPin, Languages,
+  Camera, Download, Eye
+} from "lucide-react";
 
 interface Props {
   userId?: string;
@@ -10,32 +14,99 @@ interface Props {
   onProfileUpdated?: (updated: UserProfile) => void;
 }
 
+const DEGREES = [
+  { value: "licence", label: "Licence / Bachelor" },
+  { value: "master", label: "Master / Postgraduate" },
+  { value: "doctorat", label: "Doctorat / PhD" },
+  { value: "ingenieur", label: "Diplôme d'Ingénieur" },
+];
+
+const CEFR = ["A1", "A2", "B1", "B2", "C1", "C2", "Natif"];
+
+const DESTINATIONS = [
+  "France", "Allemagne", "Royaume-Uni", "Canada", "Etats-Unis", "Suisse",
+  "Belgique", "Pays-Bas", "Suede", "Norvege", "Italie", "Espagne", "Portugal",
+  "Japon", "Chine", "Coree du Sud", "Singapour", "Australie", "Maroc",
+  "Senegal", "Afrique du Sud", "Tunisie", "Rwanda", "Emirats Arabes Unis"
+];
+
+const WORLD_COUNTRIES = [
+  "Algerie", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi",
+  "Cameroun", "Cap-Vert", "Congo", "RD Congo", "Cote d Ivoire", "Djibouti",
+  "Egypte", "Erythree", "Ethiopie", "Gabon", "Ghana", "Guinee", "Kenya",
+  "Lesotho", "Liberia", "Libye", "Madagascar", "Malawi", "Mali", "Maroc",
+  "Maurice", "Mauritanie", "Mozambique", "Namibie", "Niger", "Nigeria",
+  "Ouganda", "Rwanda", "Senegal", "Seychelles", "Sierra Leone", "Somalie",
+  "Soudan", "Tchad", "Togo", "Tunisie", "Zambie", "Zimbabwe",
+  "France", "Allemagne", "Belgique", "Suisse", "Canada", "Etats-Unis",
+  "Royaume-Uni", "Espagne", "Italie", "Portugal", "Chine", "Japon",
+  "Inde", "Bresil", "Mexique", "Australie", "Autre nationalite"
+];
+
 export default function ProfileTab({ userId, profile, onProfileUpdated }: Props) {
   const [fullName, setFullName] = useState(profile?.fullName || "");
   const [degreeLevel, setDegreeLevel] = useState(profile?.degreeLevel || "master");
-  const [fieldOfStudy, setFieldOfStudy] = useState(profile?.fieldOfStudy || "Informatique");
-  const [nationality, setNationality] = useState(profile?.nationality || "International");
-  const [targetCountries, setTargetCountries] = useState<string[]>(
-    profile?.targetCountries || ["France", "Allemagne", "Canada"]
-  );
-  const [budgetMax, setBudgetMax] = useState(profile?.budgetMax || 15000);
+  const [targetDegreeLevel, setTargetDegreeLevel] = useState((profile as any)?.targetDegreeLevel || "master");
+  const [fieldOfStudy, setFieldOfStudy] = useState(profile?.fieldOfStudy || "");
+  const [nationality, setNationality] = useState(profile?.nationality || "Togo");
+  const [university, setUniversity] = useState((profile as any)?.university || "");
+  const [targetCountries, setTargetCountries] = useState<string[]>(profile?.targetCountries || []);
   const [gpa, setGpa] = useState(profile?.gpa || 3.5);
+  const [averageOutOf20, setAverageOutOf20] = useState((profile as any)?.averageOutOf20 || 14);
   const [englishLevel, setEnglishLevel] = useState(profile?.languages?.english || "B2");
   const [frenchLevel, setFrenchLevel] = useState(profile?.languages?.french || "C1");
+  const [projectSummary, setProjectSummary] = useState((profile as any)?.projectSummary || "");
+  const [photoUrl, setPhotoUrl] = useState(profile?.photoUrl || "");
+  const [cvUrl, setCvUrl] = useState(profile?.cvUrl || "");
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("academic");
+
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const cvInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (profile) {
       setFullName(profile.fullName || "");
       setDegreeLevel(profile.degreeLevel || "master");
-      setFieldOfStudy(profile.fieldOfStudy || "Informatique");
-      setNationality(profile.nationality || "International");
-      setTargetCountries(profile.targetCountries || ["France", "Allemagne"]);
-      setBudgetMax(profile.budgetMax || 15000);
+      setTargetDegreeLevel((profile as any).targetDegreeLevel || "master");
+      setFieldOfStudy(profile.fieldOfStudy || "");
+      setNationality(profile.nationality || "Togo");
+      setUniversity((profile as any).university || "");
+      setTargetCountries(profile.targetCountries || []);
       setGpa(profile.gpa || 3.5);
+      setAverageOutOf20((profile as any).averageOutOf20 || 14);
+      setEnglishLevel(profile.languages?.english || "B2");
+      setFrenchLevel(profile.languages?.french || "C1");
+      setProjectSummary((profile as any).projectSummary || "");
+      setPhotoUrl(profile.photoUrl || "");
+      setCvUrl(profile.cvUrl || "");
     }
   }, [profile]);
+
+  const convert20To4 = (avg: number) => {
+    if (avg >= 16) return 4.0;
+    if (avg >= 14) return parseFloat((3.5 + (avg - 14) * 0.25).toFixed(2));
+    if (avg >= 12) return parseFloat((3.0 + (avg - 12) * 0.25).toFixed(2));
+    if (avg >= 10) return parseFloat((2.5 + (avg - 10) * 0.25).toFixed(2));
+    return 1.5;
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setPhotoUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCvUrl(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const handleSave = async () => {
     if (!userId) return;
@@ -46,13 +117,18 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
       userId,
       fullName,
       degreeLevel,
+      targetDegreeLevel,
       fieldOfStudy,
       nationality,
+      university,
       targetCountries,
-      budgetMax,
       gpa,
+      averageOutOf20,
       languages: { english: englishLevel, french: frenchLevel },
-      skills: ["Machine Learning", "Gestion de Projet", "Communication"],
+      projectSummary,
+      photoUrl,
+      cvUrl,
+      onboardingCompleted: true,
     };
 
     try {
@@ -81,229 +157,461 @@ export default function ProfileTab({ userId, profile, onProfileUpdated }: Props)
     );
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    padding: "10px 14px",
+    background: "var(--warm-50)",
+    border: "1px solid var(--border)",
+    borderRadius: "var(--radius)",
+    fontSize: "var(--text-body)",
+    color: "var(--ink-text)",
+    outline: "none",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    fontSize: "var(--text-caption)",
+    fontWeight: 700,
+    color: "var(--ink-muted)",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    marginBottom: "6px",
+    display: "block",
+  };
+
+  const SECTIONS = [
+    { id: "academic", label: "Parcours", icon: GraduationCap },
+    { id: "destination", label: "Destinations", icon: Globe },
+    { id: "languages", label: "Langues", icon: Languages },
+    { id: "documents", label: "Documents", icon: FileText },
+    { id: "project", label: "Projet", icon: Sparkles },
+  ];
+
   return (
-    <div style={{ maxWidth: "1000px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "var(--space-8)" }}>
-      {/* Header Banner */}
-      <div style={{ background: "var(--warm-100)", backdropFilter: "blur(12px)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "var(--space-6)", position: "relative", overflow: "hidden" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
-          <div style={{ width: "64px", height: "64px", borderRadius: "var(--radius-full)", background: "var(--gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-text)", fontWeight: 700, fontSize: "var(--text-h1)", boxShadow: "var(--shadow-lg), 0 4px 12px rgba(15, 123, 108, 0.2)" }}>
-            {profile?.photoUrl ? (
-              <img src={profile.photoUrl} alt={fullName} style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
-            ) : (
-              fullName[0]?.toUpperCase()
-            )}
+    <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+
+      {/* ── Header Profile Banner ── */}
+      <div style={{
+        background: "var(--warm-100)", border: "1px solid var(--border)",
+        borderRadius: "var(--radius-2xl)", padding: "var(--space-6)",
+        display: "flex", flexDirection: "column", gap: "var(--space-4)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}>
+          {/* ✅ FIX BUG 6: Photo de profil cliquable pour modifier */}
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <div style={{
+              width: 80, height: 80, borderRadius: "50%",
+              background: "var(--warm-200)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "white", fontWeight: 700, fontSize: "1.8rem",
+              overflow: "hidden", border: "3px solid var(--accent)",
+              boxShadow: "0 4px 16px rgba(15,123,108,0.25)",
+            }}>
+              {photoUrl ? (
+                <img src={photoUrl} alt={fullName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <span style={{ color: "var(--accent)", fontWeight: 800 }}>
+                  {fullName?.[0]?.toUpperCase() || "?"}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={() => photoInputRef.current?.click()}
+              title="Changer la photo"
+              style={{
+                position: "absolute", bottom: -2, right: -2,
+                width: 26, height: 26, borderRadius: "50%",
+                background: "var(--accent)", border: "2px solid white",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <Camera size={12} color="white" />
+            </button>
+            <input ref={photoInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
           </div>
-          <div>
-            <h2 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: 0 }}>{fullName}</h2>
-            <p style={{ fontSize: "var(--text-caption)", color: "var(--accent)", marginTop: "var(--space-1)", display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
-              <Sparkles style={{ width: "14px", height: "14px" }} /> Profil optimisé pour les bourses 2026-2027
-            </p>
-          </div>
-        </div>
 
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="btn-primary"
-          style={{ marginLeft: "auto", padding: "var(--space-3) var(--space-6)", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-lg)" }}
-        >
-          {savedSuccess ? (
-            <>
-              <CheckCircle2 style={{ width: "16px", height: "16px", color: "var(--success)" }} />
-              <span>Enregistré !</span>
-            </>
-          ) : (
-            <>
-              <Save style={{ width: "16px", height: "16px" }} />
-              <span>{saving ? "Sauvegarde..." : "Enregistrer mon profil"}</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Profile Form Sections */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "var(--space-6)" }}>
-        {/* Section 1: Informations Académiques */}
-        <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-          <h3 style={{ fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink-text)", display: "flex", alignItems: "center", gap: "var(--space-2)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)" }}>
-            <GraduationCap style={{ width: "20px", height: "20px", color: "var(--accent)" }} /> Parcours Académique
-          </h3>
-
-          <div>
-            <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>Nom complet</label>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              style={{ width: "100%", padding: "var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", fontSize: "var(--text-body)", color: "var(--ink-text)", outline: "none" }}
+              placeholder="Votre nom complet"
+              style={{
+                background: "transparent", border: "none", outline: "none",
+                fontSize: "1.3rem", fontWeight: 700, color: "var(--ink-text)",
+                width: "100%", fontFamily: "var(--font-body)",
+              }}
             />
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginTop: 4, flexWrap: "wrap" }}>
+              <span style={{
+                fontSize: "var(--text-caption)", color: "var(--accent)", fontWeight: 600,
+                display: "flex", alignItems: "center", gap: 4,
+              }}>
+                <Sparkles size={12} />
+                Profil FlyAI
+              </span>
+              {nationality && (
+                <span style={{
+                  fontSize: "var(--text-caption)", color: "var(--ink-muted)",
+                  display: "flex", alignItems: "center", gap: 4,
+                }}>
+                  <MapPin size={10} /> {nationality}
+                </span>
+              )}
+              {degreeLevel && (
+                <span style={{
+                  fontSize: "var(--text-caption)", background: "var(--accent-light)",
+                  color: "var(--accent)", padding: "2px 8px", borderRadius: "var(--radius-full)",
+                  fontWeight: 600,
+                }}>
+                  {DEGREES.find(d => d.value === degreeLevel)?.label || degreeLevel}
+                </span>
+              )}
+            </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)" }}>
+          {/* Bouton Enregistrer */}
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="btn-primary"
+            style={{ padding: "var(--space-3) var(--space-5)", borderRadius: "var(--radius-2xl)", flexShrink: 0 }}
+          >
+            {savedSuccess ? (
+              <><CheckCircle2 size={16} /><span>Enregistré !</span></>
+            ) : (
+              <><Save size={16} /><span>{saving ? "Sauvegarde..." : "Enregistrer"}</span></>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Navigation Sections (tabs) ── */}
+      <div style={{
+        display: "flex", gap: "var(--space-2)", overflowX: "auto",
+        paddingBottom: "var(--space-1)",
+      }}>
+        {SECTIONS.map((sec) => {
+          const Icon = sec.icon;
+          const active = activeSection === sec.id;
+          return (
+            <button
+              key={sec.id}
+              onClick={() => setActiveSection(sec.id)}
+              style={{
+                display: "flex", alignItems: "center", gap: "var(--space-2)",
+                padding: "var(--space-2) var(--space-4)", borderRadius: "var(--radius-full)",
+                border: "1px solid", flexShrink: 0, cursor: "pointer",
+                fontSize: "var(--text-caption)", fontWeight: 600,
+                background: active ? "var(--accent)" : "var(--warm-100)",
+                color: active ? "white" : "var(--ink-muted)",
+                borderColor: active ? "var(--accent)" : "var(--border)",
+                transition: "all var(--transition-base)",
+              }}
+            >
+              <Icon size={13} />
+              {sec.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Section: Parcours Académique ── */}
+      {activeSection === "academic" && (
+        <div style={{
+          background: "var(--warm-100)", border: "1px solid var(--border)",
+          borderRadius: "var(--radius-2xl)", padding: "var(--space-6)",
+          display: "flex", flexDirection: "column", gap: "var(--space-5)",
+        }}>
+          <h3 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--ink-text)", margin: 0, display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <GraduationCap size={20} style={{ color: "var(--accent)" }} />
+            Parcours Académique
+          </h3>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" }}>
             <div>
-              <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>Niveau d'étude cible</label>
-              <select
-                value={degreeLevel}
-                onChange={(e) => setDegreeLevel(e.target.value)}
-                style={{ width: "100%", padding: "var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", fontSize: "var(--text-body)", color: "var(--ink-text)", outline: "none" }}
-              >
-                <option value="master">Master / Graduate</option>
-                <option value="doctorat">Doctorat / PhD</option>
-                <option value="licence">Licence / Bachelor</option>
+              <label style={labelStyle}>Nationalité / Pays d'origine</label>
+              <select style={inputStyle} value={nationality} onChange={(e) => setNationality(e.target.value)}>
+                {WORLD_COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
 
             <div>
-              <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>Moyenne / GPA (sur 4.0)</label>
+              <label style={labelStyle}>Université actuelle</label>
               <input
-                type="number"
-                step="0.1"
-                min="2.0"
-                max="4.0"
-                value={gpa}
-                onChange={(e) => setGpa(parseFloat(e.target.value))}
-                style={{ width: "100%", padding: "var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", fontSize: "var(--text-body)", color: "var(--ink-text)", outline: "none" }}
+                style={inputStyle} type="text" value={university}
+                onChange={(e) => setUniversity(e.target.value)}
+                placeholder="Ex: Université de Lomé"
               />
             </div>
           </div>
 
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" }}>
+            <div>
+              <label style={labelStyle}>Niveau actuel</label>
+              <select style={inputStyle} value={degreeLevel} onChange={(e) => setDegreeLevel(e.target.value)}>
+                {DEGREES.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Niveau visé (pour les recommandations)</label>
+              <select style={inputStyle} value={targetDegreeLevel} onChange={(e) => setTargetDegreeLevel(e.target.value)}>
+                {DEGREES.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+              </select>
+            </div>
+          </div>
+
           <div>
-            <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>Domaine d'études / Spécialité</label>
+            <label style={labelStyle}>Domaine d'études / Spécialité</label>
             <input
-              type="text"
-              value={fieldOfStudy}
+              style={inputStyle} type="text" value={fieldOfStudy}
               onChange={(e) => setFieldOfStudy(e.target.value)}
-              placeholder="Ex: Informatique, Droit, Génie Civil, Bio-Santé..."
-              style={{ width: "100%", padding: "var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-xl)", fontSize: "var(--text-body)", color: "var(--ink-text)", outline: "none" }}
+              placeholder="Ex: Informatique & Intelligence Artificielle"
             />
           </div>
-        </div>
 
-        {/* Section 2: Préférences Géographiques & Budget */}
-        <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-          <h3 style={{ fontSize: "var(--text-body)", fontWeight: 700, color: "var(--ink-text)", display: "flex", alignItems: "center", gap: "var(--space-2)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)" }}>
-            <Globe style={{ width: "20px", height: "20px", color: "var(--accent)" }} /> Destination & Budget
+          {/* ✅ FIX BUG 6: Moyenne sur 20 éditableave conversion GPA */}
+          <div style={{ background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius)", padding: "var(--space-4)" }}>
+            <label style={labelStyle}>Moyenne générale (sur 20)</label>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}>
+              <input
+                type="number" step="0.1" min="0" max="20"
+                value={averageOutOf20}
+                onChange={(e) => {
+                  const v = Math.min(20, Math.max(0, parseFloat(e.target.value) || 0));
+                  setAverageOutOf20(v);
+                  setGpa(convert20To4(v));
+                }}
+                style={{ ...inputStyle, width: 110, fontSize: "1.2rem", fontWeight: 700, color: "var(--accent)", textAlign: "center" }}
+              />
+              <div>
+                <div style={{ fontSize: "var(--text-caption)", color: "var(--ink-subtle)" }}>Équivalent GPA</div>
+                <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--ink-text)" }}>{gpa} / 4.00</div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  height: 6, borderRadius: 3, background: "var(--warm-200)",
+                  overflow: "hidden", minWidth: 100,
+                }}>
+                  <div style={{
+                    height: "100%", borderRadius: 3,
+                    width: `${(averageOutOf20 / 20) * 100}%`,
+                    background: averageOutOf20 >= 14 ? "var(--accent)" : averageOutOf20 >= 12 ? "#d97706" : "var(--alert)",
+                    transition: "width 0.3s",
+                  }} />
+                </div>
+                <span style={{ fontSize: "10px", color: averageOutOf20 >= 14 ? "var(--accent)" : "var(--ink-subtle)", fontWeight: 600 }}>
+                  {averageOutOf20 >= 16 ? "Excellent" : averageOutOf20 >= 14 ? "Très bien" : averageOutOf20 >= 12 ? "Bien" : "Passable"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Section: Destinations ── */}
+      {activeSection === "destination" && (
+        <div style={{
+          background: "var(--warm-100)", border: "1px solid var(--border)",
+          borderRadius: "var(--radius-2xl)", padding: "var(--space-6)",
+          display: "flex", flexDirection: "column", gap: "var(--space-4)",
+        }}>
+          <h3 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--ink-text)", margin: 0, display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <Globe size={20} style={{ color: "var(--accent)" }} />
+            Destinations souhaitées
+          </h3>
+          <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", margin: 0 }}>
+            {targetCountries.length} destination{targetCountries.length > 1 ? "s" : ""} sélectionnée{targetCountries.length > 1 ? "s" : ""}
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "var(--space-2)" }}>
+            {DESTINATIONS.map((country) => {
+              const selected = targetCountries.includes(country);
+              return (
+                <button
+                  key={country}
+                  onClick={() => toggleCountry(country)}
+                  style={{
+                    padding: "var(--space-2) var(--space-3)",
+                    borderRadius: "var(--radius)", border: "1px solid",
+                    fontSize: "var(--text-caption)", fontWeight: selected ? 700 : 400,
+                    cursor: "pointer", transition: "all var(--transition-base)",
+                    background: selected ? "var(--accent)" : "var(--warm-50)",
+                    color: selected ? "white" : "var(--ink-muted)",
+                    borderColor: selected ? "var(--accent)" : "var(--border)",
+                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                  }}
+                >
+                  {country}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Section: Langues ── */}
+      {activeSection === "languages" && (
+        <div style={{
+          background: "var(--warm-100)", border: "1px solid var(--border)",
+          borderRadius: "var(--radius-2xl)", padding: "var(--space-6)",
+          display: "flex", flexDirection: "column", gap: "var(--space-4)",
+        }}>
+          <h3 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--ink-text)", margin: 0, display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <Languages size={20} style={{ color: "var(--accent)" }} />
+            Niveaux de langue
+          </h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "var(--space-4)" }}>
+            <div>
+              <label style={labelStyle}>Anglais (CEFR)</label>
+              <select style={inputStyle} value={englishLevel} onChange={(e) => setEnglishLevel(e.target.value)}>
+                {CEFR.map((l) => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Français (CEFR)</label>
+              <select style={inputStyle} value={frenchLevel} onChange={(e) => setFrenchLevel(e.target.value)}>
+                {CEFR.map((l) => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Section: Documents ── */}
+      {activeSection === "documents" && (
+        <div style={{
+          background: "var(--warm-100)", border: "1px solid var(--border)",
+          borderRadius: "var(--radius-2xl)", padding: "var(--space-6)",
+          display: "flex", flexDirection: "column", gap: "var(--space-5)",
+        }}>
+          <h3 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--ink-text)", margin: 0, display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <FileText size={20} style={{ color: "var(--accent)" }} />
+            Documents
           </h3>
 
-          <div>
-            <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-2)", display: "block" }}>Pays de destination cibles</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)" }}>
-              {["France", "Allemagne", "Canada", "USA", "Royaume-Uni", "Suisse", "Japon", "Togo"].map((country) => {
-                const selected = targetCountries.includes(country);
-                return (
-                  <button
-                    key={country}
-                    type="button"
-                    onClick={() => toggleCountry(country)}
-                    style={{
-                      padding: "var(--space-3.5) var(--space-9)",
-                      borderRadius: "var(--radius-xl)",
-                      fontSize: "var(--text-caption)",
-                      fontWeight: 600,
-                      border: "1px solid",
-                      cursor: "pointer",
-                      transition: "all var(--transition-base)",
-                      background: selected ? "var(--accent)" : "var(--warm-50)",
-                      color: selected ? "var(--accent-text)" : "var(--ink-muted)",
-                      borderColor: selected ? "var(--accent)" : "var(--border)",
-                      boxShadow: selected ? "var(--shadow-md)" : "none"
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!selected) {
-                        (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-text)";
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!selected) {
-                        (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-muted)";
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
-                      }
-                    }}
-                  >
-                    {country}
-                  </button>
-                );
-              })}
+          {/* Photo de profil */}
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", padding: "var(--space-4)", background: "var(--warm-50)", borderRadius: "var(--radius)", border: "1px solid var(--border)", flexWrap: "wrap" }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: "50%", flexShrink: 0,
+              background: "var(--warm-200)", overflow: "hidden",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              border: photoUrl ? "2px solid var(--accent)" : "2px dashed var(--border)",
+            }}>
+              {photoUrl ? (
+                <img src={photoUrl} alt="Photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <Camera size={20} style={{ color: "var(--ink-subtle)" }} />
+              )}
             </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)" }}>Photo de profil</div>
+              <div style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: 2 }}>
+                {photoUrl ? "✅ Photo chargée" : "JPG, PNG — recommandé pour vos candidatures"}
+              </div>
+            </div>
+            <input ref={photoInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
+            <button
+              onClick={() => photoInputRef.current?.click()}
+              className="btn-secondary"
+              style={{ padding: "var(--space-2) var(--space-4)", flexShrink: 0 }}
+            >
+              <UploadCloud size={14} />
+              <span>{photoUrl ? "Modifier" : "Ajouter"}</span>
+            </button>
           </div>
 
-          <div>
-            <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1.5)", display: "block" }}>
-              Budget max annuel estimé (€) : <span style={{ color: "var(--accent)", fontWeight: 700 }}>{budgetMax} €</span>
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="30000"
-              step="1000"
-              value={budgetMax}
-              onChange={(e) => setBudgetMax(parseInt(e.target.value))}
-              style={{ width: "100%", height: "4px", borderRadius: "var(--radius-sm)", background: "var(--warm-200)", outline: "none", WebkitAppearance: "none", cursor: "pointer" }}
-            />
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)", paddingTop: "var(--space-2)" }}>
-            <div>
-              <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1)", display: "block" }}>Niveau d'Anglais</label>
-              <select
-                value={englishLevel}
-                onChange={(e) => setEnglishLevel(e.target.value)}
-                style={{ width: "100%", padding: "var(--space-2.5) var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius)", fontSize: "var(--text-caption)", color: "var(--ink-text)", outline: "none" }}
+          {/* CV */}
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)", padding: "var(--space-4)", background: "var(--warm-50)", borderRadius: "var(--radius)", border: "1px solid var(--border)", flexWrap: "wrap" }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: "var(--radius)", flexShrink: 0,
+              background: cvUrl ? "var(--accent-light)" : "var(--warm-200)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              border: cvUrl ? "2px solid var(--accent)" : "2px dashed var(--border)",
+            }}>
+              <FileText size={24} style={{ color: cvUrl ? "var(--accent)" : "var(--ink-subtle)" }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)" }}>Curriculum Vitae</div>
+              <div style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: 2 }}>
+                {cvUrl ? "✅ CV chargé — utilisé par l'IA pour le matching" : "PDF ou Word — fortement recommandé"}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "var(--space-2)", flexShrink: 0 }}>
+              {cvUrl && (
+                <a
+                  href={cvUrl}
+                  download="mon-cv"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary"
+                  style={{ padding: "var(--space-2) var(--space-3)", textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}
+                >
+                  <Download size={13} />
+                  <span>Voir</span>
+                </a>
+              )}
+              <input ref={cvInputRef} type="file" accept=".pdf,.doc,.docx" onChange={handleCvChange} style={{ display: "none" }} />
+              <button
+                onClick={() => cvInputRef.current?.click()}
+                className="btn-secondary"
+                style={{ padding: "var(--space-2) var(--space-4)" }}
               >
-                <option value="B1">B1 (Intermédiaire)</option>
-                <option value="B2">B2 (Avancé / TOEFL 80+)</option>
-                <option value="C1">C1 (Courant / IELTS 7.0+)</option>
-              </select>
+                <UploadCloud size={14} />
+                <span>{cvUrl ? "Changer" : "Ajouter"}</span>
+              </button>
             </div>
+          </div>
 
-            <div>
-              <label style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "var(--space-1)", display: "block" }}>Niveau de Français</label>
-              <select
-                value={frenchLevel}
-                onChange={(e) => setFrenchLevel(e.target.value)}
-                style={{ width: "100%", padding: "var(--space-2.5) var(--space-3)", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius)", fontSize: "var(--text-caption)", color: "var(--ink-text)", outline: "none" }}
-              >
-                <option value="B2">B2 (DELF B2)</option>
-                <option value="C1">C1 (DALF C1)</option>
-                <option value="Natif">Langue maternelle / Natif</option>
-              </select>
-            </div>
+          <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-subtle)", margin: 0, textAlign: "center" }}>
+            Ces documents sont sauvegardés dans votre profil et utilisés pour améliorer le matching.
+          </p>
+        </div>
+      )}
+
+      {/* ── Section: Projet ── */}
+      {activeSection === "project" && (
+        <div style={{
+          background: "var(--warm-100)", border: "1px solid var(--border)",
+          borderRadius: "var(--radius-2xl)", padding: "var(--space-6)",
+          display: "flex", flexDirection: "column", gap: "var(--space-4)",
+        }}>
+          <h3 style={{ fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--ink-text)", margin: 0, display: "flex", alignItems: "center", gap: "var(--space-2)" }}>
+            <Sparkles size={20} style={{ color: "var(--accent)" }} />
+            Projet académique & professionnel
+          </h3>
+          <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", margin: 0 }}>
+            FlyAgent utilise ce contexte pour personnaliser ses conseils. Soyez spécifique.
+          </p>
+          <textarea
+            rows={5}
+            value={projectSummary}
+            onChange={(e) => setProjectSummary(e.target.value)}
+            placeholder="Ex: Obtenir un Master en IA en Allemagne pour développer des systèmes de santé intelligents adaptés à l'Afrique subsaharienne."
+            style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
+          />
+          <div style={{ padding: "var(--space-3)", background: "var(--accent-light)", borderRadius: "var(--radius)", border: "1px solid var(--accent)" }}>
+            <p style={{ fontSize: "var(--text-caption)", color: "var(--accent)", margin: 0, fontWeight: 500 }}>
+              💡 Un projet précis améliore significativement la qualité des recommandations de FlyAgent.
+            </p>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* CV & Document Upload */}
-      <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "var(--space-6)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
-          <div style={{ padding: "var(--space-4)", borderRadius: "var(--radius-2xl)", background: "var(--accent-50)", border: "1px solid var(--accent-200)", color: "var(--accent)" }}>
-            <FileText style={{ width: "32px", height: "32px" }} />
-          </div>
-          <div>
-            <h4 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", margin: 0 }}>Curriculum Vitae (CV Académique)</h4>
-            <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: "var(--space-0.5)" }}>Format PDF recommandé. Utilisé par l'IA pour évaluer ton éligibilité.</p>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)", width: "100%" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
-            <div style={{ padding: "var(--space-4)", borderRadius: "var(--radius-2xl)", background: "var(--accent-50)", border: "1px solid var(--accent-200)", color: "var(--accent)" }}>
-              <UploadCloud style={{ width: "16px", height: "16px" }} />
-            </div>
-            <div>
-              <h4 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", margin: 0 }}>Photo de profil</h4>
-              <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: "var(--space-0.5)" }}>JPG ou PNG, max 2Mo. Affichée dans ton profil et les candidatures.</p>
-            </div>
-          </div>
-          <button
-            onClick={() => alert("Upload du CV et photo vers Supabase Storage configuré !")}
-            className="btn-secondary"
-            style={{ padding: "var(--space-3) var(--space-5)", borderRadius: "var(--radius-2xl)", fontWeight: 700, border: "1px solid var(--accent)", color: "var(--accent)" }}
-          >
-            <UploadCloud style={{ width: "16px", height: "16px" }} />
-            <span>Téléverser CV & Photo</span>
-          </button>
-        </div>
+      {/* Bouton Save flottant bas */}
+      <div style={{ display: "flex", justifyContent: "center", paddingBottom: "var(--space-8)" }}>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="btn-primary"
+          style={{ padding: "var(--space-4) var(--space-8)", borderRadius: "var(--radius-2xl)", fontSize: "var(--text-body)" }}
+        >
+          {savedSuccess ? (
+            <><CheckCircle2 size={18} /><span>Profil enregistré avec succès !</span></>
+          ) : (
+            <><Save size={18} /><span>{saving ? "Sauvegarde en cours..." : "Enregistrer toutes les modifications"}</span></>
+          )}
+        </button>
       </div>
     </div>
   );

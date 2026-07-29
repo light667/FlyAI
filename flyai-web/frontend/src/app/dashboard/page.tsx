@@ -326,12 +326,13 @@ export default function Dashboard() {
       )}
 
       {/* ── Mobile Navigation Bar ────────────────────────────────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[rgb(var(--warm-50))]/95 backdrop-blur-xl border-t border-[rgb(var(--border))] px-2 py-2 z-40 flex items-center justify-around">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[rgb(var(--warm-50))]/95 backdrop-blur-xl border-t border-[rgb(var(--border))] px-1 py-2 z-40 flex items-center overflow-x-auto gap-1 justify-around">
         {[
-          { id: "recommended", label: "Recommandees", icon: Heart },
-          { id: "discover", label: "Decouvrir", icon: Globe2 },
+          { id: "recommended", label: "Bourses", icon: Heart },
+          { id: "discover", label: "Découvrir", icon: Globe2 },
           { id: "applications", label: "Candidatures", icon: Briefcase },
           { id: "flyagent", label: "FlyAgent", icon: Sparkles },
+          { id: "documents", label: "Dossiers", icon: FileText },
           { id: "profile", label: "Profil", icon: UserIcon },
         ].map((item) => {
           const Icon = item.icon;
@@ -340,15 +341,32 @@ export default function Dashboard() {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center gap-1 p-1 transition-all shrink-0 ${
-                active ? "text-accent scale-105" : "text-[rgb(var(--ink-subtle))] hover:text-[rgb(var(--ink-text))]"
+              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all shrink-0 min-w-0 ${
+                active
+                  ? "text-accent bg-accent/10 scale-105"
+                  : "text-[rgb(var(--ink-subtle))] hover:text-[rgb(var(--ink-text))]"
               }`}
             >
               <Icon className="w-4 h-4" />
-              <span className="text-[9px] font-bold">{item.label}</span>
+              <span className="text-[8px] font-bold truncate max-w-[48px]">{item.label}</span>
             </button>
           );
         })}
+        {/* ✅ FIX BUG 5: Icône Paramètres et Déconnexion sur mobile */}
+        <button
+          onClick={() => router.push("/settings")}
+          className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all shrink-0 text-[rgb(var(--ink-subtle))] hover:text-[rgb(var(--ink-text))]"
+        >
+          <Settings className="w-4 h-4" />
+          <span className="text-[8px] font-bold">Réglages</span>
+        </button>
+        <button
+          onClick={handleLogout}
+          className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all shrink-0 text-[rgb(var(--ink-subtle))] hover:text-rose-500"
+        >
+          <LogOut className="w-4 h-4" />
+          <span className="text-[8px] font-bold">Quitter</span>
+        </button>
       </nav>
     </div>
   );

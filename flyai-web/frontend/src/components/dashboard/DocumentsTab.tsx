@@ -122,6 +122,40 @@ export default function DocumentsTab({ userId, userProfile }: Props) {
     }
   };
 
+  // Combine uploaded documents with CV & Photo from userProfile
+  const allDocuments = [...documents];
+  if (userProfile?.cvUrl && !allDocuments.some((d) => d.category === "CV" || d.download_url === userProfile.cvUrl)) {
+    allDocuments.unshift({
+      id: "profile_cv",
+      file_name: "CV_Profil_Academique.pdf",
+      category: "CV",
+      file_size: 350000,
+      mime_type: "application/pdf",
+      file_extension: ".pdf",
+      storage_path: "",
+      bucket: "documents",
+      download_url: userProfile.cvUrl,
+      uploaded_at: userProfile.updatedAt || new Date().toISOString(),
+      status: "uploaded",
+    });
+  }
+
+  if (userProfile?.photoUrl && !allDocuments.some((d) => d.category === "Photo d'identité" || d.download_url === userProfile.photoUrl)) {
+    allDocuments.unshift({
+      id: "profile_photo",
+      file_name: "Photo_Profil.jpg",
+      category: "Photo d'identité",
+      file_size: 150000,
+      mime_type: "image/jpeg",
+      file_extension: ".jpg",
+      storage_path: "",
+      bucket: "documents",
+      download_url: userProfile.photoUrl,
+      uploaded_at: userProfile.updatedAt || new Date().toISOString(),
+      status: "uploaded",
+    });
+  }
+
   const handleUploadClick = () => {
     setIsModalOpen(true);
     setError(null);
@@ -372,7 +406,7 @@ export default function DocumentsTab({ userId, userProfile }: Props) {
         </div>
       )}
 
-      {loading && documents.length === 0 && (
+      {loading && allDocuments.length === 0 && (
         <div style={{ padding: "var(--space-8)", textAlign: "center" }}>
           <Loader2 style={{ width: "32px", height: "32px", margin: "0 auto", color: "var(--accent)", animation: "spin 1s linear infinite" }} />
           <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", marginTop: "var(--space-2)" }}>Chargement des documents...</p>
@@ -381,10 +415,10 @@ export default function DocumentsTab({ userId, userProfile }: Props) {
 
       <div style={{ background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
         <h3 style={{ fontWeight: 700, color: "var(--ink-text)", fontSize: "var(--text-body)", paddingBottom: "var(--space-3)", borderBottom: "1px solid var(--border)" }}>
-          Documents Enregistrés ({documents.length})
+          Documents Enregistrés ({allDocuments.length})
         </h3>
 
-        {documents.length === 0 && !loading ? (
+        {allDocuments.length === 0 && !loading ? (
           <div style={{ padding: "var(--space-8)", textAlign: "center", color: "var(--ink-muted)", fontSize: "var(--text-body)" }}>
             <FileText style={{ width: "48px", height: "48px", margin: "0 auto var(--space-2)", opacity: 0.5, color: "var(--ink-subtle)" }} />
             <p>Aucun document téléversé.</p>
@@ -392,7 +426,7 @@ export default function DocumentsTab({ userId, userProfile }: Props) {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-            {documents.map((doc) => {
+            {allDocuments.map((doc) => {
               const categoryColor = getCategoryColor(doc.category);
               const statusColor = getStatusColor(doc.status);
               return (

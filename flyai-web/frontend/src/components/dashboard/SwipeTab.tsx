@@ -262,10 +262,22 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                   <button
                     onClick={() => onOpenFlyAgent(currentCard)}
                     className="btn-primary"
-                    style={{ padding: "var(--space-1.5) var(--space-3)", borderRadius: "var(--radius-xl)", fontSize: "11px", boxShadow: "var(--shadow-sm)" }}
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      padding: "8px 16px",
+                      borderRadius: "var(--radius-xl)",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      whiteSpace: "nowrap",
+                      flexShrink: 0,
+                    }}
                   >
-                    <Sparkles style={{ width: "var(--space-3)", height: "var(--space-3)", color: "var(--accent-text)" }} />
-                    <span>FlyAgent</span>
+                    <Sparkles style={{ width: "14px", height: "14px", color: "var(--accent-text)", flexShrink: 0 }} />
+                    <span style={{ whiteSpace: "nowrap" }}>Postuler avec FlyAgent</span>
                   </button>
                 )}
               </div>
@@ -300,12 +312,22 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
           <button
             onClick={() => handleSwipe("right")}
             className="btn-primary"
-            style={{ width: "56px", height: "56px", borderRadius: "var(--radius-full)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-lg), 0 4px 12px rgba(15, 123, 108, 0.3)", transition: "transform var(--transition-base)" }}
+            style={{
+              width: "56px",
+              height: "56px",
+              borderRadius: "var(--radius-full)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "var(--shadow-lg), 0 4px 16px rgba(15, 123, 108, 0.4)",
+              transition: "transform var(--transition-base)",
+              cursor: "pointer",
+            }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.1)"; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)"; }}
-            title="Aimer"
+            title="Aimer et ajouter aux favoris"
           >
-            <Heart style={{ width: "24px", height: "24px", fill: "rgba(255, 255, 255, 0.2)", color: "var(--accent-text)" }} />
+            <Heart style={{ width: "26px", height: "26px", fill: "#ffffff", color: "#ffffff" }} />
           </button>
         </div>
       )}
