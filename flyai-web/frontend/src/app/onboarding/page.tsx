@@ -217,9 +217,7 @@ export default function OnboardingPage() {
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-6)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-          <div style={{ width: 32, height: 32, borderRadius: "var(--radius)", background: "var(--ink-800)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Sparkles size={16} color="white" />
-          </div>
+         
           <span style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", color: "var(--ink-text)" }}>
             Fly<span style={{ color: "var(--accent)" }}>AI</span>
           </span>

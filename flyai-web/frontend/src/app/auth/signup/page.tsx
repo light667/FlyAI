@@ -190,34 +190,7 @@ export default function SignupPage() {
   // Guide pour les nouveaux utilisateurs
   const GuideMessage = () => (
     <div style={{
-      marginBottom: "var(--space-6)",
-      padding: "var(--space-4)",
-      background: "var(--warning-light)",
-      border: "1px solid var(--warning)",
-      borderRadius: "var(--radius-xl)",
-      display: "flex",
-      alignItems: "flex-start",
-      gap: "var(--space-3)",
     }}>
-      <div style={{ flexShrink: 0 }}>
-        <Sparkles size={20} style={{ color: "var(--warning)" }} />
-      </div>
-      <div style={{ flex: 1 }}>
-        <p style={{ fontSize: "var(--text-body)", color: "var(--warning)", fontWeight: 500, lineHeight: 1.6 }}>
-          <strong>Conseil :</strong> Pour une expérience optimale, nous vous recommandons de vous inscrire avec votre 
-          <strong>adresse email et mot de passe</strong>. Cela vous permettra de compléter votre profil et de bénéficier 
-          de notre système de recommandation de bourses personnalisées.
-        </p>
-        <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: "var(--space-2)" }}>
-          Si vous utilisez Google, vous serez également redirigé vers la page de complétion de profil.
-        </p>
-      </div>
-      <button
-        onClick={() => setShowGuide(false)}
-        style={{ color: "var(--warning)", fontSize: "var(--text-caption)", fontWeight: 600, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-      >
-        J'ai compris
-      </button>
     </div>
   );
 
