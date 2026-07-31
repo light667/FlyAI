@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
     const degree = searchParams.get("degree") || "";
     const funding = searchParams.get("funding") || "";
     const userId = searchParams.get("userId") || "";
+    const strict = searchParams.get("strict") === "true";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "40");
     const offset = (page - 1) * limit;
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
       budgetMax: 15000,
     };
 
-    const rankedBourses = rankScholarshipsForProfile(defaultProfile, bourses || [], degree || undefined);
+    const rankedBourses = rankScholarshipsForProfile(defaultProfile, bourses || [], degree || undefined, strict);
 
     return NextResponse.json({
       data: rankedBourses,

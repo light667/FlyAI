@@ -304,7 +304,12 @@ export function rankScholarshipsForProfile(
   strict: boolean = false
 ): Scholarship[] {
   return scholarships
-    .filter((sch) => !isDeadlineExpired(sch.deadline))
+    .filter((sch) => {
+      if (strict && isDeadlineExpired(sch.deadline)) {
+        return false;
+      }
+      return true;
+    })
     .map((sch) => {
       const breakdown = calculateMatchScore(profile, sch, overrideDegreeFilter);
       return {
@@ -314,7 +319,6 @@ export function rankScholarshipsForProfile(
       };
     })
     .filter((sch) => {
-      // En mode strict, exclure les bourses avec degré incompatible ET score < 30
       if (strict && !sch.matchBreakdown?.degreeMatch && (sch.niveau_etude?.length ?? 0) > 0) {
         return false;
       }

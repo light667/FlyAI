@@ -291,11 +291,6 @@ export default function Dashboard() {
 
         {/* Dynamic Tab Contents */}
         <div className="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full">
-          {/* Guides pour nouveaux utilisateurs */}
-          {isFirstVisit() && activeTab === "recommended" && (
-            <NewUserDashboardGuide onDismiss={markFirstVisitComplete} />
-          )}
-          
           {activeTab === "recommended" && (
             <RecommendedTab
               userId={currentUser?.uid}
@@ -307,6 +302,7 @@ export default function Dashboard() {
           {activeTab === "discover" && (
             <DiscoverTab
               userId={currentUser?.uid}
+              userProfile={profile}
               onOpenFlyAgent={handleOpenFlyAgent}
             />
           )}
@@ -342,8 +338,9 @@ export default function Dashboard() {
         />
       )}
 
-      {/* ── Mobile Navigation Bar (Consolidated 5 Core Tabs) ────────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[rgb(var(--warm-50))]/95 backdrop-blur-xl border-t border-[rgb(var(--border))] px-2 py-2 z-40 flex items-center justify-around">
+      {/* ── Mobile Navigation Bar (Solid 100% Opacity) ────────────────── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[rgb(var(--warm-50))] border-t border-[rgb(var(--border))] shadow-2xl px-2 py-2.5 z-40 flex items-center justify-around">
+
         {[
           { id: "recommended", label: "Bourses", icon: Heart },
           { id: "discover", label: "Découvrir", icon: Globe2 },

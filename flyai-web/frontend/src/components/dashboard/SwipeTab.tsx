@@ -30,6 +30,7 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
     try {
       const params = new URLSearchParams();
       if (userId) params.append("userId", userId);
+      params.append("strict", "true");
       params.append("limit", "50");
 
       const res = await fetch(`/api/scholarships?${params.toString()}`);
@@ -64,7 +65,6 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
 
     if (userId) {
       try {
-        // Déterminer la catégorie en fonction de la direction
         let category = "standard";
         if (direction === "right") category = "favoris";
         if (direction === "superlike") category = "flyagent";
@@ -103,7 +103,7 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
       {/* ── Horizontal Scrollable List / Carousel (Ordre Décroissant de Score) ── */}
       {deck.length > 0 && (
         <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: "4px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
               Toutes les bourses ({deck.length})
             </span>
@@ -139,7 +139,7 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                     cursor: "pointer",
                     display: "flex",
                     flexDirection: "column",
-                    justify: "space-between",
+                    justifyContent: "space-between",
                     gap: "8px",
                     boxShadow: isActive ? "0 4px 12px rgba(15,123,108,0.2)" : "var(--shadow-sm)",
                     transition: "all 0.2s ease"
@@ -243,7 +243,7 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
       </AnimatePresence>
 
       {/* ── Main Interactive Swiping Card ── */}
-      <div style={{ position: "relative", width: "100%", maxWidth: "448px", minHeight: "380px", maxHeight: "460px", height: "420px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: "448px", minHeight: "420px", maxHeight: "480px", height: "440px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {loading ? (
           <div style={{ width: "100%", height: "100%", borderRadius: "20px", background: "var(--warm-50)", border: "1px solid var(--border)", animation: "pulse 2s ease-in-out infinite", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)", fontSize: "0.8rem", fontWeight: 700 }}>
             Calcul des meilleures bourses...
@@ -277,7 +277,7 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                 padding: "16px 20px", 
                 display: "flex", 
                 flexDirection: "column", 
-                justify: "space-between", 
+                justifyContent: "space-between", 
                 cursor: "grab", 
                 boxShadow: "var(--shadow-lg)", 
                 overflow: "hidden" 
@@ -306,8 +306,8 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
               </motion.div>
 
               {/* Card Content Header */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {/* Badges line without heavy icons */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
+                {/* Badges line */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "6px" }}>
                   <span style={{ padding: "3px 10px", fontSize: "0.72rem", fontWeight: 800, borderRadius: "9999px", background: "var(--accent-light)", color: "var(--accent)", border: "1px solid var(--accent-200)" }}>
                     Compatibilité {currentCard.matchScore || 85}%
@@ -318,7 +318,7 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                   </span>
                 </div>
 
-                {/* Title (compact font size to avoid overflow) */}
+                {/* Title */}
                 <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--ink-text)", margin: 0, lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                   {currentCard.titre}
                 </h3>
@@ -336,7 +336,7 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                   )}
                 </div>
 
-                {/* Score Reasons (Concise) */}
+                {/* Score Reasons */}
                 {currentCard.matchBreakdown?.reasons && (
                   <div style={{ padding: "8px 10px", borderRadius: "10px", background: "var(--warm-100)", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "2px" }}>
                     {currentCard.matchBreakdown.reasons.slice(0, 2).map((r, i) => (
@@ -348,13 +348,13 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                 )}
 
                 {/* Description */}
-                <p style={{ fontSize: "0.78rem", color: "var(--ink-muted)", margin: 0, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", lineHeight: 1.5 }}>
+                <p style={{ fontSize: "0.78rem", color: "var(--ink-muted)", margin: 0, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: 1.5 }}>
                   {currentCard.description}
                 </p>
               </div>
 
-              {/* Card Footer (Cleanly placed inside card without overflow) */}
-              <div style={{ paddingTop: "10px", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+              {/* Card Footer (Pushed to bottom of card) */}
+              <div style={{ marginTop: "auto", paddingTop: "12px", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
                 <button
                   onClick={() => setInspectScholarship(currentCard)}
                   style={{ color: "var(--accent)", fontWeight: 700, fontSize: "0.75rem", background: "none", border: "none", cursor: "pointer", padding: "4px 0", textDecoration: "underline" }}
