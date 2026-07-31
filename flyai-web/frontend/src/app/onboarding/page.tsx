@@ -37,21 +37,84 @@ const WORLD_COUNTRIES = [
   "Bresil","Mexique","Australie","Autre nationalite"
 ];
 
-const FIELDS = [
-  "Informatique & Intelligence Artificielle","Genie Logiciel & Cybersecurite",
-  "Data Science & Big Data","Ingenierie Electrique & Electronique",
-  "Ingenierie Mecanique & Mecatronique","Genie Civil & BTP",
-  "Ingenierie Chimique & Materiaux","Aeronautique & Spatial",
-  "Medecine Generale & Chirurgie","Pharmacie & Biologie Medicale",
-  "Sante Publique & Epidemiologie","Economie, Finance & Gestion",
-  "Management & Business Administration","Marketing Digital & Commerce International",
-  "Droit International & Droit des Affaires","Sciences Politiques & Relations Internationales",
-  "Physique, Chimie & Materiaux","Biotechnologies & Bio-Ingenierie",
-  "Mathematiques & Statistique Appliquee","Sciences de l Environnement & Energies Renouvelables",
-  "Agronomie, Agriculture & Agroalimentaire","Architecture, Urbanisme & Design",
-  "Sciences Humaines & Philosophie","Psychologie & Neurosciences",
-  "Journalisme, Communication & Medias","Education & Sciences de l Enseignement",
-];
+const CATEGORIZED_FIELDS: Record<string, string[]> = {
+  "Informatique & Tech": [
+    "Informatique & Intelligence Artificielle",
+    "Génie Logiciel & Développement Web/Mobile",
+    "Data Science, Big Data & Analytics",
+    "Cybersécurité & Sécurité des Systèmes",
+    "Réseaux, Systèmes & Cloud Computing",
+    "Systèmes Embarqués & IoT",
+    "Bio-informatique & Santé Numérique",
+    "Blockchain & FinTech",
+    "Graphisme, VR & Jeux Vidéo",
+  ],
+  "Ingénierie & Industrie": [
+    "Génie Électrique & Électronique",
+    "Génie Mécanique & Mécatronique",
+    "Génie Civil, BTP & Structure",
+    "Génie Chimique, Procédés & Matériaux",
+    "Aéronautique, Spatiale & Avionique",
+    "Génie Industriel & Logistique",
+    "Robotique, Automatique & Productique",
+    "Énergie, Pétrole & Ressources Minières",
+  ],
+  "Santé & Médecine": [
+    "Médecine Générale & Chirurgie",
+    "Pharmacie & Sciences Pharmaceutiques",
+    "Santé Publique, Épidémiologie & Biostatistique",
+    "Biologie Médicale & Génétique",
+    "Odontologie & Chirurgie Dentaire",
+    "Maïeutique & Sciences Infirmières",
+    "Neurosciences & Biologie du Comportement",
+    "Bio-Ingénierie Médicale & Imagerie",
+  ],
+  "Économie & Business": [
+    "Économie Appliquée & Économétrie",
+    "Finance d'Entreprise, Marchés & Banque",
+    "Management, Stratégie & Entrepreneurship",
+    "Marketing Digital, Communication & E-Commerce",
+    "Audit, Comptabilité & Contrôle de Gestion",
+    "Commerce International & Supply Chain",
+    "Gestion des Ressources Humaines",
+    "Administration des Affaires (MBA)",
+  ],
+  "Droit & Sciences Politiques": [
+    "Droit International & Droit comparé",
+    "Droit des Affaires, Fiscalité & Concurrence",
+    "Droit du Numérique & Propriété Intellectuelle",
+    "Sciences Politiques & Gouvernance Publique",
+    "Relations Internationales & Diplomatie",
+    "Droit de l'Environnement & Énergie",
+    "Droits Humains & Droit Humanitaire",
+  ],
+  "Environnement & Climat": [
+    "Énergies Renouvelables & Transition Énergétique",
+    "Écologie, Biodiversité & Conservation",
+    "Agronomie, Agriculture Intelligente & Agroalimentaire",
+    "Hydrologie & Gestion des Ressources en Eau",
+    "Géosciences, Géologie & Océanographie",
+    "Aménagement du Territoire & Urbanisme Durable",
+  ],
+  "Sciences Fondamentales": [
+    "Mathématiques Pures & Modélisation",
+    "Statistique, Probabilités & Data Mining",
+    "Physique Théorique, Quantique & Matériaux",
+    "Chimie Moléculaire & Subatomique",
+    "Biologie Cellulaire, Moléculaire & Biochimie",
+    "Astrophysique & Astronomie",
+  ],
+  "Arts, Médias & Sciences Humaines": [
+    "Psychologie Clinique & Cognition",
+    "Sociologie, Anthropologie & Démographie",
+    "Journalisme, Médias & Communication",
+    "Design, Art Numérique & Architecture d'Intérieur",
+    "Langues Étrangères Appliquées & Traduction",
+    "Éducation & Sciences de l'Enseignement",
+  ],
+};
+
+const ALL_FIELDS = Object.values(CATEGORIZED_FIELDS).flat();
 
 const DESTINATIONS = [
   "France","Allemagne","Royaume-Uni","Canada","Etats-Unis","Suisse","Belgique",
@@ -109,6 +172,8 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0);
   const [user, setUser] = useState<any>(null);
   const [saving, setSaving] = useState(false);
+  const [fieldSearch, setFieldSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<ProfileState>({
     fullName: "",
@@ -194,7 +259,6 @@ export default function OnboardingPage() {
         }
         router.push("/dashboard");
       } else {
-        // Sauvegarder dans localStorage pour récupération après signup
         localStorage.setItem("flyai_onboarding_profile", JSON.stringify(profile));
         localStorage.setItem("flyai_onboarding_completed", "true");
         router.push("/auth/signup");
@@ -203,7 +267,7 @@ export default function OnboardingPage() {
       console.error("Error saving profile:", err);
       alert("Erreur lors de la sauvegarde du profil. Veuillez réessayer.");
       setSaving(false);
-      return; // Ne pas rediriger si échec
+      return;
     } finally {
       setSaving(false);
     }
@@ -211,25 +275,33 @@ export default function OnboardingPage() {
 
   const pct = Math.round(((step + 1) / STEPS.length) * 100);
 
+  // Filtered fields for specialty search
+  const filteredFields = ALL_FIELDS.filter((f) => {
+    const matchesSearch = f.toLowerCase().includes(fieldSearch.toLowerCase());
+    if (selectedCategory) {
+      const catFields = CATEGORIZED_FIELDS[selectedCategory] || [];
+      return matchesSearch && catFields.includes(f);
+    }
+    return matchesSearch;
+  });
+
   return (
     <div style={{ minHeight: "100vh", background: "var(--warm-50)", display: "flex", flexDirection: "column", padding: "var(--space-6)", fontFamily: "var(--font-body)" }}>
 
       {/* Header */}
       <div style={{ maxWidth: 560, margin: "0 auto", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-6)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-         
           <span style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", color: "var(--ink-text)" }}>
             Fly<span style={{ color: "var(--accent)" }}>AI</span>
           </span>
         </div>
         <span style={{ fontSize: "var(--text-caption)", color: "var(--ink-subtle)", fontWeight: 600 }}>
-          Etape {step + 1} / {STEPS.length}
+          Étape {step + 1} / {STEPS.length}
         </span>
       </div>
 
-      {/* Barre de progression */}
+      {/* Progress Bar */}
       <div style={{ maxWidth: 560, margin: "0 auto var(--space-6)", width: "100%" }}>
-        {/* Steps pills */}
         <div style={{ display: "flex", gap: 4, marginBottom: "var(--space-3)" }}>
           {STEPS.map((s, i) => (
             <div key={s.id} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= step ? "var(--accent)" : "var(--warm-300)", transition: "background 300ms" }} />
@@ -241,50 +313,51 @@ export default function OnboardingPage() {
         </div>
       </div>
 
-      {/* Card */}
+      {/* Main Form Card */}
       <div style={{ maxWidth: 560, margin: "0 auto", width: "100%", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)", padding: "var(--space-8)", boxShadow: "var(--shadow-md)", display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
 
-        {/* Etape 0 — Identite */}
+        {/* Etape 0 — Identité */}
         {step === 0 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
             <div style={{ textAlign: "center" }}>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h1)", fontWeight: 400, color: "var(--ink-text)", margin: "0 0 var(--space-2)" }}>
-                Bonjour, qui etes-vous ?
+                Bonjour, qui êtes-vous ?
               </h2>
               <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", margin: 0 }}>
-                Ces informations determinent votre eligibilite aux bourses reservees a certaines nationalites.
+                Ces informations déterminent votre éligibilité aux bourses réservées à certaines nationalités.
               </p>
             </div>
             <div>
               <label style={labelSt}>Votre nom complet</label>
-              <input style={inputSt} type="text" placeholder="Prenom Nom" value={profile.fullName} onChange={(e) => setProfile({ ...profile, fullName: e.target.value })} />
+              <input style={inputSt} type="text" placeholder="Prénom Nom" value={profile.fullName} onChange={(e) => setProfile({ ...profile, fullName: e.target.value })} />
             </div>
             <div>
-              <label style={labelSt}>Nationalite / Pays d origine</label>
+              <label style={labelSt}>Nationalité / Pays d'origine</label>
               <select style={inputSt} value={profile.nationality} onChange={(e) => setProfile({ ...profile, nationality: e.target.value })}>
                 {WORLD_COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelSt}>Universite actuelle (facultatif)</label>
-              <input style={inputSt} type="text" placeholder="Ex: Universite Cheikh Anta Diop" value={profile.university} onChange={(e) => setProfile({ ...profile, university: e.target.value })} />
+              <label style={labelSt}>Université actuelle (facultatif)</label>
+              <input style={inputSt} type="text" placeholder="Ex: Université Cheikh Anta Diop" value={profile.university} onChange={(e) => setProfile({ ...profile, university: e.target.value })} />
             </div>
           </div>
         )}
 
-        {/* Etape 1 — Parcours academique */}
+        {/* Etape 1 — Parcours & Sélection Riche des Spécialités */}
         {step === 1 && (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
             <div style={{ textAlign: "center" }}>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "var(--text-h1)", fontWeight: 400, color: "var(--ink-text)", margin: "0 0 var(--space-2)" }}>
-                Votre parcours academique
+                Votre parcours & spécialité
               </h2>
               <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", margin: 0 }}>
-                Le niveau d etudes est un filtre eliminatoire dans la plupart des bourses d excellence.
+                Sélectionnez votre niveau d'études et votre spécialité académique précise.
               </p>
             </div>
+
             <div>
-              <label style={labelSt}>Niveau d etudes ACTUEL</label>
+              <label style={labelSt}>Niveau d'études ACTUEL</label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)" }}>
                 {DEGREES.map((d) => {
                   const sel = profile.degreeLevel === d.value;
@@ -297,8 +370,9 @@ export default function OnboardingPage() {
                 })}
               </div>
             </div>
+
             <div>
-              <label style={labelSt}>Niveau d etudes VISE (pour les recommandations)</label>
+              <label style={labelSt}>Niveau d'études VISÉ (pour les recommandations)</label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-3)" }}>
                 {DEGREES.map((d) => {
                   const sel = profile.targetDegreeLevel === d.value;
@@ -311,14 +385,110 @@ export default function OnboardingPage() {
                 })}
               </div>
             </div>
+
+            {/* ── Catalogue Complet des Spécialités ── */}
             <div>
-              <label style={labelSt}>Domaine d etudes principal</label>
-              <select style={inputSt} value={profile.fieldOfStudy} onChange={(e) => setProfile({ ...profile, fieldOfStudy: e.target.value })}>
-                {FIELDS.map((f) => <option key={f} value={f}>{f}</option>)}
-              </select>
+              <label style={labelSt}>Domaine / Spécialité académique (Sélection parmi la liste)</label>
+              
+              {/* Category Filter Chips */}
+              <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "6px", marginBottom: "8px" }} className="no-scrollbar">
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  style={{
+                    padding: "4px 10px", borderRadius: "9999px", fontSize: "11px", fontWeight: 700,
+                    border: "1px solid var(--border)", background: !selectedCategory ? "var(--accent)" : "var(--warm-100)",
+                    color: !selectedCategory ? "#fff" : "var(--ink-muted)", cursor: "pointer", whiteSpace: "nowrap"
+                  }}
+                >
+                  Tous les domaines
+                </button>
+                {Object.keys(CATEGORIZED_FIELDS).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
+                    style={{
+                      padding: "4px 10px", borderRadius: "9999px", fontSize: "11px", fontWeight: 700,
+                      border: "1px solid var(--border)", background: selectedCategory === cat ? "var(--accent)" : "var(--warm-100)",
+                      color: selectedCategory === cat ? "#fff" : "var(--ink-muted)", cursor: "pointer", whiteSpace: "nowrap"
+                    }}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Search input for field of study */}
+              <input
+                type="text"
+                placeholder="Rechercher une spécialité (ex: Data Science, Droit, Chimie, IA...)..."
+                value={fieldSearch}
+                onChange={(e) => setFieldSearch(e.target.value)}
+                style={{ ...inputSt, marginBottom: "8px", fontSize: "0.8rem" }}
+              />
+
+              {/* Selected Field Indicator */}
+              {profile.fieldOfStudy && (
+                <div style={{ padding: "6px 12px", background: "var(--accent-light)", border: "1px solid var(--accent)", borderRadius: "8px", fontSize: "0.78rem", fontWeight: 700, color: "var(--accent)", marginBottom: "8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span>Sélectionné : {profile.fieldOfStudy}</span>
+                  <span>✓</span>
+                </div>
+              )}
+
+              {/* Scrollable list of fields */}
+              <div 
+                className="custom-scrollbar"
+                style={{ 
+                  maxHeight: "180px", 
+                  overflowY: "auto", 
+                  border: "1px solid var(--border)", 
+                  borderRadius: "var(--radius)", 
+                  background: "var(--warm-100)", 
+                  padding: "6px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "4px"
+                }}
+              >
+                {filteredFields.length === 0 ? (
+                  <div style={{ padding: "12px", textAlign: "center", fontSize: "0.78rem", color: "var(--ink-muted)" }}>
+                    Aucune spécialité trouvée. Vous pouvez taper directement votre domaine.
+                    <button 
+                      onClick={() => setProfile({ ...profile, fieldOfStudy: fieldSearch })}
+                      style={{ marginTop: "6px", display: "block", width: "100%", padding: "6px", borderRadius: "6px", background: "var(--accent)", color: "#fff", fontWeight: 700, fontSize: "0.75rem", border: "none", cursor: "pointer" }}
+                    >
+                      Utiliser "{fieldSearch}"
+                    </button>
+                  </div>
+                ) : (
+                  filteredFields.map((f) => {
+                    const isSelected = profile.fieldOfStudy === f;
+                    return (
+                      <button
+                        key={f}
+                        onClick={() => setProfile({ ...profile, fieldOfStudy: f })}
+                        style={{
+                          padding: "8px 12px",
+                          borderRadius: "6px",
+                          border: `1px solid ${isSelected ? "var(--accent)" : "transparent"}`,
+                          background: isSelected ? "var(--accent-light)" : "var(--warm-50)",
+                          color: isSelected ? "var(--accent)" : "var(--ink-text)",
+                          fontSize: "0.78rem",
+                          fontWeight: isSelected ? 700 : 500,
+                          textAlign: "left",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        {f}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
             </div>
           </div>
         )}
+
 
         {/* Etape 2 — Resultats */}
         {step === 2 && (

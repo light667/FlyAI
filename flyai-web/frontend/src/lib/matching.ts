@@ -280,9 +280,22 @@ export function calculateMatchScore(
   };
 }
 
+function isDeadlineExpired(deadlineStr?: string): boolean {
+  if (!deadlineStr) return false;
+  try {
+    const dStr = deadlineStr.split("T")[0].trim();
+    const deadlineDate = new Date(dStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return deadlineDate < today;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Rank scholarships for a student profile (descending score)
- * Exclut les bourses avec niveau incompatible si strict=true
+ * Exclut les bourses expirées et les bourses avec niveau incompatible si strict=true
  */
 export function rankScholarshipsForProfile(
   profile: Partial<UserProfile> | null,
@@ -291,6 +304,7 @@ export function rankScholarshipsForProfile(
   strict: boolean = false
 ): Scholarship[] {
   return scholarships
+    .filter((sch) => !isDeadlineExpired(sch.deadline))
     .map((sch) => {
       const breakdown = calculateMatchScore(profile, sch, overrideDegreeFilter);
       return {
@@ -308,3 +322,4 @@ export function rankScholarshipsForProfile(
     })
     .sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
 }
+

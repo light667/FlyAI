@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ChatMessage, ChatSession, UserProfile } from "@/types";
-import { Sparkles, Send, User as UserIcon, Plus, MessageSquare, Clock, X, MessageCircle } from "lucide-react";
+import { Bot, Send, User as UserIcon, Plus, MessageSquare, Clock, X, MessageCircle, FileSearch, Sparkles } from "lucide-react";
 import FormattedText from "@/components/FormattedText";
 
 interface Props {
@@ -11,11 +11,10 @@ interface Props {
 }
 
 const QUICK_PROMPTS = [
-  "Analyse mon CV et donne des améliorations",
-  "Écris-moi une lettre de motivation pour une opportunité",
-  "Quels sont les différents tests de langues qui existent, combien ils coûtent et où les faire ?",
-  "Comment avoir un passeport, quels sont les dossiers à fournir ?",
-  "Comment avoir un visa d'études pour un pays spécifique ?",
+  "📄 Analyser mon CV et proposer des améliorations",
+  "🎯 Vérifier mon éligibilité et postuler à une bourse",
+  "✉️ Rédiger une lettre de motivation sur mesure",
+  "🌍 Guide des tests de langue (TOEFL, IELTS, TCF) et visas",
 ];
 
 export default function AssistantTab({ userId, userProfile }: Props) {
@@ -116,104 +115,98 @@ export default function AssistantTab({ userId, userProfile }: Props) {
   };
 
   return (
-    <div style={{ height: "calc(100vh - 90px)", width: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
+    <div style={{ height: "calc(100vh - 120px)", width: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
 
-      {/* ── Chat Container (Plein Écran sous la barre) ── */}
+      {/* ── Chat Container ── */}
       <div style={{
         flex: 1,
         display: "flex",
         flexDirection: "column",
         background: "var(--warm-50)",
         border: "1px solid var(--border)",
-        borderRadius: "var(--radius-xl)",
+        borderRadius: "16px",
         overflow: "hidden",
         width: "100%",
         height: "100%",
       }}>
 
-        {/* Header avec boutons agrandis et tooltips sur hover */}
+        {/* Header */}
         <div style={{
-          padding: "var(--space-3) var(--space-6)",
+          padding: "10px 16px",
           borderBottom: "1px solid var(--border)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           background: "var(--warm-100)",
-          minHeight: "64px",
+          minHeight: "56px",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <div style={{
-              width: 40, height: 40, borderRadius: "var(--radius-lg)",
-              background: "var(--accent)",
+              width: 36, height: 36, borderRadius: "10px",
+              background: "#0f7b6c",
               display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               boxShadow: "0 2px 8px rgba(15,123,108,0.3)",
             }}>
-              <Sparkles size={20} color="white" />
+              <Bot size={20} color="white" />
             </div>
             <div>
               <h3 style={{
-                fontFamily: "var(--font-body)", fontSize: "1.1rem", fontWeight: 700,
-                color: "var(--ink-text)", margin: 0, display: "flex", alignItems: "center", gap: "var(--space-2)",
+                fontSize: "0.95rem", fontWeight: 800,
+                color: "var(--ink-text)", margin: 0, display: "flex", alignItems: "center", gap: "6px",
               }}>
                 FlyAgent
                 <span style={{
-                  fontSize: "10px", fontWeight: 700,
-                  padding: "2px 8px", borderRadius: "var(--radius-full)",
+                  fontSize: "9px", fontWeight: 800,
+                  padding: "1px 6px", borderRadius: "9999px",
                   border: "1px solid var(--accent)", color: "var(--accent)",
-                  background: "var(--accent-light)", textTransform: "uppercase", letterSpacing: "0.04em",
+                  background: "var(--accent-light)", textTransform: "uppercase",
                 }}>
-                  Copilote
+                  Agent IA
                 </span>
               </h3>
             </div>
           </div>
 
-          {/* ✅ FIX: Boutons Historique et Nouvelle discussion plus grands avec icônes + tooltips */}
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-            {/* Bouton Historique */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <button
               onClick={() => { fetchSessions(); setShowHistory(!showHistory); }}
-              title="Historique des discussions (cliquer pour ouvrir)"
+              title="Historique des discussions"
               style={{
-                display: "flex", alignItems: "center", gap: "var(--space-2)",
-                padding: "10px 16px",
-                borderRadius: "var(--radius-xl)", border: "1px solid var(--border)",
+                display: "flex", alignItems: "center", gap: "6px",
+                padding: "6px 12px",
+                borderRadius: "10px", border: "1px solid var(--border)",
                 background: showHistory ? "var(--accent)" : "var(--warm-50)",
                 color: showHistory ? "white" : "var(--ink-text)",
-                cursor: "pointer", fontSize: "var(--text-body)", fontWeight: 700,
-                transition: "all var(--transition-base)",
-                boxShadow: "var(--shadow-sm)",
+                cursor: "pointer", fontSize: "0.78rem", fontWeight: 700,
               }}
             >
-              <Clock size={18} />
-              <span>Historique</span>
+              <Clock size={15} />
+              <span className="hidden sm:inline">Historique</span>
               {sessions.length > 0 && (
                 <span style={{
                   background: showHistory ? "white" : "var(--accent)",
                   color: showHistory ? "var(--accent)" : "white",
-                  borderRadius: "50%", width: 20, height: 20,
+                  borderRadius: "50%", width: 18, height: 18,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "11px", fontWeight: 800,
+                  fontSize: "10px", fontWeight: 800,
                 }}>
                   {sessions.length}
                 </span>
               )}
             </button>
 
-            {/* Bouton Nouvelle discussion */}
             <button
               onClick={handleNewSession}
-              title="Nouvelle discussion (démarrer un nouveau sujet)"
+              title="Nouvelle discussion"
               className="btn-primary"
               style={{
-                display: "flex", alignItems: "center", gap: "var(--space-2)",
-                padding: "10px 18px", borderRadius: "var(--radius-xl)",
-                fontSize: "var(--text-body)", fontWeight: 700, cursor: "pointer",
-                boxShadow: "var(--shadow-md)",
+                display: "flex", alignItems: "center", gap: "6px",
+                padding: "6px 14px", borderRadius: "10px",
+                fontSize: "0.78rem", fontWeight: 700, cursor: "pointer",
               }}
             >
-              <Plus size={18} />
-              <span>Nouvelle discussion</span>
+              <Plus size={15} />
+              <span className="hidden sm:inline">Nouveau</span>
             </button>
           </div>
         </div>
@@ -221,62 +214,51 @@ export default function AssistantTab({ userId, userProfile }: Props) {
         {/* Messages Body */}
         <div
           className="custom-scrollbar"
-          style={{ flex: 1, padding: "var(--space-6)", overflowY: "auto", display: "flex", flexDirection: "column", gap: "var(--space-4)" }}
+          style={{ flex: 1, padding: "16px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px" }}
         >
           {messages.length === 0 ? (
             <div style={{
               flex: 1, display: "flex", flexDirection: "column",
               alignItems: "center", justifyContent: "center", textAlign: "center",
-              maxWidth: "750px", margin: "0 auto", gap: "var(--space-6)", padding: "var(--space-6) 0",
+              maxWidth: "680px", margin: "0 auto", gap: "16px", padding: "12px 0",
               width: "100%",
             }}>
               <div style={{
-                width: 64, height: 64, borderRadius: "50%",
+                width: 52, height: 52, borderRadius: "50%",
                 border: "2px solid var(--accent)", background: "var(--accent-light)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 4px 16px rgba(15,123,108,0.2)",
+                boxShadow: "0 4px 12px rgba(15,123,108,0.2)",
               }}>
-                <Sparkles size={32} style={{ color: "var(--accent)" }} />
+                <Bot size={28} style={{ color: "var(--accent)" }} />
               </div>
 
               <div>
-                <h3 style={{ fontFamily: "var(--font-body)", fontSize: "1.4rem", fontWeight: 800, color: "var(--ink-text)", margin: "0 0 8px" }}>
-                  Comment puis-je vous aider aujourd'hui ?
+                <h3 style={{ fontSize: "1.15rem", fontWeight: 800, color: "var(--ink-text)", margin: "0 0 4px" }}>
+                  Comment FlyAgent peut vous aider aujourd'hui ?
                 </h3>
-                <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", margin: 0 }}>
-                  Sélectionnez une suggestion ci-dessous ou écrivez directement votre question.
+                <p style={{ fontSize: "0.78rem", color: "var(--ink-muted)", margin: 0 }}>
+                  Sélectionnez une option ou posez directement votre question ci-dessous.
                 </p>
               </div>
 
-              {/* ✅ FIX: Espace augmenté entre les propositions de questions (gap-4) */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3.5)", width: "100%" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                 {QUICK_PROMPTS.map((prompt, i) => (
                   <button
                     key={i}
                     onClick={() => handleSend(prompt)}
                     className="btn-secondary"
                     style={{
-                      textAlign: "left", fontSize: "var(--text-body)", fontWeight: 600,
-                      padding: "var(--space-4) var(--space-5)", lineHeight: 1.5,
-                      display: "flex", alignItems: "center", gap: "var(--space-3)",
+                      textAlign: "left", fontSize: "0.8rem", fontWeight: 600,
+                      padding: "10px 14px", lineHeight: 1.4,
+                      display: "flex", alignItems: "center", gap: "10px",
                       justifyContent: "flex-start", width: "100%",
-                      borderRadius: "var(--radius-xl)",
+                      borderRadius: "12px",
                       border: "1px solid var(--border)",
                       background: "var(--warm-100)",
                       cursor: "pointer",
-                      transition: "all var(--transition-base)",
-                      boxShadow: "var(--shadow-sm)",
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--accent)";
-                      (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)";
-                      (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+                      transition: "all 0.2s ease",
                     }}
                   >
-                    <Sparkles size={16} style={{ color: "var(--accent)", flexShrink: 0 }} />
                     <span>{prompt}</span>
                   </button>
                 ))}
@@ -289,25 +271,25 @@ export default function AssistantTab({ userId, userProfile }: Props) {
                 <div
                   key={msg.id}
                   style={{
-                    display: "flex", gap: "var(--space-3)", maxWidth: "850px",
+                    display: "flex", gap: "10px", maxWidth: "800px",
                     flexDirection: isUser ? "row-reverse" : "row",
                     marginLeft: isUser ? "auto" : 0,
                   }}
                 >
                   <div style={{
-                    width: 34, height: 34, borderRadius: "var(--radius-lg)",
-                    background: isUser ? "var(--ink-800)" : "var(--accent)",
+                    width: 32, height: 32, borderRadius: "8px",
+                    background: isUser ? "var(--ink-800)" : "#0f7b6c",
                     border: "1px solid var(--border)",
                     display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
                   }}>
                     {isUser
-                      ? <UserIcon size={16} color="white" />
-                      : <Sparkles size={16} color="white" />
+                      ? <UserIcon size={15} color="white" />
+                      : <Bot size={15} color="white" />
                     }
                   </div>
                   <div style={{
-                    padding: "var(--space-4) var(--space-5)", borderRadius: "var(--radius-2xl)",
-                    fontSize: "var(--text-body)", lineHeight: 1.65, whiteSpace: "pre-line",
+                    padding: "10px 14px", borderRadius: "14px",
+                    fontSize: "0.82rem", lineHeight: 1.55, whiteSpace: "pre-line",
                     background: isUser ? "var(--ink-800)" : "var(--warm-100)",
                     color: isUser ? "#ffffff" : "var(--ink-text)",
                     border: `1px solid ${isUser ? "var(--ink-700)" : "var(--border)"}`,
@@ -322,27 +304,27 @@ export default function AssistantTab({ userId, userProfile }: Props) {
 
           {/* Indicateur de chargement */}
           {sending && (
-            <div style={{ display: "flex", gap: "var(--space-3)", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
               <div style={{
-                width: 34, height: 34, borderRadius: "var(--radius-lg)",
-                background: "var(--accent)", border: "1px solid var(--border)",
+                width: 32, height: 32, borderRadius: "8px",
+                background: "#0f7b6c", border: "1px solid var(--border)",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
-                <Sparkles size={16} color="white" />
+                <Bot size={15} color="white" />
               </div>
               <div style={{
-                padding: "var(--space-3) var(--space-5)", borderRadius: "var(--radius-2xl)",
+                padding: "8px 12px", borderRadius: "14px",
                 border: "1px solid var(--border)", background: "var(--warm-100)",
-                display: "flex", alignItems: "center", gap: "var(--space-2)",
+                display: "flex", alignItems: "center", gap: "6px",
               }}>
                 {[0, 1, 2].map((i) => (
                   <span key={i} style={{
-                    width: 6, height: 6, borderRadius: "50%",
+                    width: 5, height: 5, borderRadius: "50%",
                     background: "var(--accent)", display: "inline-block",
                     animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
                   }} />
                 ))}
-                <span style={{ fontSize: "var(--text-body)", fontWeight: 600, color: "var(--ink-subtle)", marginLeft: "var(--space-1)" }}>
+                <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--ink-subtle)", marginLeft: "4px" }}>
                   FlyAgent prépare une réponse...
                 </span>
               </div>
@@ -352,50 +334,52 @@ export default function AssistantTab({ userId, userProfile }: Props) {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* ✅ FIX: Barre de message élargie en largeur avec bouton d'envoi parfaitement intégré */}
-        <div style={{ padding: "var(--space-4) var(--space-6)", borderTop: "1px solid var(--border)", background: "var(--warm-100)" }}>
+        {/* Input Bar with High-Contrast Send Button */}
+        <div style={{ padding: "10px 12px", borderTop: "1px solid var(--border)", background: "var(--warm-100)" }}>
           <form
             onSubmit={(e) => { e.preventDefault(); handleSend(); }}
             style={{
-              display: "flex", alignItems: "center", gap: "var(--space-3)",
+              display: "flex", alignItems: "center", gap: "8px",
               background: "var(--warm-50)", border: "1.5px solid var(--border)",
-              borderRadius: "var(--radius-2xl)", padding: "8px 12px 8px 20px",
-              width: "100%", maxWidth: "900px", margin: "0 auto",
-              boxShadow: "var(--shadow-md)",
-              transition: "border-color var(--transition-base)",
+              borderRadius: "14px", padding: "4px 8px 4px 14px",
+              width: "100%", maxWidth: "850px", margin: "0 auto",
+              boxShadow: "var(--shadow-sm)",
             }}
-            onFocusCapture={(e) => (e.currentTarget.style.borderColor = "var(--accent)")}
-            onBlurCapture={(e) => (e.currentTarget.style.borderColor = "var(--border)")}
           >
             <input
               type="text"
-              placeholder="Posez votre question à FlyAgent (dossier, visa, tests de langue, CV...)..."
+              placeholder="Posez votre question à FlyAgent (dossier, CV, visa, bourses...)..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               style={{
                 flex: 1, background: "transparent", border: "none", outline: "none",
-                fontSize: "var(--text-body)", color: "var(--ink-text)",
+                fontSize: "0.82rem", color: "var(--ink-text)",
                 padding: "6px 0", width: "100%",
               }}
             />
             <button
               type="submit"
               disabled={!inputMessage.trim() || sending}
-              className="btn-primary"
               style={{
-                width: "44px", height: "44px", borderRadius: "var(--radius-xl)",
+                width: "38px", height: "38px", borderRadius: "10px",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                flexShrink: 0, opacity: !inputMessage.trim() || sending ? 0.4 : 1,
-                padding: 0, cursor: !inputMessage.trim() || sending ? "not-allowed" : "pointer",
+                flexShrink: 0, 
+                backgroundColor: "#0f7b6c",
+                color: "#ffffff",
+                border: "none",
+                opacity: !inputMessage.trim() || sending ? 0.4 : 1,
+                padding: 0, 
+                cursor: !inputMessage.trim() || sending ? "not-allowed" : "pointer",
                 boxShadow: "0 2px 8px rgba(15,123,108,0.3)",
               }}
               title="Envoyer le message"
             >
-              <Send size={18} color="white" />
+              <Send size={16} color="#ffffff" />
             </button>
           </form>
         </div>
       </div>
+
 
       {/* ✅ FIX: Panneau Historique fonctionnel permettant d'ouvrir et continuer une ancienne discussion */}
       {showHistory && (

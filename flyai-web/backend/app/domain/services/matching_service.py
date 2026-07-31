@@ -147,6 +147,20 @@ def _match_funding(user_needs_full: bool, funding_type: str) -> tuple[int, str]:
     return 6, "Type de financement non précisé"
 
 
+def _is_expired(deadline_val: Any) -> bool:
+    """
+    Vérifie si la date limite de candidature est déjà dépassée par rapport à aujourd'hui.
+    """
+    if not deadline_val:
+        return False
+    try:
+        d_str = str(deadline_val).split("T")[0].strip()
+        deadline_date = datetime.strptime(d_str, "%Y-%m-%d").date()
+        return deadline_date < datetime.utcnow().date()
+    except Exception:
+        return False
+
+
 # ─────────────────────────────────────────────────────────────
 # Fonction principale
 # ─────────────────────────────────────────────────────────────
@@ -160,7 +174,21 @@ def calculate_compatibility_score(
     Retourne un dict avec le score total et la décomposition ligne par ligne.
 
     Terminologie §4.4 : JAMAIS "probabilité d'admission".
+    Filtre strict : si la bourse est expirée, score = 0.
     """
+    deadline_val = scholarship.get("deadline") or scholarship.get("date_limite")
+    if _is_expired(deadline_val):
+        return {
+            "overall_score": 0,
+            "summary": "Date limite de candidature dépassée (Bourse expirée)",
+            "breakdown": [
+                {"criterion": "Date limite", "weight": 100, "score": 0, "max": 100, "detail": f"Bourse clôturée le {deadline_val}", "is_hard_filter": True}
+            ],
+            "degree_ok": False,
+            "lang_ok": False,
+            "is_expired": True,
+        }
+
     degree_score, degree_ok, degree_reason = _match_degree(
         profile.get("degree_level", ""),
         scholarship.get("niveau_etude", []) or scholarship.get("degree_level", []),
@@ -204,7 +232,7 @@ def calculate_compatibility_score(
         {"criterion": "Pays de destination", "weight": 15, "score": country_score, "max": 15, "detail": country_reason, "is_hard_filter": False},
         {"criterion": "Niveau de langue", "weight": 15, "score": lang_score, "max": 15, "detail": lang_reason, "is_hard_filter": True},
         {"criterion": "Type de financement", "weight": 15, "score": funding_score, "max": 15, "detail": funding_reason, "is_hard_filter": False},
-        {"criterion": "Cohérence du projet", "weight": 10, "score": 10, "max": 10, "detail": "Score de base (affinement via RAG en Phase B)", "is_hard_filter": False},
+        {"criterion": "Cohérence du projet", "weight": 10, "score": 10, "max": 10, "detail": "Score de base (affinement via RAG)", "is_hard_filter": False},
     ]
 
     return {
@@ -213,6 +241,7 @@ def calculate_compatibility_score(
         "breakdown": breakdown,
         "degree_ok": degree_ok,
         "lang_ok": lang_ok,
+        "is_expired": False,
     }
 
 
@@ -255,6 +284,7 @@ def get_top_scholarships(
     """
     Retourne les `limit` meilleures bourses pour ce profil.
     Calcule et stocke les scores en BDD.
+    Filtrage strict des bourses dont la date limite est expirée.
     """
     supabase = _get_supabase()
 
@@ -264,7 +294,14 @@ def get_top_scholarships(
 
     scored = []
     for sch in bourses:
+        deadline_val = sch.get("deadline") or sch.get("date_limite")
+        if _is_expired(deadline_val):
+            continue
+
         result = calculate_compatibility_score(profile, sch)
+        if result.get("overall_score", 0) <= 0:
+            continue
+
         score_id = store_matching_score(user_id, sch.get("id", ""), result)
         scored.append({
             **sch,
@@ -277,3 +314,4 @@ def get_top_scholarships(
     # Trier par score décroissant et retourner les N premières
     scored.sort(key=lambda x: x["compatibility_score"], reverse=True)
     return scored[:limit]
+

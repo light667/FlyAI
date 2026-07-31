@@ -87,18 +87,111 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
   };
 
   const currentCard = deck[currentIndex];
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "75vh", position: "relative", padding: "var(--space-4)", color: "var(--ink-text)", width: "100%", maxWidth: "1200px", margin: "0 auto" }}>
-      {/* Title */}
-      <div style={{ textAlign: "center", marginBottom: "var(--space-6)", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
-        <h2 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h2)", fontWeight: 700, color: "var(--ink-text)", display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-2)", margin: 0 }}>
-          <Sparkles style={{ width: "var(--space-6)", height: "var(--space-6)", color: "var(--accent)" }} /> Deck de Matching Avancé
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: "1200px", margin: "0 auto", padding: "12px 16px", color: "var(--ink-text)", gap: "16px" }}>
+      
+      {/* Title Header */}
+      <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "4px" }}>
+        <h2 style={{ fontSize: "1.15rem", fontWeight: 800, color: "var(--ink-text)", margin: 0 }}>
+          Opportunités Recommandées
         </h2>
-        <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", margin: 0 }}>
-          Les opportunités classées par compatibilité directe avec ton profil académique.
+        <p style={{ fontSize: "0.75rem", color: "var(--ink-muted)", margin: 0 }}>
+          Classées par score de compatibilité décroissant avec votre profil académique.
         </p>
       </div>
+
+      {/* ── Horizontal Scrollable List / Carousel (Ordre Décroissant de Score) ── */}
+      {deck.length > 0 && (
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: "4px" }}>
+            <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Toutes les bourses ({deck.length})
+            </span>
+            <span style={{ fontSize: "0.7rem", color: "var(--ink-subtle)" }}>Défiler à gauche →</span>
+          </div>
+
+          <div 
+            className="no-scrollbar"
+            style={{ 
+              display: "flex", 
+              gap: "12px", 
+              overflowX: "auto", 
+              paddingBottom: "8px",
+              scrollSnapType: "x mandatory",
+              width: "100%"
+            }}
+          >
+            {deck.map((sch, idx) => {
+              const isActive = idx === currentIndex;
+              const score = sch.matchScore || 85;
+              return (
+                <div
+                  key={sch.id || idx}
+                  onClick={() => setCurrentIndex(idx)}
+                  style={{
+                    flexShrink: 0,
+                    width: "220px",
+                    scrollSnapAlign: "start",
+                    background: isActive ? "var(--accent-light)" : "var(--warm-50)",
+                    border: isActive ? "2px solid var(--accent)" : "1px solid var(--border)",
+                    borderRadius: "14px",
+                    padding: "12px",
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    justify: "space-between",
+                    gap: "8px",
+                    boxShadow: isActive ? "0 4px 12px rgba(15,123,108,0.2)" : "var(--shadow-sm)",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ 
+                      fontSize: "0.68rem", 
+                      fontWeight: 800, 
+                      padding: "2px 8px", 
+                      borderRadius: "9999px",
+                      background: score >= 80 ? "var(--success-light)" : "var(--warm-100)",
+                      color: score >= 80 ? "var(--success)" : "var(--accent)",
+                      border: "1px solid var(--border)"
+                    }}>
+                      Score : {score}%
+                    </span>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "var(--ink-subtle)" }}>
+                      #{idx + 1}
+                    </span>
+                  </div>
+
+                  <h4 style={{ 
+                    fontSize: "0.82rem", 
+                    fontWeight: 700, 
+                    color: "var(--ink-text)", 
+                    margin: 0, 
+                    lineHeight: 1.3,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden"
+                  }}>
+                    {sch.titre}
+                  </h4>
+
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.68rem", color: "var(--ink-muted)" }}>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "120px" }}>
+                      {sch.pays_destination?.join(", ") || "International"}
+                    </span>
+                    {sch.deadline && (
+                      <span style={{ fontWeight: 600, color: "var(--warning)" }}>
+                        {new Date(sch.deadline).toLocaleDateString("fr-FR", { month: "numeric", day: "numeric" })}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Match Animation Modal Overlay */}
       <AnimatePresence>
@@ -109,19 +202,19 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
             exit={{ opacity: 0, scale: 0.8 }}
             style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-4)", background: "rgba(15, 26, 46, 0.6)", backdropFilter: "blur(8px)" }}
           >
-            <div style={{ background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-8)", maxWidth: "448px", width: "100%", textAlign: "center", display: "flex", flexDirection: "column", gap: "var(--space-6)", boxShadow: "var(--shadow-xl)" }}>
-              <div style={{ width: "var(--space-20)", height: "var(--space-20)", margin: "0 auto", borderRadius: "var(--radius-full)", background: "var(--gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center", animation: "bounce 1s infinite", boxShadow: "var(--shadow-lg)", color: "var(--accent-text)" }}>
-                <Sparkles style={{ width: "var(--space-10)", height: "var(--space-10)" }} />
+            <div style={{ background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", maxWidth: "400px", width: "100%", textAlign: "center", display: "flex", flexDirection: "column", gap: "16px", boxShadow: "var(--shadow-xl)" }}>
+              <div style={{ width: "56px", height: "56px", margin: "0 auto", borderRadius: "var(--radius-full)", background: "var(--gradient-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-text)" }}>
+                <Sparkles style={{ width: "28px", height: "28px" }} />
               </div>
 
               <div>
-                <h3 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: 0 }}>Compatible à {lastMatch.matchScore || 90}% !</h3>
-                <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", marginTop: "var(--space-2)" }}>
-                  <span style={{ fontWeight: 700, color: "var(--accent)" }}>{lastMatch.titre}</span> a été ajoutée à tes candidatures.
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--ink-text)", margin: 0 }}>Compatible à {lastMatch.matchScore || 90}% !</h3>
+                <p style={{ fontSize: "0.82rem", color: "var(--ink-muted)", marginTop: "6px" }}>
+                  <span style={{ fontWeight: 700, color: "var(--accent)" }}>{lastMatch.titre}</span> a été ajoutée à vos favoris.
                 </p>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {onOpenFlyAgent && (
                   <button
                     onClick={() => {
@@ -130,9 +223,8 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                       onOpenFlyAgent(m);
                     }}
                     className="btn-primary"
-                    style={{ padding: "var(--space-3.5) var(--space-6)", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-lg)" }}
+                    style={{ padding: "10px 18px", borderRadius: "14px" }}
                   >
-                    <Sparkles style={{ width: "var(--space-4)", height: "var(--space-4)", color: "var(--accent-text)" }} />
                     <span>Postuler avec FlyAgent</span>
                   </button>
                 )}
@@ -140,9 +232,9 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                 <button
                   onClick={() => setLastMatch(null)}
                   className="btn-secondary"
-                  style={{ padding: "var(--space-3) var(--space-6)", borderRadius: "var(--radius-2xl)", fontWeight: 700 }}
+                  style={{ padding: "8px 16px", borderRadius: "14px", fontSize: "0.8rem", fontWeight: 700 }}
                 >
-                  Continuer le Matching
+                  Continuer
                 </button>
               </div>
             </div>
@@ -150,34 +242,46 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
         )}
       </AnimatePresence>
 
-      {/* Main Matching Deck Container */}
-      <div style={{ position: "relative", width: "100%", maxWidth: "448px", height: "520px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {/* ── Main Interactive Swiping Card ── */}
+      <div style={{ position: "relative", width: "100%", maxWidth: "448px", minHeight: "380px", maxHeight: "460px", height: "420px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {loading ? (
-          <div style={{ width: "100%", height: "100%", borderRadius: "var(--radius-2xl)", background: "var(--warm-50)", border: "1px solid var(--border)", animation: "pulse 2s ease-in-out infinite", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)", fontSize: "var(--text-caption)", fontWeight: 700 }}>
-            Calcul des scores de matching...
+          <div style={{ width: "100%", height: "100%", borderRadius: "20px", background: "var(--warm-50)", border: "1px solid var(--border)", animation: "pulse 2s ease-in-out infinite", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-muted)", fontSize: "0.8rem", fontWeight: 700 }}>
+            Calcul des meilleures bourses...
           </div>
         ) : !currentCard ? (
-          <div style={{ width: "100%", padding: "var(--space-8)", textAlign: "center", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", display: "flex", flexDirection: "column", gap: "var(--space-4)", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-lg)" }}>
-            <Sparkles style={{ width: "var(--space-12)", height: "var(--space-12)", color: "var(--accent)", margin: "0 auto" }} />
-            <h3 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: 0 }}>Toutes les bourses ont été examinées !</h3>
+          <div style={{ width: "100%", padding: "24px", textAlign: "center", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "20px", display: "flex", flexDirection: "column", gap: "14px", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-lg)" }}>
+            <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--ink-text)", margin: 0 }}>Toutes les bourses ont été explorées !</h3>
             <button
               onClick={loadDeck}
               className="btn-primary"
-              style={{ padding: "var(--space-3) var(--space-6)", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-lg)" }}
+              style={{ padding: "10px 20px", borderRadius: "14px" }}
             >
-              Recharger le Deck
+              Recharger la liste
             </button>
           </div>
         ) : (
           <div style={{ position: "relative", width: "100%", height: "100%" }}>
             {/* Card Preview behind */}
             {deck[currentIndex + 1] && (
-              <div style={{ position: "absolute", inset: 0, background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", transform: "scale(0.95) translateY(12px)", opacity: 0.5, pointerEvents: "none", boxShadow: "var(--shadow-md)" }} />
+              <div style={{ position: "absolute", inset: 0, background: "var(--warm-100)", border: "1px solid var(--border)", borderRadius: "20px", transform: "scale(0.96) translateY(8px)", opacity: 0.6, pointerEvents: "none" }} />
             )}
 
             {/* Top Interactive Card */}
             <motion.div
-              style={{ x, rotate, position: "absolute", inset: 0, background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", padding: "var(--space-6)", display: "flex", flexDirection: "column", justifyContent: "space-between", cursor: "grab", boxShadow: "var(--shadow-xl)", overflow: "hidden" }}
+              style={{ 
+                x, rotate, 
+                position: "absolute", inset: 0, 
+                background: "var(--warm-50)", 
+                border: "1px solid var(--border)", 
+                borderRadius: "20px", 
+                padding: "16px 20px", 
+                display: "flex", 
+                flexDirection: "column", 
+                justify: "space-between", 
+                cursor: "grab", 
+                boxShadow: "var(--shadow-lg)", 
+                overflow: "hidden" 
+              }}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               onDragEnd={(_, info) => {
@@ -190,70 +294,70 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
             >
               {/* Swipe Badges */}
               <motion.div
-                style={{ opacity: opacityLike, position: "absolute", top: "var(--space-6)", left: "var(--space-6)", zIndex: 20, padding: "var(--space-4) var(--space-10)", background: "var(--success)", color: "var(--accent-text)", fontWeight: 700, fontSize: "var(--text-body)", textTransform: "uppercase", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-xl)", transform: "rotate(-12deg)" }}
+                style={{ opacity: opacityLike, position: "absolute", top: "16px", left: "16px", zIndex: 20, padding: "6px 16px", background: "var(--success)", color: "#fff", fontWeight: 800, fontSize: "0.8rem", textTransform: "uppercase", borderRadius: "12px", transform: "rotate(-10deg)" }}
               >
-                LIKE
+                AJOUTER
               </motion.div>
 
               <motion.div
-                style={{ opacity: opacitySkip, position: "absolute", top: "var(--space-6)", right: "var(--space-6)", zIndex: 20, padding: "var(--space-4) var(--space-10)", background: "var(--alert)", color: "var(--accent-text)", fontWeight: 700, fontSize: "var(--text-body)", textTransform: "uppercase", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-xl)", transform: "rotate(12deg)" }}
+                style={{ opacity: opacitySkip, position: "absolute", top: "16px", right: "16px", zIndex: 20, padding: "6px 16px", background: "var(--alert)", color: "#fff", fontWeight: 800, fontSize: "0.8rem", textTransform: "uppercase", borderRadius: "12px", transform: "rotate(10deg)" }}
               >
-                SKIP
+                PASSER
               </motion.div>
 
-              {/* Card Body */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ padding: "var(--space-3.5) var(--space-9)", fontSize: "var(--text-caption)", fontWeight: 700, borderRadius: "var(--radius-full)", background: "var(--accent-50)", color: "var(--accent)", border: "1px solid var(--accent-200)", display: "flex", alignItems: "center", gap: "var(--space-1.5)" }}>
-                    <Sparkles style={{ width: "var(--space-3.5)", height: "var(--space-3.5)", color: "var(--accent)" }} />
-                    Match Score {currentCard.matchScore || 85}%
+              {/* Card Content Header */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {/* Badges line without heavy icons */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "6px" }}>
+                  <span style={{ padding: "3px 10px", fontSize: "0.72rem", fontWeight: 800, borderRadius: "9999px", background: "var(--accent-light)", color: "var(--accent)", border: "1px solid var(--accent-200)" }}>
+                    Compatibilité {currentCard.matchScore || 85}%
                   </span>
 
-                  <span style={{ padding: "var(--space-3) var(--space-9)", fontSize: "11px", fontWeight: 700, borderRadius: "var(--radius-full)", background: "var(--success-light)", color: "var(--success)", border: "1px solid var(--success-200)", textTransform: "uppercase" }}>
-                    {currentCard.financement === "TOTAL" ? "100% Financé" : "Partiel"}
+                  <span style={{ padding: "3px 10px", fontSize: "0.68rem", fontWeight: 700, borderRadius: "9999px", background: "var(--success-light)", color: "var(--success)", border: "1px solid var(--success-200)", textTransform: "uppercase" }}>
+                    {currentCard.financement === "TOTAL" ? "Financement Total" : "Financement Partiel"}
                   </span>
                 </div>
 
-                <h3 style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-h1)", fontWeight: 700, color: "var(--ink-text)", margin: 0, lineHeight: 1.2 }}>
+                {/* Title (compact font size to avoid overflow) */}
+                <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--ink-text)", margin: 0, lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                   {currentCard.titre}
                 </h3>
 
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-2)", fontSize: "var(--text-caption)", fontWeight: 600, color: "var(--ink-muted)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", background: "var(--warm-100)", padding: "var(--space-2.5) var(--space-6)", borderRadius: "var(--radius)" }}>
-                    <MapPin style={{ width: "var(--space-3.5)", height: "var(--space-3.5)", color: "var(--accent)" }} />
-                    <span>{currentCard.pays_destination?.join(", ") || "International"}</span>
-                  </div>
+                {/* Target & Deadline Tags */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", fontSize: "0.72rem", fontWeight: 600, color: "var(--ink-muted)" }}>
+                  <span style={{ background: "var(--warm-100)", padding: "3px 8px", borderRadius: "6px" }}>
+                    📍 {currentCard.pays_destination?.join(", ") || "International"}
+                  </span>
 
                   {currentCard.deadline && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-1)", background: "var(--warning-light)", padding: "var(--space-2.5) var(--space-6)", borderRadius: "var(--radius)", color: "var(--warning)" }}>
-                      <Calendar style={{ width: "var(--space-3.5)", height: "var(--space-3.5)" }} />
-                      <span>{new Date(currentCard.deadline).toLocaleDateString("fr-FR")}</span>
-                    </div>
+                    <span style={{ background: "var(--warning-light)", padding: "3px 8px", borderRadius: "6px", color: "var(--warning)", fontWeight: 700 }}>
+                      ⏳ Clôture : {new Date(currentCard.deadline).toLocaleDateString("fr-FR")}
+                    </span>
                   )}
                 </div>
 
-                {/* Score Reasons */}
+                {/* Score Reasons (Concise) */}
                 {currentCard.matchBreakdown?.reasons && (
-                  <div style={{ padding: "var(--space-3)", borderRadius: "var(--radius-2xl)", background: "var(--accent-50)", border: "1px solid var(--accent-100)", display: "flex", flexDirection: "column", gap: "var(--space-1)" }}>
+                  <div style={{ padding: "8px 10px", borderRadius: "10px", background: "var(--warm-100)", border: "1px solid var(--border)", display: "flex", flexDirection: "column", gap: "2px" }}>
                     {currentCard.matchBreakdown.reasons.slice(0, 2).map((r, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--space-1.5)", fontSize: "11px", fontWeight: 600, color: "var(--accent)" }}>
-                        <CheckCircle2 style={{ width: "var(--space-3.5)", height: "var(--space-3.5)", color: "var(--accent)", flexShrink: 0 }} />
-                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r}</span>
-                      </div>
+                      <span key={i} style={{ fontSize: "0.68rem", fontWeight: 600, color: "var(--accent)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        ✓ {r}
+                      </span>
                     ))}
                   </div>
                 )}
 
-                <p style={{ fontSize: "var(--text-body)", color: "var(--ink-muted)", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", lineHeight: 1.65 }}>
+                {/* Description */}
+                <p style={{ fontSize: "0.78rem", color: "var(--ink-muted)", margin: 0, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", lineHeight: 1.5 }}>
                   {currentCard.description}
                 </p>
               </div>
 
-              {/* Card Footer */}
-              <div style={{ paddingTop: "var(--space-3)", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "var(--text-caption)" }}>
+              {/* Card Footer (Cleanly placed inside card without overflow) */}
+              <div style={{ paddingTop: "10px", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
                 <button
                   onClick={() => setInspectScholarship(currentCard)}
-                  style={{ color: "var(--accent)", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 4 }}
+                  style={{ color: "var(--accent)", fontWeight: 700, fontSize: "0.75rem", background: "none", border: "none", cursor: "pointer", padding: "4px 0", textDecoration: "underline" }}
                 >
                   Détails complets
                 </button>
@@ -263,21 +367,15 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
                     onClick={() => onOpenFlyAgent(currentCard)}
                     className="btn-primary"
                     style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      padding: "8px 16px",
-                      borderRadius: "var(--radius-xl)",
-                      fontSize: "12px",
+                      padding: "6px 14px",
+                      borderRadius: "12px",
+                      fontSize: "0.75rem",
                       fontWeight: 700,
                       whiteSpace: "nowrap",
                       flexShrink: 0,
                     }}
                   >
-                    <Sparkles style={{ width: "14px", height: "14px", color: "var(--accent-text)", flexShrink: 0 }} />
-                    <span style={{ whiteSpace: "nowrap" }}>Postuler avec FlyAgent</span>
+                    <span>Postuler avec FlyAgent</span>
                   </button>
                 )}
               </div>
@@ -288,46 +386,40 @@ export default function SwipeTab({ userId, userProfile, onOpenFlyAgent }: Props)
 
       {/* Control Buttons */}
       {currentCard && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-6)", marginTop: "var(--space-6)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "20px", marginTop: "4px" }}>
           <button
             onClick={() => handleSwipe("left")}
-            style={{ width: "56px", height: "56px", borderRadius: "var(--radius-full)", background: "var(--warm-50)", border: "2px solid var(--alert)", color: "var(--alert)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, cursor: "pointer", boxShadow: "var(--shadow-lg)", transition: "all var(--transition-base)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--alert-light)"; e.currentTarget.style.transform = "scale(1.1)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--warm-50)"; e.currentTarget.style.transform = "scale(1)"; }}
+            style={{ width: "48px", height: "48px", borderRadius: "9999px", background: "var(--warm-50)", border: "2px solid var(--alert)", color: "var(--alert)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, cursor: "pointer", boxShadow: "var(--shadow-sm)", transition: "all 0.2s" }}
             title="Passer"
           >
-            <X style={{ width: "24px", height: "24px" }} />
+            <X style={{ width: "20px", height: "20px" }} />
           </button>
 
           <button
             onClick={() => handleSwipe("superlike")}
-            style={{ width: "48px", height: "48px", borderRadius: "var(--radius-full)", background: "var(--warm-50)", border: "2px solid var(--warning)", color: "var(--warning)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, cursor: "pointer", boxShadow: "var(--shadow-lg)", transition: "all var(--transition-base)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--warning-light)"; e.currentTarget.style.transform = "scale(1.1)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--warm-50)"; e.currentTarget.style.transform = "scale(1)"; }}
+            style={{ width: "42px", height: "42px", borderRadius: "9999px", background: "var(--warm-50)", border: "2px solid var(--warning)", color: "var(--warning)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, cursor: "pointer", boxShadow: "var(--shadow-sm)", transition: "all 0.2s" }}
             title="Super Match"
           >
-            <Star style={{ width: "20px", height: "20px" }} />
+            <Star style={{ width: "18px", height: "18px" }} />
           </button>
 
           <button
             onClick={() => handleSwipe("right")}
             className="btn-primary"
             style={{
-              width: "56px",
-              height: "56px",
-              borderRadius: "var(--radius-full)",
+              width: "48px",
+              height: "48px",
+              borderRadius: "9999px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "var(--shadow-lg), 0 4px 16px rgba(15, 123, 108, 0.4)",
-              transition: "transform var(--transition-base)",
+              boxShadow: "0 4px 14px rgba(15, 123, 108, 0.4)",
               cursor: "pointer",
+              padding: 0,
             }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.1)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)"; }}
             title="Aimer et ajouter aux favoris"
           >
-            <Heart style={{ width: "26px", height: "26px", fill: "#ffffff", color: "#ffffff" }} />
+            <Heart style={{ width: "22px", height: "22px", fill: "#ffffff", color: "#ffffff" }} />
           </button>
         </div>
       )}
