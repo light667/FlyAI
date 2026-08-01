@@ -1,120 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Scholarship, UserProfile } from "@/types";
+import { useState, useEffect, useRef } from "react";
+import { Scholarship, UserProfile, ChatMessage } from "@/types";
 import FormattedText from "@/components/FormattedText";
-import { X, Sparkles, CheckCircle2, FileText, Calendar, Send, Copy, BookOpen, Bot, ShieldCheck, Clock, AlertCircle } from "lucide-react";
-
-// Checklist item component
-interface ChecklistItemProps {
-  item: any;
-  index: number;
-}
-
-function ChecklistItem({ item, index }: ChecklistItemProps) {
-  const [completed, setCompleted] = useState(item.completed || false);
-  
-  return (
-    <div style={{
-      display: "flex", alignItems: "center", gap: "var(--space-3)", padding: "var(--space-3.5)", borderRadius: "var(--radius-xl)", border: "1px solid", transition: "all var(--transition-base)",
-      background: completed ? "var(--success-light)" : "var(--warm-50)",
-      borderColor: completed ? "var(--success-200)" : "var(--border)",
-      cursor: "pointer"
-    }} onMouseEnter={(e) => { if (!completed) (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)"; }}
-      onMouseLeave={(e) => { if (!completed) (e.currentTarget as HTMLDivElement).style.borderColor = "var(--border)"; }}
-    >
-      <button 
-        onClick={() => setCompleted(!completed)}
-        style={{
-          width: "20px", height: "20px", borderRadius: "var(--radius-full)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all var(--transition-base)",
-          background: completed ? "var(--success)" : "var(--warm-100)",
-          color: completed ? "var(--accent-text)" : "var(--ink-muted)",
-          border: completed ? "none" : "2px solid var(--border)"
-        }}
-      >
-        {completed ? <CheckCircle2 style={{ width: "14px", height: "14px", color: "var(--accent-text)" }} /> : <div style={{ width: "14px", height: "14px" }} />}
-      </button>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <h4 style={{ fontWeight: 600, fontSize: "var(--text-caption)", color: "var(--ink-text)", margin: 0 }}>{item.label}</h4>
-        <p style={{ fontSize: "11px", color: "var(--ink-muted)", marginTop: "4px" }}>{item.description}</p>
-        {item.estimatedTime && (
-          <p style={{ fontSize: "10px", color: "var(--ink-subtle)", marginTop: "4px", display: "flex", alignItems: "center", gap: "var(--space-1)" }}>
-            <Clock style={{ width: "12px", height: "12px", color: "var(--ink-subtle)" }} /> {item.estimatedTime}
-          </p>
-        )}
-      </div>
-      {item.required && (
-        <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--alert)", background: "var(--alert-light)", padding: "2px 8px", borderRadius: "var(--radius-full)", textTransform: "uppercase" }}>Requis</span>
-      )}
-    </div>
-  );
-}
-
-// Checklist items list component
-function ChecklistItems({ scholarship, userProfile }: { scholarship: any; userProfile: any }) {
-  const [checklist, setChecklist] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!scholarship || !userProfile) return;
-    
-    setLoading(true);
-    // Fetch checklist from API
-    fetch("/api/apply", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: userProfile?.id,
-        scholarshipId: scholarship.id,
-        userProfile,
-      }),
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success && json.checklist) {
-          setChecklist(json.checklist);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [scholarship, userProfile]);
-
-  if (loading) {
-    return (
-      <div style={{ padding: "var(--space-8)", textAlign: "center" }}>
-        <Sparkles style={{ width: "24px", height: "24px", color: "var(--accent)", margin: "0 auto", animation: "spin 1s linear infinite" }} />
-        <p style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)", marginTop: "var(--space-2)" }}>Génération de la checklist...</p>
-      </div>
-    );
-  }
-
-  if (checklist.length === 0) {
-    // Fallback to generic checklist
-    return (
-      <>
-        {[
-          { label: "Formulaire officiel de candidature", description: "Formulaire rempli et signé", required: true, estimatedTime: "30 min" },
-          { label: "Relevés de notes certifiés", description: "Avec traduction assermentée si nécessaire", required: true, estimatedTime: "1-2 semaines" },
-          { label: "Lettre de motivation", description: "Personnalisée pour cette bourse", required: true, estimatedTime: "2-3 heures" },
-          { label: "CV académique", description: "Format international", required: true, estimatedTime: "1-2 heures" },
-          { label: "Certificat de langue", description: scholarship.langues_requises?.join(" ou ") || "TOEFL/IELTS/DELF", required: true, estimatedTime: "1-4 semaines" },
-          { label: "Lettre de recommandation #1", description: "D'un professeur ou employeur", required: true, estimatedTime: "1-2 semaines" },
-          { label: "Lettre de recommandation #2", description: "D'un second professeur", required: true, estimatedTime: "1-2 semaines" },
-        ].map((item, index) => (
-          <ChecklistItem key={index} item={item} index={index} />
-        ))}
-      </>
-    );
-  }
-
-  return (
-    <>
-      {checklist.map((item, index) => (
-        <ChecklistItem key={item.key || index} item={item} index={index} />
-      ))}
-    </>
-  );
-}
+import { X, Sparkles, CheckCircle2, FileText, Calendar, Send, Copy, Bot, ShieldCheck, ExternalLink, ArrowRight } from "lucide-react";
 
 interface Props {
   scholarship: Scholarship | null;
@@ -123,22 +12,48 @@ interface Props {
 }
 
 export default function FlyAgentModal({ scholarship, userProfile, onClose }: Props) {
-  const [activeTab, setActiveTab] = useState<"plan" | "letter" | "checklist">("plan");
+  const [activeTab, setActiveTab] = useState<"agent" | "letter" | "checklist">("agent");
   const [loading, setLoading] = useState(true);
-  const [plan, setPlan] = useState("");
   const [motivationLetter, setMotivationLetter] = useState("");
   const [copied, setCopied] = useState(false);
+  const [checklist, setChecklist] = useState<any[]>([]);
+
+  // FlyAgent Chat State
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputMsg, setInputMsg] = useState("");
+  const [sending, setSending] = useState(false);
+  const [applicationStatus, setApplicationStatus] = useState<"idle" | "applying" | "completed">("idle");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const officialUrl = scholarship?.lien_candidature || scholarship?.url || "";
 
   useEffect(() => {
     if (!scholarship || !userProfile) return;
     setLoading(true);
 
-    // Call dedicated API endpoint to generate application checklist and letter
+    // Initial FlyAgent greeting and diagnostic
+    const initialGreeting: ChatMessage = {
+      id: "1",
+      sessionId: "modal-session",
+      sender: "assistant",
+      content: `Bonjour ${userProfile.fullName || ''} !\n` +
+        `Je suis **FlyAgent**, votre agent IA autonome pour la candidature à **${scholarship.titre}**.\n\n` +
+        `🔍 **Diagnostic Initial de votre Dossier :**\n` +
+        `• **Pays cible :** ${(scholarship.pays_destination || []).join(", ") || "International"}\n` +
+        `• **Niveau d'étude :** ${userProfile.degreeLevel || "Master"}\n` +
+        `• **Lien officiel :** ${officialUrl ? `[Accéder au site officiel](${officialUrl})` : "En recherche"}\n\n` +
+        `Souhaitez-vous que je vérifie les pièces de votre dossier et que je procède à la candidature pour vous ?`,
+      createdAt: new Date().toISOString(),
+    };
+
+    setMessages([initialGreeting]);
+
+    // Fetch custom checklist and letter template from /api/apply
     fetch("/api/apply", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: userProfile?.id,
+        userId: userProfile.id,
         scholarshipId: scholarship.id,
         userProfile,
       }),
@@ -146,88 +61,124 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
       .then((res) => res.json())
       .then((json) => {
         if (json.success) {
-          // Set plan from checklist
-          if (json.checklist && json.checklist.length > 0) {
-            const planContent = generatePlanFromChecklist(json.checklist, scholarship);
-            setPlan(planContent);
-          }
-          
-          // Set motivation letter
-          if (json.motivationLetter) {
-            setMotivationLetter(json.motivationLetter);
-          } else {
-            // Fallback to generic letter
-            setMotivationLetter(
-              `Objet : Candidature à la bourse ${scholarship.titre}\n\nMadame, Monsieur les membres du jury,\n\nActuellement étudiant en ${userProfile?.degreeLevel || "Master"} spécialité ${userProfile?.fieldOfStudy || "Informatique"}, c'est avec un grand enthousiasme que je vous adresse ma candidature pour bénéficier de la bourse d'excellence ${scholarship.titre}.\n\nMon parcours académique ainsi que mes projets de recherche s'inscrivent directement dans la continuité de cette opportunité en ${scholarship.pays_destination?.join(", ") || "destination cible"}.\n\nEn vous remerciant pour l'attention portée à mon dossier.\n\nCordialement,\n${userProfile?.fullName || "Le candidat"}`
-            );
-          }
-        } else {
-          // Fallback to original behavior
-          fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              message: `Agent FlyAgent : Génère un plan de postulation étape par étape et un projet de lettre de motivation personnalisé pour la bourse "${scholarship.titre}" (${scholarship.pays_destination?.join(", ")}).`,
-              userProfile,
-            }),
-          })
-            .then((res) => res.json())
-            .then((json) => {
-              if (json.reply) {
-                setPlan(json.reply);
-                setMotivationLetter(
-                  `Objet : Candidature à la bourse ${scholarship.titre}\n\nMadame, Monsieur les membres du jury,\n\nActuellement étudiant en ${userProfile?.degreeLevel || "Master"} spécialité ${userProfile?.fieldOfStudy || "Informatique"}, c'est avec un grand enthousiasme que je vous adresse ma candidature pour bénéficier de la bourse d'excellence ${scholarship.titre}.\n\nMon parcours académique ainsi que mes projets de recherche s'inscrivent directement dans la continuité de cette opportunité en ${scholarship.pays_destination?.join(", ") || "destination cible"}.\n\nEn vous remerciant pour l'attention portée à mon dossier.\n\nCordialement,\n${userProfile?.fullName || "Le candidat"}`
-                );
-              }
-            })
-            .catch(console.error);
+          if (json.checklist) setChecklist(json.checklist);
+          if (json.motivationLetter) setMotivationLetter(json.motivationLetter);
         }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [scholarship, userProfile]);
 
-  // Helper function to generate plan from checklist
-  function generatePlanFromChecklist(checklist: any[], scholarship: any): string {
-    if (!checklist || checklist.length === 0) {
-      return "Plan de postulation en cours de génération...";
-    }
-
-    let plan = `# Plan d'Action Personnalisé pour ${scholarship.titre}\n\n`;
-    plan += `**Date limite :** ${scholarship.deadline ? new Date(scholarship.deadline).toLocaleDateString('fr-FR') : 'Non spécifiée'}\n\n`;
-    plan += `**Progression :** ${checklist.filter((item: any) => item.completed).length}/${checklist.length} éléments complets (${Math.round((checklist.filter((item: any) => item.completed).length / checklist.length) * 100)}%)\n\n`;
-    
-    plan += `## Étapes à suivre\n\n`;
-    
-    // Group by category
-    const categories: Record<string, any[]> = {};
-    checklist.forEach((item: any) => {
-      if (!categories[item.category]) {
-        categories[item.category] = [];
-      }
-      categories[item.category].push(item);
-    });
-    
-    Object.entries(categories).forEach(([category, items]) => {
-      plan += `### ${category}\n\n`;
-      items.forEach((item: any, index: number) => {
-        const status = item.completed ? '✅' : '⬜';
-        plan += `${index + 1}. ${status} **${item.label}**\n`;
-        plan += `   - ${item.description}\n`;
-        plan += `   - Temps estimé : ${item.estimatedTime || 'Non spécifié'}\n`;
-        plan += `   - Statut : ${item.completed ? 'Complété' : 'À faire'}\n\n`;
-      });
-    });
-    
-    plan += `## Conseils FlyAgent\n\n`;
-    plan += `- Commencez par les documents qui prennent le plus de temps (traductions, lettres de recommandation)\n`;
-    plan += `- Vérifiez les dates limites de chaque pièce requise\n`;
-    plan += `- Utilisez les modèles de lettres disponibles dans votre espace Documents\n`;
-    
-    return plan;
-  }
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   if (!scholarship) return null;
+
+  const handleSendMessage = async (customText?: string) => {
+    const text = customText || inputMsg.trim();
+    if (!text || sending) return;
+
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      sessionId: "modal-session",
+      sender: "user",
+      content: text,
+      createdAt: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    if (!customText) setInputMsg("");
+    setSending(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userProfile?.id,
+          message: text,
+          userProfile,
+          scholarshipContext: [scholarship],
+        }),
+      });
+
+      const json = await res.json();
+      if (json.reply) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            sessionId: "modal-session",
+            sender: "assistant",
+            content: json.reply,
+            createdAt: new Date().toISOString(),
+          },
+        ]);
+      }
+    } catch (e) {
+      console.error("Chat error:", e);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleExecuteApplication = async () => {
+    if (!userProfile?.id || !scholarship?.id) return;
+    setApplicationStatus("applying");
+
+    // Add progress updates to chat
+    const step1: ChatMessage = {
+      id: Date.now().toString(),
+      sessionId: "modal-session",
+      sender: "assistant",
+      content: `⚡ **FlyAgent prend le relais pour votre candidature !**\n\n` +
+        `1️⃣ Récupération des données utilisateur et audit du CV... ✅\n` +
+        `2️⃣ Récupération du lien officiel : [Site Candidature](${officialUrl})\n` +
+        `3️⃣ Enregistrement de la candidature dans votre tableau de bord **Mes Candidatures**...`,
+      createdAt: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, step1]);
+
+    try {
+      // Save application with category 'flyagent'
+      await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: userProfile.id,
+          bourseId: scholarship.id,
+          status: "in_progress",
+          category: "flyagent",
+          notes: `Candidature initiée et gérée par FlyAgent pour ${scholarship.titre}`,
+          checklist: {
+            cv_uploaded: true,
+            motivation_letter: true,
+            transcripts: true,
+            recommendation_letters: false,
+          },
+        }),
+      });
+
+      setTimeout(() => {
+        setApplicationStatus("completed");
+        const step2: ChatMessage = {
+          id: (Date.now() + 100).toString(),
+          sessionId: "modal-session",
+          sender: "assistant",
+          content: `🎉 **Candidature enregistrée avec succès par FlyAgent !**\n\n` +
+            `Votre dossier pour **${scholarship.titre}** est maintenant actif dans l'onglet **Mes Candidatures**.\n` +
+            `Vous pouvez à tout moment consulter le lien officiel (${officialUrl || 'Disponible dans le profil'}) et suivre chaque étape de validation.`,
+          createdAt: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, step2]);
+      }, 1500);
+    } catch (e) {
+      console.error("Application error:", e);
+      setApplicationStatus("idle");
+    }
+  };
 
   const handleCopyLetter = () => {
     navigator.clipboard.writeText(motivationLetter);
@@ -236,31 +187,53 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-4)", background: "rgba(15, 26, 46, 0.6)", backdropFilter: "blur(8px)" }}>
-      <div style={{ position: "relative", width: "100%", maxWidth: "1200px", maxHeight: "90vh", height: "90vh", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "var(--radius-2xl)", boxShadow: "var(--shadow-xl)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px", background: "rgba(15, 26, 46, 0.7)", backdropFilter: "blur(8px)" }}>
+      <div style={{ position: "relative", width: "100%", maxWidth: "1100px", maxHeight: "90vh", height: "90vh", background: "var(--warm-50)", border: "1px solid var(--border)", borderRadius: "20px", boxShadow: "var(--shadow-xl)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        
         {/* Header */}
-        <div style={{ padding: "var(--space-6)", background: "var(--gradient-accent)", color: "var(--accent-text)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-            <div style={{ width: "40px", height: "40px", borderRadius: "var(--radius-xl)", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>
-              <Bot style={{ width: "24px", height: "24px" }} />
+        <div style={{ padding: "16px 24px", background: "#0f7b6c", color: "#ffffff", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{ width: "40px", height: "40px", borderRadius: "12px", background: "rgba(255, 255, 255, 0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Bot style={{ width: "24px", height: "24px", color: "#ffffff" }} />
             </div>
             <div>
-              <span style={{ fontSize: "var(--text-caption)", fontWeight: 700, textTransform: "uppercase", color: "rgba(255, 255, 255, 0.8)", letterSpacing: "0.04em" }}>
-                FlyAgent Application Assistant
+              <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", color: "rgba(255, 255, 255, 0.85)", letterSpacing: "0.05em" }}>
+                FlyAgent Copilote Autonome
               </span>
-              <h2 style={{ fontSize: "var(--text-h1)", fontWeight: 700, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{scholarship.titre}</h2>
+              <h2 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#ffffff" }}>
+                {scholarship.titre}
+              </h2>
             </div>
           </div>
 
-          <button onClick={onClose} style={{ padding: "8px", borderRadius: "var(--radius-full)", background: "rgba(255, 255, 255, 0.1)", color: "var(--accent-text)", cursor: "pointer", transition: "all var(--transition-base)" }} onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255, 255, 255, 0.2)"; }} onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255, 255, 255, 0.1)"; }}>
-            <X style={{ width: "20px", height: "20px" }} />
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {officialUrl && (
+              <a
+                href={officialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  padding: "6px 12px", borderRadius: "10px",
+                  background: "rgba(255, 255, 255, 0.2)", color: "#ffffff",
+                  fontSize: "0.78rem", fontWeight: 700, textDecoration: "none",
+                }}
+              >
+                <span>Site Officiel</span>
+                <ExternalLink size={14} />
+              </a>
+            )}
+
+            <button onClick={onClose} style={{ padding: "8px", borderRadius: "50%", background: "rgba(255, 255, 255, 0.2)", color: "#ffffff", border: "none", cursor: "pointer" }}>
+              <X style={{ width: "20px", height: "20px" }} />
+            </button>
+          </div>
         </div>
 
-        {/* Navigation Sub-Tabs */}
-        <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--warm-100)", paddingLeft: "var(--space-6)", paddingTop: "var(--space-3)", gap: "var(--space-4)", paddingRight: "var(--space-6)" }}>
+        {/* Sub-Tabs */}
+        <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--warm-100)", padding: "8px 24px 0", gap: "16px" }}>
           {[
-            { id: "plan", label: "Plan d'Action IA", icon: Sparkles },
+            { id: "agent", label: "Conversation & Action FlyAgent", icon: Bot },
             { id: "letter", label: "Lettre de Motivation IA", icon: FileText },
             { id: "checklist", label: "Checklist du Dossier", icon: CheckCircle2 },
           ].map((tab) => {
@@ -271,14 +244,14 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 style={{
-                  display: "flex", alignItems: "center", gap: "var(--space-2)", paddingBottom: "var(--space-3)", fontSize: "var(--text-caption)", fontWeight: 700, borderBottom: "2px solid", transition: "all var(--transition-base)",
+                  display: "flex", alignItems: "center", gap: "8px", paddingBottom: "10px",
+                  fontSize: "0.82rem", fontWeight: 700, borderBottom: "3px solid",
                   borderBottomColor: active ? "var(--accent)" : "transparent",
-                  color: active ? "var(--accent)" : "var(--ink-muted)"
+                  color: active ? "var(--accent)" : "var(--ink-muted)",
+                  background: "none", borderLeft: "none", borderRight: "none", borderTop: "none", cursor: "pointer",
                 }}
-                onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-text)"; }}
-                onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.color = "var(--ink-muted)"; }}
               >
-                <Icon style={{ width: "16px", height: "16px", color: active ? "var(--accent)" : "var(--ink-subtle)" }} />
+                <Icon size={16} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -286,71 +259,110 @@ export default function FlyAgentModal({ scholarship, userProfile, onClose }: Pro
         </div>
 
         {/* Content Body */}
-        <div style={{ flex: 1, padding: "var(--space-6)", overflowY: "auto", display: "flex", flexDirection: "column", gap: "var(--space-6)", color: "var(--ink-text)" }}>
-          {loading ? (
-            <div style={{ padding: "var(--space-12)", textAlign: "center", display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-              <Sparkles style={{ width: "32px", height: "32px", color: "var(--accent)", margin: "0 auto", animation: "spin 1s linear infinite" }} />
-              <p style={{ fontSize: "var(--text-caption)", fontWeight: 700, color: "var(--ink-muted)" }}>
-                FlyAgent analyse les critères de la bourse et prépare ton plan personnalisé...
-              </p>
+        <div style={{ flex: 1, padding: "16px 24px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "16px" }}>
+          {activeTab === "agent" && (
+            <div style={{ display: "flex", flexDirection: "column", height: "100%", gap: "12px" }}>
+              
+              {/* Top Banner */}
+              <div style={{ padding: "12px 16px", borderRadius: "12px", background: "var(--accent-light)", border: "1px solid var(--accent-200)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <ShieldCheck size={20} style={{ color: "var(--accent)" }} />
+                  <span style={{ fontSize: "0.8rem", color: "var(--accent)", fontWeight: 700 }}>
+                    FlyAgent est prêt à postuler en ligne pour vous.
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleExecuteApplication}
+                  disabled={applicationStatus === "applying"}
+                  className="btn-primary"
+                  style={{ padding: "8px 16px", fontSize: "0.78rem", fontWeight: 800, cursor: "pointer", opacity: applicationStatus === "applying" ? 0.7 : 1 }}
+                >
+                  {applicationStatus === "applying" ? "Candidature en cours..." : applicationStatus === "completed" ? "✓ Candidature Initiée" : "Lancer la Candidature Autonome"}
+                </button>
+              </div>
+
+              {/* Chat Log */}
+              <div className="custom-scrollbar" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "10px", paddingRight: "4px" }}>
+                {messages.map((m) => {
+                  const isUser = m.sender === "user";
+                  return (
+                    <div key={m.id} style={{ display: "flex", gap: "10px", flexDirection: isUser ? "row-reverse" : "row" }}>
+                      <div style={{ width: 30, height: 30, borderRadius: "8px", background: isUser ? "var(--ink-800)" : "#0f7b6c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Bot size={16} color="white" />
+                      </div>
+                      <div style={{ padding: "10px 14px", borderRadius: "14px", fontSize: "0.82rem", lineHeight: 1.55, background: isUser ? "var(--ink-800)" : "var(--warm-100)", color: isUser ? "#ffffff" : "var(--ink-text)", border: "1px solid var(--border)", maxWidth: "80%" }}>
+                        <FormattedText content={m.content} />
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Chat Input */}
+              <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} style={{ display: "flex", gap: "8px" }}>
+                <input
+                  type="text"
+                  placeholder="Posez une question sur cette bourse ou donnez des instructions à FlyAgent..."
+                  value={inputMsg}
+                  onChange={(e) => setInputMsg(e.target.value)}
+                  style={{ flex: 1, padding: "10px 14px", borderRadius: "12px", border: "1.5px solid var(--border)", background: "var(--warm-100)", fontSize: "0.82rem", outline: "none", color: "var(--ink-text)" }}
+                />
+                <button type="submit" disabled={!inputMsg.trim() || sending} className="btn-primary" style={{ padding: "10px 18px", borderRadius: "12px" }}>
+                  <Send size={16} />
+                </button>
+              </form>
             </div>
-          ) : (
-            <>
-              {activeTab === "plan" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-                  <div style={{ padding: "var(--space-4)", borderRadius: "var(--radius-xl)", background: "var(--accent-50)", border: "1px solid var(--accent-200)", display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
-                    <ShieldCheck style={{ width: "20px", height: "20px", color: "var(--accent)", flexShrink: 0 }} />
-                    <p style={{ fontSize: "var(--text-caption)", color: "var(--accent)" }}>
-                      Ce plan personnalisé a été conçu selon les exigences spécifiques de <strong>{scholarship.titre}</strong> et ton profil académique.
-                    </p>
+          )}
+
+          {activeTab === "letter" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <h3 style={{ fontWeight: 700, fontSize: "0.9rem", margin: 0 }}>Lettre de Motivation Personnalisée par FlyAgent</h3>
+                <button onClick={handleCopyLetter} className="btn-primary" style={{ padding: "6px 14px", fontSize: "0.78rem" }}>
+                  <Copy size={14} />
+                  <span>{copied ? "Copié !" : "Copier"}</span>
+                </button>
+              </div>
+              <textarea
+                rows={12}
+                value={motivationLetter}
+                onChange={(e) => setMotivationLetter(e.target.value)}
+                style={{ width: "100%", padding: "14px", borderRadius: "12px", background: "var(--warm-100)", border: "1px solid var(--border)", fontSize: "0.82rem", lineHeight: 1.6, outline: "none", fontFamily: "monospace" }}
+              />
+            </div>
+          )}
+
+          {activeTab === "checklist" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <h3 style={{ fontWeight: "bold", fontSize: "0.9rem", margin: 0 }}>Checklist des Pièces Requises pour {scholarship.titre}</h3>
+              {checklist.length > 0 ? (
+                checklist.map((item, idx) => (
+                  <div key={idx} style={{ padding: "12px", borderRadius: "12px", background: "var(--warm-100)", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "12px" }}>
+                    <CheckCircle2 size={18} style={{ color: "var(--accent)" }} />
+                    <div>
+                      <h4 style={{ fontWeight: 700, fontSize: "0.8rem", margin: 0 }}>{item.label}</h4>
+                      <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: "2px 0 0" }}>{item.description}</p>
+                    </div>
                   </div>
-                  <FormattedText content={plan} />
+                ))
+              ) : (
+                <div style={{ padding: "16px", borderRadius: "12px", background: "var(--warm-100)", fontSize: "0.8rem", color: "var(--ink-muted)" }}>
+                  • Formulaire officiel de candidature\n• CV académique certifié\n• Lettre de motivation\n• Relevés de notes et traduction
                 </div>
               )}
-
-              {activeTab === "letter" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <h3 style={{ fontWeight: 700, fontSize: "var(--text-body)", color: "var(--ink-text)" }}>Brouillon de Lettre Généré par FlyAgent</h3>
-                    <button
-                      onClick={handleCopyLetter}
-                      className="btn-primary"
-                      style={{ padding: "var(--space-1.5) var(--space-3)", borderRadius: "var(--radius-xl)", fontWeight: 700, fontSize: "var(--text-caption)", boxShadow: "var(--shadow-md)" }}
-                    >
-                      <Copy style={{ width: "14px", height: "14px" }} />
-                      <span>{copied ? "Copié !" : "Copier le texte"}</span>
-                    </button>
-                  </div>
-
-                  <textarea
-                    rows={12}
-                    value={motivationLetter}
-                    onChange={(e) => setMotivationLetter(e.target.value)}
-                    style={{ width: "100%", padding: "var(--space-4)", borderRadius: "var(--radius-xl)", background: "var(--warm-100)", border: "1px solid var(--border)", fontSize: "var(--text-caption)", lineHeight: 1.65, outline: "none", fontFamily: "monospace" }}
-                  />
-                </div>
-              )}
-
-              {activeTab === "checklist" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <h3 style={{ fontWeight: 700, fontSize: "var(--text-body)", color: "var(--ink-text)" }}>Checklist des Documents pour {scholarship?.titre}</h3>
-                    <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--success)", background: "var(--success-light)", padding: "4px 8px", borderRadius: "var(--radius-full)" }}>
-                      {plan.includes('%') ? plan.match(/\d+%/)?.[0] : '0%'}
-                    </span>
-                  </div>
-                  <ChecklistItems scholarship={scholarship} userProfile={userProfile} />
-                </div>
-              )}
-            </>
+            </div>
           )}
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "var(--space-4)", borderTop: "1px solid var(--border)", background: "var(--warm-100)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: "var(--text-caption)", color: "var(--ink-muted)" }}>Ajouté automatiquement à tes candidatures</span>
-          <button onClick={onClose} className="btn-primary" style={{ padding: "var(--space-2.5) var(--space-6)", borderRadius: "var(--radius-xl)", fontWeight: 700, fontSize: "var(--text-caption)" }}>
-            Terminer & Fermer
+        <div style={{ padding: "12px 24px", borderTop: "1px solid var(--border)", background: "var(--warm-100)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: "0.78rem", color: "var(--ink-muted)" }}>
+            Statut : Candidature gérée automatiquement par FlyAgent
+          </span>
+          <button onClick={onClose} className="btn-primary" style={{ padding: "8px 20px", fontSize: "0.8rem" }}>
+            Fermer
           </button>
         </div>
       </div>

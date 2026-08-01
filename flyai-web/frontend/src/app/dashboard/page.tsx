@@ -14,9 +14,7 @@ import AssistantTab from "@/components/dashboard/AssistantTab";
 import ProfileTab from "@/components/dashboard/ProfileTab";
 import DocumentsTab from "@/components/dashboard/DocumentsTab";
 import FlyAgentModal from "@/components/dashboard/FlyAgentModal";
-import { NewUserDashboardGuide, RecommendedTabGuide, DocumentsTabGuide, FlyAgentTabGuide, isFirstVisit, markFirstVisitComplete } from "@/components/FirstVisitGuide";
 import {
-  Compass,
   Sparkles,
   Briefcase,
   User as UserIcon,
@@ -66,13 +64,11 @@ export default function Dashboard() {
       setAgentScholarship(sch);
     } catch (err) {
       console.error("Error saving FlyAgent application:", err);
-      // Still open the modal even if save fails
       setAgentScholarship(sch);
     }
   };
 
   useEffect(() => {
-    // Theme initialization
     const savedTheme = (localStorage.getItem("flyai_theme") as "light" | "dark") || "light";
     setTheme(savedTheme);
     if (savedTheme === "dark") {
@@ -141,10 +137,15 @@ export default function Dashboard() {
   const firstName = profile?.fullName?.split(" ")[0] || currentUser?.displayName?.split(" ")[0] || "Étudiant";
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "dark" : ""} bg-[rgb(var(--background))] text-[rgb(var(--foreground))] flex flex-col md:flex-row font-sans overflow-hidden transition-colors duration-200`}>
+    <div className={`h-[100dvh] min-h-screen ${theme === "dark" ? "dark" : ""} bg-[rgb(var(--background))] text-[rgb(var(--foreground))] flex flex-col md:flex-row font-sans overflow-hidden transition-colors duration-200`}>
       <style jsx global>{`
-        html { background: rgb(var(--background)) !important; }
+        html, body {
+          background: rgb(var(--background)) !important;
+          overflow: hidden !important;
+          height: 100% !important;
+        }
       `}</style>
+      
       {/* ── Desktop Sidebar ────────────────────────────────────────── */}
       <aside className="hidden md:flex flex-col w-64 bg-[rgb(var(--warm-50))] backdrop-blur-xl border-r border-[rgb(var(--border))] p-6 z-20 shrink-0">
         <div className="flex items-center gap-3 mb-8">
@@ -233,10 +234,10 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      {/* ── Main Panel ────────────────────────────────────────────── */}
-      <main className="flex-1 flex flex-col z-10 overflow-y-auto max-h-screen pb-20 md:pb-8">
+      {/* ── Main Panel (Restricted Viewport Height for Mobile) ───────────────── */}
+      <main className="flex-1 flex flex-col z-10 overflow-y-auto max-h-full pb-24 md:pb-8">
         {/* Top Header */}
-        <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b border-[rgb(var(--border))] bg-[rgb(var(--warm-50))]/80 backdrop-blur-xl">
+        <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b border-[rgb(var(--border))] bg-[rgb(var(--warm-50))]/90 backdrop-blur-xl shrink-0">
           <div className="flex items-center gap-3 md:hidden">
             <Image src="/logo.png" alt="FlyAI" width={32} height={32} className="rounded-xl" />
             <span className="font-extrabold text-lg tracking-tight text-[rgb(var(--ink-900))]">FlyAI</span>
@@ -338,9 +339,8 @@ export default function Dashboard() {
         />
       )}
 
-      {/* ── Mobile Navigation Bar (Solid 100% Opacity) ────────────────── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[rgb(var(--warm-50))] border-t border-[rgb(var(--border))] shadow-2xl px-2 py-2.5 z-40 flex items-center justify-around">
-
+      {/* ── Mobile Navigation Bar (Fixed 100% Solid & Height Bounded) ────────────────── */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[rgb(var(--warm-50))] border-t border-[rgb(var(--border))] shadow-2xl px-2 py-2.5 z-40 flex items-center justify-around pb-[calc(0.625rem+env(safe-area-inset-bottom,0px))]">
         {[
           { id: "recommended", label: "Bourses", icon: Heart },
           { id: "discover", label: "Découvrir", icon: Globe2 },
@@ -354,7 +354,7 @@ export default function Dashboard() {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-xl transition-all shrink-0 ${
+              className={`flex flex-col items-center gap-1 px-2.5 py-1 rounded-xl transition-all shrink-0 ${
                 active
                   ? "text-accent bg-accent/10 font-bold scale-105"
                   : "text-[rgb(var(--ink-subtle))] hover:text-[rgb(var(--ink-text))]"

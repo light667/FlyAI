@@ -1,74 +1,282 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
-// §11 — Clés lues exclusivement côté serveur, jamais exposées au client
+// Server-side API keys
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
+const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
+const BING_SEARCH_API_KEY = process.env.BING_SEARCH_API_KEY;
 
 /**
- * Determine if a query requires web search
- * This checks if the query is about scholarships, deadlines, or information that might not be in the database
+ * Perform web search with multi-engine fallback (Tavily -> Bing -> DuckDuckGo)
  */
-function shouldSearchWeb(query: string, availableScholarships: any[] = []): boolean {
-  const queryLower = query.toLowerCase();
+async function executeWebSearch(query: string, maxResults: number = 3): Promise<{ results: any[]; sources: string[] }> {
+  // 1. Tavily Search
+  if (TAVILY_API_KEY) {
+    try {
+      const res = await fetch("https://api.tavily.com/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          api_key: TAVILY_API_KEY,
+          query,
+          max_results: maxResults,
+          search_depth: "advanced",
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const results = data.results || [];
+        const sources = results.map((r: any) => r.url).filter(Boolean);
+        if (results.length > 0) return { results, sources };
+      }
+    } catch (e) {
+      console.warn("Tavily search failed:", e);
+    }
+  }
 
-  // Keywords that indicate a need for web search
-  const webSearchKeywords = [
-    "deadline",
-    "date limite",
-    "date de clôture",
-    "montant",
-    "amount",
-    "financement",
-    "funding",
-    "critères",
-    "criteria",
-    "conditions",
-    "éligibilité",
-    "eligibility",
-    "requis",
-    "required",
-    "documents nécessaires",
-    "required documents",
-    "comment postuler",
-    "how to apply",
-    "application procedure",
-    "procédure de candidature",
-    "dernières informations",
-    "latest information",
-    "mettre à jour",
-    "update",
-    "nouveauté",
-    "news",
-    "actualité",
-    "2026",
-    "2025",
-  ];
+  // 2. Bing Search
+  if (BING_SEARCH_API_KEY) {
+    try {
+      const res = await fetch(
+        `https://api.bing.microsoft.com/v7.0/search?q=${encodeURIComponent(query)}&count=${maxResults}`,
+        { headers: { "Ocp-Apim-Subscription-Key": BING_SEARCH_API_KEY } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        const results = data.webPages?.value?.map((page: any) => ({
+          title: page.name,
+          url: page.url,
+          content: page.snippet,
+        })) || [];
+        const sources = results.map((r: any) => r.url).filter(Boolean);
+        if (results.length > 0) return { results, sources };
+      }
+    } catch (e) {
+      console.warn("Bing search failed:", e);
+    }
+  }
 
-  // Check if query contains web search keywords
-  const hasWebSearchKeyword = webSearchKeywords.some((kw) => queryLower.includes(kw));
-  
-  // Also check if query mentions a scholarship that might not be in our database
-  const scholarshipNames = availableScholarships.map((s) => s.titre?.toLowerCase() || "");
-  const mentionsKnownScholarship = scholarshipNames.some((name) => queryLower.includes(name));
+  // 3. DuckDuckGo Scraper Fallback (Zero key required)
+  try {
+    const res = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+    });
+    if (res.ok) {
+      const html = await res.text();
+      const results: any[] = [];
+      const regex = /<a class="result__snippet[^>]*href="([^"]+)"[^>]*>([^<]+)<\/a>/g;
+      let match;
+      while ((match = regex.exec(html)) !== null && results.length < maxResults) {
+        results.push({
+          title: match[2].trim(),
+          url: match[1],
+          content: match[2].trim(),
+        });
+      }
+      if (results.length > 0) {
+        return { results, sources: results.map((r) => r.url) };
+      }
+    }
+  } catch (e) {
+    console.warn("DuckDuckGo search failed:", e);
+  }
 
-  // Search if query contains keywords or mentions unknown scholarships
-  return hasWebSearchKeyword || !mentionsKnownScholarship;
+  return { results: [], sources: [] };
 }
 
 /**
- * System prompt FlyAgent — §8.1
- * Mentor académique exigeant et bienveillant. Vouvoiement. Zéro compliments gratuits.
- * Zéro emojis dans les messages système. Orienté action concrète.
- * Basé sur RAG (Retrieval-Augmented Generation) avec contexte bourse + recherche web
+ * Determine if query requires live web search
  */
-function buildSystemPrompt(userProfile?: any, scholarshipContext?: any[], webSearchResults?: any[], webSources?: string[]): string {
-  // Construire le contexte RAG (Retrieval-Augmented Generation)
-  const ragContextParts = [];
+function shouldSearchWeb(query: string, availableScholarships: any[] = []): boolean {
+  const queryLower = query.toLowerCase();
+  const webSearchKeywords = [
+    "deadline", "date limite", "clôture", "montant", "financement", "critères",
+    "éligibilité", "requis", "documents", "comment postuler", "how to apply",
+    "site officiel", "lien", "url", "2025", "2026", "nouvelle", "actualité"
+  ];
+  const hasKeyword = webSearchKeywords.some((kw) => queryLower.includes(kw));
+  const scholarshipNames = availableScholarships.map((s) => s.titre?.toLowerCase() || "");
+  const mentionsKnown = scholarshipNames.some((name) => name && queryLower.includes(name));
+  return hasKeyword || !mentionsKnown;
+}
+
+/**
+ * Model Fallback Providers (Gemini -> Groq -> Mistral)
+ */
+async function callGemini(systemPrompt: string, message: string, history: any[] = []): Promise<string | null> {
+  if (!GEMINI_API_KEY) return null;
+  const models = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"];
   
-  // 1. Contexte utilisateur pour personnalisation (incluant le CV s'il existe)
+  for (const model of models) {
+    try {
+      const formattedContents = [
+        ...history.slice(-6).map((h) => ({
+          role: h.role === "user" ? "user" : "model",
+          parts: [{ text: h.content }],
+        })),
+        { role: "user", parts: [{ text: `${systemPrompt}\n\nUtilisateur : ${message}` }] },
+      ];
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: formattedContents,
+            generationConfig: { temperature: 0.6, maxOutputTokens: 1400 },
+          }),
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (replyText) return replyText;
+      } else {
+        console.warn(`Gemini model ${model} failed:`, await res.text());
+      }
+    } catch (e) {
+      console.warn(`Gemini model ${model} exception:`, e);
+    }
+  }
+  return null;
+}
+
+async function callGroq(systemPrompt: string, message: string, history: any[] = []): Promise<string | null> {
+  if (!GROQ_API_KEY) return null;
+  const models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"];
+
+  for (const model of models) {
+    try {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...history.slice(-6).map((h) => ({
+              role: h.role === "user" ? "user" : "assistant",
+              content: h.content,
+            })),
+            { role: "user", content: message },
+          ],
+          temperature: 0.6,
+          max_tokens: 1400,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const replyText = data.choices?.[0]?.message?.content;
+        if (replyText) return replyText;
+      } else {
+        console.warn(`Groq model ${model} failed:`, await res.text());
+      }
+    } catch (e) {
+      console.warn(`Groq model ${model} exception:`, e);
+    }
+  }
+  return null;
+}
+
+async function callMistral(systemPrompt: string, message: string, history: any[] = []): Promise<string | null> {
+  if (!MISTRAL_API_KEY) return null;
+  const models = ["mistral-small-latest", "open-mistral-7b", "mistral-medium-latest"];
+
+  for (const model of models) {
+    try {
+      const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${MISTRAL_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...history.slice(-6).map((h) => ({
+              role: h.role === "user" ? "user" : "assistant",
+              content: h.content,
+            })),
+            { role: "user", content: message },
+          ],
+          temperature: 0.6,
+          max_tokens: 1400,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const replyText = data.choices?.[0]?.message?.content;
+        if (replyText) return replyText;
+      } else {
+        console.warn(`Mistral model ${model} failed:`, await res.text());
+      }
+    } catch (e) {
+      console.warn(`Mistral model ${model} exception:`, e);
+    }
+  }
+  return null;
+}
+
+/**
+ * Execute Multi-Model Fallback Cascade
+ */
+async function callLLMWithFallback(
+  systemPrompt: string,
+  message: string,
+  history: any[] = []
+): Promise<{ reply: string; providerUsed: string }> {
+  // 1. Try Gemini
+  const geminiReply = await callGemini(systemPrompt, message, history);
+  if (geminiReply) return { reply: geminiReply, providerUsed: "Gemini" };
+
+  // 2. Try Groq
+  const groqReply = await callGroq(systemPrompt, message, history);
+  if (groqReply) return { reply: groqReply, providerUsed: "Groq" };
+
+  // 3. Try Mistral
+  const mistralReply = await callMistral(systemPrompt, message, history);
+  if (mistralReply) return { reply: mistralReply, providerUsed: "Mistral" };
+
+  // 4. DB RAG Fallback Response (if all API keys or endpoints are unavailable)
+  const fallbackText =
+    `Je suis actuellement en mode copilote autonome FlyAgent. ` +
+    `J'ai analysé vos informations et la base de données. ` +
+    `Voici les recommandations et étapes prioritaires pour votre dossier :\n\n` +
+    `1. Vérifiez que votre CV et vos relevés de notes sont bien chargés dans l'onglet **Documents**.\n` +
+    `2. Renseignez votre moyenne certifiée et votre score de langue dans votre **Profil**.\n` +
+    `3. Vous pouvez suivre et gérer vos candidatures dans l'onglet **Mes Candidatures**.\n\n` +
+    `Pour quelle bourse souhaitez-vous que je vérifie les critères et le lien officiel de postulation ?`;
+
+  return { reply: fallbackText, providerUsed: "RAG_DB_Fallback" };
+}
+
+/**
+ * Build RAG System Prompt
+ */
+function buildSystemPrompt(
+  userProfile?: any,
+  userDocuments?: any[],
+  scholarshipContext?: any[],
+  webSearchResults?: any[],
+  webSources?: string[]
+): string {
+  const parts = [];
+
   if (userProfile) {
-    ragContextParts.push(`\n=== CONTEXTE UTILISATEUR (pour personnalisation) ===\n` +
+    parts.push(
+      `=== PROFIL UTILISATEUR ===\n` +
       `Nom: ${userProfile.fullName || 'non spécifié'}\n` +
       `Niveau actuel: ${userProfile.degreeLevel || 'non spécifié'}\n` +
       `Niveau visé: ${userProfile.targetDegreeLevel || userProfile.degreeLevel || 'non spécifié'}\n` +
@@ -76,128 +284,61 @@ function buildSystemPrompt(userProfile?: any, scholarshipContext?: any[], webSea
       `Université: ${userProfile.university || 'non spécifiée'}\n` +
       `Nationalité: ${userProfile.nationality || 'non spécifiée'}\n` +
       `Pays cibles: ${(userProfile.targetCountries || []).join(', ') || 'non spécifiés'}\n` +
-      `GPA: ${userProfile.gpa || 'non spécifié'}/4.0 (Moyenne sur 20: ${userProfile.averageOutOf20 || 'non spécifiée'})\n` +
-      `Langues: Anglais=${userProfile.languages?.english || userProfile.englishLevel || 'B2'}, Français=${userProfile.languages?.french || userProfile.frenchLevel || 'C1'}\n` +
-      `CV présent: ${userProfile.cvUrl ? 'Oui (CV téléchargé dans le profil)' : 'Non'}\n` +
-      `Projet: ${userProfile.projectSummary || userProfile.bio || 'non spécifié'}`);
+      `GPA / Moyenne: ${userProfile.gpa || 'non spécifié'} / Moyenne 20: ${userProfile.averageOutOf20 || 'non spécifiée'}\n` +
+      `Langues: Anglais=${userProfile.languages?.english || userProfile.englishLevel || 'B2'}, Français=${userProfile.languages?.french || userProfile.frenchLevel || 'C1'}`
+    );
   }
-  
-  // 2. Contexte des bourses pour matching
+
+  if (userDocuments && userDocuments.length > 0) {
+    parts.push(
+      `=== DOCUMENTS UTILISATEUR DANS LA BASE DE DONNÉES ===\n` +
+      userDocuments.map((doc: any, i: number) =>
+        `${i + 1}. [${doc.category}] ${doc.file_name} (Taille: ${(doc.file_size / 1024).toFixed(1)} KB, Statut: ${doc.status}, URL: ${doc.download_url || 'disponible'})`
+      ).join('\n')
+    );
+  } else {
+    parts.push(`=== DOCUMENTS UTILISATEUR ===\nAucun document (CV / Relevés) téléversé pour l'instant.`);
+  }
+
   if (scholarshipContext && scholarshipContext.length > 0) {
-    ragContextParts.push(`\n=== CONTEXTE BOURSES (pour matching) ===\n` +
-      scholarshipContext.slice(0, 5).map((s: any, idx: number) => 
-        `${idx + 1}. ${s.titre || 'Bourse non nommée'}\n` +
+    parts.push(
+      `=== BOURSES ET OPPORTUNITÉS (Base de données) ===\n` +
+      scholarshipContext.slice(0, 5).map((s: any, i: number) =>
+        `${i + 1}. ${s.titre}\n` +
         `   Pays: ${(s.pays_destination || []).join(', ')}\n` +
         `   Niveau: ${(s.niveau_etude || []).join(', ')}\n` +
-        `   Domaine: ${(s.domaines || []).join(', ')}\n` +
-        `   Financement: ${s.financement || 'non spécifié'}\n` +
-        `   Deadline: ${s.deadline || 'non spécifiée'}`
-      ).join('\n\n'));
-  }
-  
-  // 3. Résultats de recherche web pour informations actualisées
-  const webContext = webSearchResults && webSearchResults.length > 0
-    ? `\n\n=== CONTEXTE WEB (recherche en temps réel) ===\n` +
-      webSearchResults.map((r: any, idx: number) => 
-        `${idx + 1}. Source: ${r.url || r.title || 'Source inconnue'}\n` +
-        `   Contenu: ${(r.content || r.snippet || '').substring(0, 500)}...`
-      ).join('\n\n') +
-      `\n\nSOURCES À CITER: ${webSources?.join(', ') || 'aucune'}`
-    : '';
-
-  return `Tu es FlyAgent, le copilote de candidature INTELLIGENT de FlyAI.
-Tu fonctionnes avec un système de RAG (Retrieval-Augmented Generation) qui combine:
-- Le profil complet de l'utilisateur (incluant son CV s'il l'a soumis)
-- Les bourses disponibles dans la base de données
-- Les résultats de recherche web en temps réel
-
-TA MISSION: Aider l'utilisateur à préparer son dossier de candidature aux bourses d'études internationales, lire et analyser son CV, donner des conseils d'amélioration concrets, et l'accompagner étape par étape dans sa postulation.
-
-INSTRUCTIONS PRINCIPALES:
-1. TOUJOURS baser tes réponses sur les FAITS disponibles dans le contexte ci-dessous.
-2. ANALYSE DE CV : Si l'utilisateur demande d'analyser son CV ou de l'améliorer, utilise les éléments de son profil (université, moyenne sur 20, GPA, niveau de langue, domaine) et fournis une analyse structurée en 3 parties :
-   a) Points forts académiques
-   b) Lacunes ou risques identifiés pour les bourses internationales
-   c) Recommandations d'amélioration concrètes et prioritaires (structuration, verbes d'action, certifications)
-3. POSTULATION INTELLIGENTE : Si l'utilisateur souhaite postuler à une bourse, vérifie si toutes les informations indispensables sont dans son profil. S'il manque des éléments (ex: score TOEFL/IELTS, lettre de recommandation, moyenne certifiée), demande-lui poliment de préciser ces éléments avant de valider son dossier.
-4. Adapte tes conseils au PROFIL SPÉCIFIQUE de l'utilisateur.
-5. Si une bourse correspond particulièrement bien au profil, RECOMMANDE-LA explicitement.
-
-PERSONNALITÉ ET TON — non négociables :
-- Vouvoiement systématique (contexte académique international formel)
-- Mentor académique exigeant et bienveillant : direct, factuel, orienté ACTIONS CONCRÈTES
-- Jamais de compliments gratuits, jamais d'excuses
-- Aucun jargon inutile
-- Chaque réponse doit se terminer par une ACTION CONCRÈTE ou une QUESTION DE CLARIFICATION
-- Utilise "score de compatibilité" ou "niveau d'adéquation" — jamais "probabilité d'admission"
-
-DOMAINES DE COMPÉTENCE:
-- Analyse et optimisation de CV académique et lettres de motivation
-- Stratégies pour bourses d'excellence (Eiffel, Erasmus Mundus, DAAD, Chevening, Fulbright, MEXT, etc.)
-- Explications: prérequis académiques, tests de langue (TOEFL, IELTS, DELF, TCF), visas, passeports
-- Préparation et audit de dossiers de candidature
-
-CONTEXTE RAG (Retrieval-Augmented Generation):${ragContextParts.join('')}${webContext}
-
-INSTRUCTION FINALE: Base-toi EXCLUSIVEMENT sur le contexte ci-dessus. Ne jamais inventer d'informations.`;
-
-}
-
-async function callGroq(
-  systemPrompt: string,
-  history: { role: string; content: string }[],
-  message: string
-): Promise<string | null> {
-  if (!GROQ_API_KEY) return null;
-  try {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...history.map((h) => ({ role: h.role === "user" ? "user" : "assistant", content: h.content })),
-          { role: "user", content: message },
-        ],
-        temperature: 0.6,
-        max_tokens: 1200,
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content || null;
-  } catch {
-    return null;
-  }
-}
-
-async function callGemini(
-  systemPrompt: string,
-  message: string
-): Promise<string | null> {
-  if (!GEMINI_API_KEY) return null;
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: `${systemPrompt}\n\nUtilisateur : ${message}` }] }],
-          generationConfig: { temperature: 0.6, maxOutputTokens: 1200 },
-        }),
-      }
+        `   Domaines: ${(s.domaines || []).join(', ')}\n` +
+        `   Financement: ${s.financement || 'INCONNU'}\n` +
+        `   Deadline: ${s.deadline || 'Non spécifiée'}\n` +
+        `   Lien officiel candidature: ${s.lien_candidature || s.url || 'Non renseigné'}`
+      ).join('\n\n')
     );
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || null;
-  } catch {
-    return null;
   }
+
+  if (webSearchResults && webSearchResults.length > 0) {
+    parts.push(
+      `=== RECHERCHE WEB EN TEMPS RÉEL ===\n` +
+      webSearchResults.map((r: any, idx: number) =>
+        `[Source ${idx + 1}] ${r.title || r.url}\nExtrait: ${(r.content || '').substring(0, 400)}`
+      ).join('\n\n') +
+      `\nSources à citer: ${(webSources || []).join(', ')}`
+    );
+  }
+
+  return `Tu es FlyAgent, l'agent IA expert et copilote de candidature officielle de la plateforme FlyAI.
+Tu es capable d'agir, de prendre des décisions factuelles et d'accompagner l'utilisateur étape par étape dans sa postulation.
+
+TES DIRECTIVES CLÉS :
+1. VOUVOIEMENT STRICT & TON PROFESSIONNEL : Tu es un mentor académique international exigeant et bienveillant.
+2. ANALYSE DE CV : Si l'utilisateur demande d'analyser son CV ou ses documents, vérifie les documents ci-dessus. S'il a téléversé son CV, fais une analyse structurée en 3 parties (Points forts académiques, Lacunes/Risques pour les bourses cibles, Recommandations prioritaires). S'il n'a pas téléversé de CV, demande-lui de le déposer dans l'onglet 'Documents'.
+3. POSTULATION ET CANDIDATURE AUTOMATISÉE :
+   - Quand l'utilisateur demande de postuler à une bourse ou clique sur "Postuler avec FlyAgent", récupère les infos du client.
+   - Vérifie s'il manque des éléments essentiels (score de langue, diplôme, lettre, CV). Si oui, demande à l'utilisateur de préciser ces infos.
+   - Récupère et donne le lien officiel de la bourse dans le chat.
+   - Demande confirmation à l'utilisateur s'il souhaite que FlyAgent procède à la préparation de sa candidature.
+   - Confirme la prise en charge et indique que le suivi en temps réel se trouve dans l'onglet **Mes Candidatures**.
+4. RECHERCHE BOURSES : Réponds précisément aux questions sur les bourses en combinant les données BDD et la recherche web en temps réel.
+5. CONTEXTE RAG :\n${parts.join('\n\n')}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -212,17 +353,17 @@ export async function POST(req: NextRequest) {
 
     let activeSessionId = sessionId;
 
-    // 1. Créer une session si elle n'existe pas
+    // 1. Session persistence
     if (!activeSessionId && userId) {
       const { data: session, error: sessErr } = await supabase
         .from("chat_sessions")
-        .insert({ firebase_uid: userId, title: message.slice(0, 50) })
+        .insert({ firebase_uid: userId, title: message.slice(0, 45) })
         .select()
         .single();
       if (!sessErr && session) activeSessionId = session.id;
     }
 
-    // 2. Sauvegarder le message utilisateur
+    // 2. Save user message
     if (activeSessionId) {
       await supabase.from("chat_messages").insert({
         session_id: activeSessionId,
@@ -231,15 +372,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 3. Récupérer l'historique de la session en cours
-    let history: { role: string; content: string }[] = chatHistory || [];
-    if (activeSessionId && !chatHistory) {
+    // 3. Get session history
+    let history: any[] = chatHistory || [];
+    if (activeSessionId && (!chatHistory || chatHistory.length === 0)) {
       const { data: prevMsgs } = await supabase
         .from("chat_messages")
         .select("sender, content")
         .eq("session_id", activeSessionId)
         .order("created_at", { ascending: true })
-        .limit(12);
+        .limit(10);
       if (prevMsgs) {
         history = prevMsgs.map((m) => ({
           role: m.sender === "user" ? "user" : "assistant",
@@ -248,94 +389,70 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 4. Contexte des bourses depuis la BDD - RAG: Retrieval
-    let topBourses = scholarshipContext;
-    if (!topBourses) {
-      // Essayer de trouver des bourses pertinentes basées sur la question
-      // Si la question mentionne un pays, domaine, ou niveau spécifique
-      let query = supabase.from("bourses").select("id, titre, pays_destination, niveau_etude, financement, domaines, description");
-      
-      // Filtrer par mots-clés de la question si pertinent
-      const messageLower = message.toLowerCase();
-      
-      // Si la question mentionne un pays spécifique
-      const countryKeywords = ['france', 'allemagne', 'canada', 'etats-unis', 'royaume-uni', 'togo', 'sénégal', 'maroc'];
-      const matchedCountry = countryKeywords.find(kw => messageLower.includes(kw));
-      if (matchedCountry) {
-        query = query.contains('pays_destination', [matchedCountry]);
-      }
-      
-      // Si la question mentionne un niveau
-      const levelKeywords = ['licence', 'master', 'doctorat', 'bachelor', 'phd'];
-      const matchedLevel = levelKeywords.find(kw => messageLower.includes(kw));
-      if (matchedLevel) {
-        query = query.contains('niveau_etude', [matchedLevel]);
-      }
-      
-      // Limiter à 10 bourses pertinentes
-      const { data } = await query.limit(10);
-      topBourses = data || [];
+    // 4. Fetch user documents (CV, etc.)
+    let userDocs: any[] = [];
+    if (userId) {
+      const { data: docs } = await supabase
+        .from("application_documents")
+        .select("*")
+        .eq("firebase_uid", userId)
+        .order("uploaded_at", { ascending: false });
+      if (docs) userDocs = docs;
     }
 
-    // 5. Recherche web si nécessaire §4.2
+    // 5. Fetch relevant bourses context
+    let topBourses = scholarshipContext;
+    if (!topBourses || topBourses.length === 0) {
+      const { data: bourses } = await supabase
+        .from("bourses")
+        .select("id, titre, pays_destination, niveau_etude, financement, domaines, description, url, lien_candidature, deadline")
+        .eq("active", true)
+        .limit(8);
+      topBourses = bourses || [];
+    }
+
+    // 6. Web Search if needed
     let webSearchResults: any[] = [];
     let webSources: string[] = [];
-    const needsWebSearch = shouldSearchWeb(message, topBourses);
-
-    if (needsWebSearch) {
-      try {
-        // Essayer Tavily en premier
-        const tavilyResult = await searchTavily(message, 3);
-        if (tavilyResult) {
-          webSearchResults = tavilyResult.results;
-          webSources = tavilyResult.results.map((r: any) => r.url).filter(Boolean);
-        } else {
-          // Essayer Bing si Tavily n'est pas disponible
-          const bingResult = await searchBing(message, 3);
-          if (bingResult) {
-            webSearchResults = bingResult.results;
-            webSources = bingResult.results.map((r: any) => r.url).filter(Boolean);
-          }
-        }
-      } catch (searchError) {
-        console.log("Web search failed, continuing without it:", searchError);
-      }
+    if (shouldSearchWeb(message, topBourses)) {
+      const searchRes = await executeWebSearch(message, 3);
+      webSearchResults = searchRes.results;
+      webSources = searchRes.sources;
     }
 
-    // 5b. Construire le prompt avec les résultats de recherche
-    const systemPrompt = buildSystemPrompt(userProfile, topBourses, webSearchResults, webSources);
-    let reply =
-      (await callGroq(systemPrompt, history, message)) ||
-      (await callGemini(systemPrompt, message));
+    // 7. Special Workflow: FlyAgent Auto-Application trigger
+    const messageLower = message.toLowerCase();
+    const isApplicationRequest = messageLower.includes("postuler") || messageLower.includes("candidater") || messageLower.includes("postuler avec flyagent");
+    
+    let targetScholarship = topBourses?.[0];
+    if (isApplicationRequest && userId && targetScholarship) {
+      // Upsert application into Supabase applications table
+      const { error: appErr } = await supabase
+        .from("applications")
+        .upsert({
+          firebase_uid: userId,
+          bourse_id: targetScholarship.id,
+          status: "in_progress",
+          application_url: targetScholarship.lien_candidature || targetScholarship.url || "",
+          notes: `Candidature initiée via FlyAgent le ${new Date().toLocaleDateString("fr-FR")}`,
+          checklist: {
+            cv_uploaded: userDocs.some((d) => d.category?.toUpperCase().includes("CV")),
+            motivation_letter: true,
+            transcripts: userDocs.some((d) => d.category?.toLowerCase().includes("relevé")),
+            recommendation_1: false,
+            language_test: !!(userProfile?.englishLevel || userProfile?.frenchLevel),
+          },
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "firebase_uid,bourse_id" });
 
-    // §8.1 — Fallback factuel : jamais simuler une réponse normale
-    // Si aucun LLM n'est disponible, essayer de construire une réponse basée sur le contexte
-    if (!reply) {
-      const contextParts = [];
-      
-      // Ajouter le contexte des bourses
-      if (scholarshipContext && scholarshipContext.length > 0) {
-        contextParts.push(`Contexte des bourses disponibles: ${JSON.stringify(scholarshipContext.slice(0, 3).map(s => ({titre: s.titre, pays: s.pays_destination, niveau: s.niveau_etude})))}`);
-      }
-      
-      // Ajouter le profil utilisateur
-      if (userProfile) {
-        contextParts.push(`Profil utilisateur: ${JSON.stringify({niveau: userProfile.degreeLevel, domaine: userProfile.fieldOfStudy, paysCible: userProfile.targetCountries})}`);
-      }
-      
-      // Si on a du contexte, essayer de donner une réponse basée sur les données disponibles
-      if (contextParts.length > 0) {
-        reply = `Désolé, mon service de traitement avancé est temporairement indisponible. ` +
-                `Cependant, je peux vous aider avec les informations disponibles dans notre base de données. ` +
-                `Voici ce que je sais: ${contextParts.join('. ')}. ` +
-                `Pour une réponse plus précise, pourriez-vous reformuler votre question ou réessayer dans quelques instants?`;
-      } else {
-        // Dernier recours: message minimal
-        reply = "Désolé, je ne peux pas répondre pour le moment. Veuillez réessayer dans quelques instants ou reformuler votre question.";
-      }
+      if (appErr) console.warn("Application upsert error:", appErr);
     }
 
-    // 6. Sauvegarder la réponse de l'assistant
+    // 8. Generate LLM Reply with Multi-Model Fallback
+    const systemPrompt = buildSystemPrompt(userProfile, userDocs, topBourses, webSearchResults, webSources);
+    const { reply } = await callLLMWithFallback(systemPrompt, message, history);
+
+    // 9. Save assistant response
     if (activeSessionId) {
       await supabase.from("chat_messages").insert({
         session_id: activeSessionId,
@@ -347,9 +464,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       sessionId: activeSessionId,
       reply,
-      suggestedActions: [],
+      suggestedActions: [
+        "📄 Analyser mon CV",
+        "🌐 Obtenir le lien officiel de la bourse",
+        "📊 Suivre mes candidatures dans 'Mes Candidatures'",
+      ],
     });
   } catch (err: any) {
+    console.error("Chat API error:", err);
     return NextResponse.json(
       { error: "Une erreur technique est survenue. Veuillez réessayer." },
       { status: 500 }

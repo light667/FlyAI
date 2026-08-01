@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ChatMessage, ChatSession, UserProfile } from "@/types";
-import { Bot, Send, User as UserIcon, Plus, MessageSquare, Clock, X, MessageCircle, FileSearch, Sparkles } from "lucide-react";
+import { Bot, Send, User as UserIcon, Plus, MessageSquare, Clock, X, Trash2, MessageCircle, Sparkles } from "lucide-react";
 import FormattedText from "@/components/FormattedText";
 
 interface Props {
@@ -29,7 +29,7 @@ export default function AssistantTab({ userId, userProfile }: Props) {
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   useEffect(() => { scrollToBottom(); }, [messages]);
 
-  // Charger les sessions de l'utilisateur
+  // Fetch all sessions for user
   const fetchSessions = async () => {
     if (!userId) return;
     try {
@@ -47,12 +47,23 @@ export default function AssistantTab({ userId, userProfile }: Props) {
     fetchSessions();
   }, [userId]);
 
-  // Charger les messages de la session active
+  // Fetch messages for active session
   useEffect(() => {
     if (!activeSessionId) return;
     fetch(`/api/chat?sessionId=${activeSessionId}`)
       .then((r) => r.json())
-      .then((json) => { if (json.data) setMessages(json.data); })
+      .then((json) => {
+        if (json.data) {
+          const formatted = json.data.map((m: any) => ({
+            id: m.id,
+            sessionId: m.session_id || m.sessionId,
+            sender: m.sender,
+            content: m.content,
+            createdAt: m.created_at || m.createdAt || new Date().toISOString(),
+          }));
+          setMessages(formatted);
+        }
+      })
       .catch(console.error);
   }, [activeSessionId]);
 
@@ -117,7 +128,7 @@ export default function AssistantTab({ userId, userProfile }: Props) {
   return (
     <div style={{ height: "calc(100vh - 120px)", width: "100%", display: "flex", flexDirection: "column", position: "relative" }}>
 
-      {/* ── Chat Container ── */}
+      {/* ── Chat Main Window ── */}
       <div style={{
         flex: 1,
         display: "flex",
@@ -154,14 +165,14 @@ export default function AssistantTab({ userId, userProfile }: Props) {
                 fontSize: "0.95rem", fontWeight: 800,
                 color: "var(--ink-text)", margin: 0, display: "flex", alignItems: "center", gap: "6px",
               }}>
-                FlyAgent
+                FlyAgent Copilote
                 <span style={{
                   fontSize: "9px", fontWeight: 800,
                   padding: "1px 6px", borderRadius: "9999px",
                   border: "1px solid var(--accent)", color: "var(--accent)",
                   background: "var(--accent-light)", textTransform: "uppercase",
                 }}>
-                  Agent IA
+                  Agent Autonome
                 </span>
               </h3>
             </div>
@@ -234,10 +245,10 @@ export default function AssistantTab({ userId, userProfile }: Props) {
 
               <div>
                 <h3 style={{ fontSize: "1.15rem", fontWeight: 800, color: "var(--ink-text)", margin: "0 0 4px" }}>
-                  Comment FlyAgent peut vous aider aujourd'hui ?
+                  Comment FlyAgent peut vous accompagner aujourd'hui ?
                 </h3>
                 <p style={{ fontSize: "0.78rem", color: "var(--ink-muted)", margin: 0 }}>
-                  Sélectionnez une option ou posez directement votre question ci-dessous.
+                  FlyAgent analyse votre CV, trouve les liens officiels de candidatures, et agit à votre place.
                 </p>
               </div>
 
@@ -302,7 +313,7 @@ export default function AssistantTab({ userId, userProfile }: Props) {
             })
           )}
 
-          {/* Indicateur de chargement */}
+          {/* Loading Indicator */}
           {sending && (
             <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
               <div style={{
@@ -325,7 +336,7 @@ export default function AssistantTab({ userId, userProfile }: Props) {
                   }} />
                 ))}
                 <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--ink-subtle)", marginLeft: "4px" }}>
-                  FlyAgent prépare une réponse...
+                  FlyAgent recherche et analyse vos données...
                 </span>
               </div>
             </div>
@@ -334,7 +345,7 @@ export default function AssistantTab({ userId, userProfile }: Props) {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Bar with High-Contrast Send Button */}
+        {/* Input Bar */}
         <div style={{ padding: "10px 12px", borderTop: "1px solid var(--border)", background: "var(--warm-100)" }}>
           <form
             onSubmit={(e) => { e.preventDefault(); handleSend(); }}
@@ -348,7 +359,7 @@ export default function AssistantTab({ userId, userProfile }: Props) {
           >
             <input
               type="text"
-              placeholder="Posez votre question à FlyAgent (dossier, CV, visa, bourses...)..."
+              placeholder="Posez votre question à FlyAgent (analyse CV, postulation, bourses, statut)..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               style={{
@@ -380,8 +391,7 @@ export default function AssistantTab({ userId, userProfile }: Props) {
         </div>
       </div>
 
-
-      {/* ✅ FIX: Panneau Historique fonctionnel permettant d'ouvrir et continuer une ancienne discussion */}
+      {/* History Drawer */}
       {showHistory && (
         <div
           style={{
@@ -439,35 +449,40 @@ export default function AssistantTab({ userId, userProfile }: Props) {
                   <p style={{ fontSize: "var(--text-body)", margin: 0 }}>Aucune discussion passée</p>
                 </div>
               ) : (
-                sessions.map((sess) => (
-                  <button
-                    key={sess.id}
-                    onClick={() => handleSelectSession(sess.id)}
-                    style={{
-                      display: "flex", alignItems: "center", gap: "var(--space-3)",
-                      padding: "var(--space-3.5)",
-                      borderRadius: "var(--radius-xl)", textAlign: "left",
-                      background: activeSessionId === sess.id ? "var(--accent-light)" : "var(--warm-100)",
-                      border: activeSessionId === sess.id ? "1.5px solid var(--accent)" : "1px solid var(--border)",
-                      color: activeSessionId === sess.id ? "var(--accent)" : "var(--ink-text)",
-                      fontSize: "var(--text-body)",
-                      fontWeight: activeSessionId === sess.id ? 700 : 500,
-                      cursor: "pointer", width: "100%",
-                      marginBottom: "var(--space-2)",
-                      transition: "all var(--transition-base)",
-                    }}
-                  >
-                    <MessageSquare size={16} style={{ flexShrink: 0, opacity: 0.8 }} />
-                    <div style={{ overflow: "hidden", flex: 1 }}>
-                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>
-                        {sess.title}
-                      </span>
-                      <span style={{ fontSize: "11px", color: "var(--ink-subtle)", marginTop: 2, display: "block" }}>
-                        {new Date(sess.createdAt).toLocaleDateString("fr-FR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </div>
-                  </button>
-                ))
+                sessions.map((sess) => {
+                  const dateStr = sess.createdAt || (sess as any).created_at;
+                  return (
+                    <button
+                      key={sess.id}
+                      onClick={() => handleSelectSession(sess.id)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "var(--space-3)",
+                        padding: "var(--space-3.5)",
+                        borderRadius: "var(--radius-xl)", textAlign: "left",
+                        background: activeSessionId === sess.id ? "var(--accent-light)" : "var(--warm-100)",
+                        border: activeSessionId === sess.id ? "1.5px solid var(--accent)" : "1px solid var(--border)",
+                        color: activeSessionId === sess.id ? "var(--accent)" : "var(--ink-text)",
+                        fontSize: "var(--text-body)",
+                        fontWeight: activeSessionId === sess.id ? 700 : 500,
+                        cursor: "pointer", width: "100%",
+                        marginBottom: "var(--space-2)",
+                        transition: "all var(--transition-base)",
+                      }}
+                    >
+                      <MessageSquare size={16} style={{ flexShrink: 0, opacity: 0.8 }} />
+                      <div style={{ overflow: "hidden", flex: 1 }}>
+                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>
+                          {sess.title}
+                        </span>
+                        {dateStr && (
+                          <span style={{ fontSize: "11px", color: "var(--ink-subtle)", marginTop: 2, display: "block" }}>
+                            {new Date(dateStr).toLocaleDateString("fr-FR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })
               )}
             </div>
           </div>

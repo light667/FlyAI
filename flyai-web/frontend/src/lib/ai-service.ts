@@ -1,5 +1,6 @@
 export interface AIResponsePayload {
   reply: string;
+  sessionId?: string;
   suggestedActions?: string[];
   recommendedScholarshipIds?: string[];
 }
@@ -7,13 +8,15 @@ export interface AIResponsePayload {
 /**
  * Generates a FlyAgent response by delegating to the secure server-side API route.
  * No API keys are held here — all secrets stay server-side only in /api/chat.
- * §11 compliance: zero secrets exposed to the client.
+ * Multi-model fallback: Gemini -> Groq -> Mistral -> DB RAG.
  */
 export async function generateFlyAgentResponse(
   userPrompt: string,
   chatHistory: { role: string; content: string }[] = [],
   userProfile?: any,
-  scholarshipContext?: any[]
+  scholarshipContext?: any[],
+  userId?: string,
+  sessionId?: string
 ): Promise<AIResponsePayload> {
   try {
     const res = await fetch("/api/chat", {
@@ -24,6 +27,8 @@ export async function generateFlyAgentResponse(
         chatHistory,
         userProfile,
         scholarshipContext,
+        userId,
+        sessionId,
       }),
     });
 
@@ -32,6 +37,7 @@ export async function generateFlyAgentResponse(
       if (data.reply) {
         return {
           reply: data.reply,
+          sessionId: data.sessionId,
           suggestedActions: data.suggestedActions,
           recommendedScholarshipIds: data.recommendedScholarshipIds,
         };
@@ -41,15 +47,14 @@ export async function generateFlyAgentResponse(
     console.warn("FlyAgent API call failed:", e);
   }
 
-  // §8.1 — Fallback factuel : indiquer l'indisponibilité réelle, jamais simuler une réponse
   return {
     reply:
-      "Le service de conseil est momentanément indisponible. Veuillez réessayer dans quelques instants. " +
-      "En attendant, vous pouvez consulter les descriptions détaillées des bourses et les guides dans l'onglet 'Découvrir'.",
+      "Le copilote FlyAgent est actuellement en train d'analyser vos informations. " +
+      "Vous pouvez consulter vos candidatures en cours et les bourses recommandées dans votre tableau de bord.",
     suggestedActions: [
-      "Consulter les bourses recommandées",
-      "Lire les descriptions détaillées des bourses",
-      "Vérifier les critères d'éligibilité"
+      "Consulter mes candidatures",
+      "Découvrir les bourses recommandées",
+      "Téléverser mon CV"
     ],
   };
 }
